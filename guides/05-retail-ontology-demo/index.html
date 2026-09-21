@@ -1,0 +1,636 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- TODO: 문서 제목으로 변경 -->
+<title>Retail Ontology Agent 데모 · Demo Guide</title>
+<script>
+  (() => {
+    const param = new URLSearchParams(window.location.search).get("scoutTheme");
+    const theme =
+      param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  padding: 3.2rem 1rem 4rem;
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15.5px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+main {
+  max-width: 900px; margin: 0 auto;
+  background: var(--cp-surface);
+  border: 1px solid var(--cp-border);
+  border-radius: 16px;
+  padding: 40px 46px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+h1, h2, h3 { font-weight: 650; line-height: 1.35; }
+h1 { font-size: 2rem; margin: 0 0 .6rem; letter-spacing: -0.02em; }
+h2 {
+  font-size: 1.4rem; margin: 2.4rem 0 1rem;
+  padding-bottom: .5rem; border-bottom: 2px solid var(--cp-border);
+}
+h2::before {
+  content: ""; display: inline-block; width: 6px; height: 1.05em; border-radius: 3px;
+  background: var(--cp-accent); margin-right: 10px; vertical-align: -0.16em;
+}
+h3 { font-size: 1.12rem; margin: 1.8rem 0 .5rem; }
+p { margin: .8rem 0; }
+a { color: var(--cp-link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+hr { border: none; border-top: 1px solid var(--cp-border); margin: 2.2rem 0; }
+ul, ol { padding-left: 1.5rem; }
+li { margin: .3rem 0; }
+li::marker { color: var(--cp-accent); }
+table {
+  width: 100%; border-collapse: separate; border-spacing: 0; margin: 1.2rem 0;
+  font-size: 14px; border: 1px solid var(--cp-border); border-radius: 12px; overflow: hidden;
+}
+thead th {
+  background: var(--cp-surface-soft); font-weight: 650; text-align: left;
+  padding: 11px 14px; border-bottom: 1px solid var(--cp-border);
+}
+tbody td { padding: 10px 14px; border-bottom: 1px solid var(--cp-border); vertical-align: top; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--cp-accent-soft); }
+code {
+  font-family: Consolas, "Courier New", Courier, monospace;
+  font-size: .88em; background: var(--cp-surface-soft); color: var(--cp-accent);
+  padding: .12em .38em; border-radius: 5px; border: 1px solid var(--cp-border);
+}
+pre {
+  background: var(--cp-bg-elevated); border: 1px solid var(--cp-border);
+  border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 1.1rem 0;
+}
+html[data-theme="dark"] pre { background: #1f1f1f; }
+pre code { background: none; border: none; padding: 0; color: var(--cp-text); font-size: 13px; }
+blockquote {
+  margin: 1.2rem 0; padding: 12px 18px; background: var(--cp-accent-soft);
+  border-left: 4px solid var(--cp-accent); border-radius: 0 10px 10px 0;
+}
+blockquote p { margin: .35rem 0; }
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--cp-border);
+}
+.badge {
+  display: inline-block; background: var(--cp-accent); color: var(--cp-accent-fg);
+  font-size: 11px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 999px;
+}
+.toggle {
+  cursor: pointer; border: 1px solid var(--cp-border); background: var(--cp-surface-soft);
+  color: var(--cp-text); border-radius: 0.625rem; padding: 7px 14px;
+  font-size: 13px; font-family: inherit;
+}
+.toggle:hover { border-color: var(--cp-accent); color: var(--cp-accent); }
+.meta { color: var(--cp-text-soft); font-size: 13px; }
+@media (max-width: 640px) { main { padding: 26px 18px; } }
+@media print { .toggle { display: none; } main { border: none; box-shadow: none; padding: 0; } }
+</style>
+</head>
+<body data-lang="ko">
+<main>
+  <div class="topbar">
+    <!-- TODO: 배지 문구 변경 -->
+    <span class="badge">Microsoft Fabric · Guide</span>
+    <button class="toggle" id="themeToggle" type="button"><span class="lang-ko">테마 전환</span><span class="lang-en">Theme</span></button>
+  </div>
+
+  <div class="lang-ko">
+  <h1>Retail Ontology Agent 데모 — 가이드 & 설명</h1>
+  <p class="meta">4개의 서로 다른 물리 데이터 계층(Lakehouse 관리형 Delta · ADLS 단축 · SharePoint Excel · Eventhouse)을 <strong>하나의 온톨로지</strong>로 묶고, 그 위에서 <strong>Data Agent</strong>가 자연어로 비즈니스 질문에 답하는 옴니채널 리테일 데모입니다. 이 문서는 데모의 구조·데이터·시나리오·운영을 설명하고, 그대로 재현·발표하는 방법을 안내합니다.</p>
+
+  <blockquote>
+    <p><strong>한 줄 요약</strong> — "잘 기획된 프로모션(PR9999, Seoul Audio Summer Surge)이 강한 구매 의도를 만들었지만, 재고 부족으로 전환에 실패했다"는 인사이트를, 온톨로지가 연결한 여러 소스를 Data Agent가 관계로 추적해 근거와 함께 도출합니다.</p>
+  </blockquote>
+
+  <h2>1. 데모가 보여주는 것</h2>
+  <ul>
+    <li><strong>비즈니스 질문</strong>: 서울 오디오 여름 프로모션은 왜 고객 관심이 폭발했는데 매출은 저조했나?</li>
+    <li><strong>핵심 메시지</strong>: 온톨로지는 테이블·컬럼을 <em>비즈니스 의미(엔터티·관계)</em>로 바꾸고, Data Agent는 이름 매칭이 아니라 <strong>관계 그래프를 순회</strong>해 답을 만든다.</li>
+    <li><strong>결정적 신호</strong>: 장바구니 담기 1,729건 vs 실제 구매 36건 → 전환율 <strong>2.08%</strong>. 같은 기간 해당 매장·상품의 평균 재고는 <strong>1개</strong>였다.</li>
+    <li><strong>액션</strong>: 재고 확보 전까지 캠페인 예산 재배분 + 개인화 동의를 가진 고가치 고객만 합법적으로 재접촉.</li>
+  </ul>
+
+  <h2>2. 아키텍처 — 4개 물리 계층 → 1개 온톨로지</h2>
+  <p>이 데모의 핵심은 <strong>네 가지 서로 다른 물리 저장 방식</strong>이 하나의 온톨로지로 통합된다는 점입니다.</p>
+  <pre><code>[생성 운영 데이터]  ──관리형 Delta 테이블──▶ ┐
+ products/stores/orders/order_lines/          │
+ inventory_snapshots/customer_events          │
+                                              │
+[외부 거버넌스 Delta] ──OneLake 단축(복사 없음)─▶ ┤
+ ADLS: customer_profiles                      ├─▶ RetailOperationsLH ─▶ RetailCommerceOntology ─▶ RetailInsightAgent ─▶ 자연어 분석
+                                              │      (Lakehouse)          (7 엔터티·12 관계)        (Data Agent)
+[업무 담당자 관리 데이터] ─SharePoint Excel→Dataflow▶┤
+ promotions                                   │
+                                              │
+[이벤트 데이터] ──JSONL 배치 적재──▶ CustomerSignalsEH (Eventhouse/KQL)  ┘
+                └─Delta 배치 적재──▶ customer_events (Lakehouse)</code></pre>
+  <table>
+    <thead><tr><th>소스</th><th>데이터셋</th><th>Fabric 표현</th><th>패턴</th></tr></thead>
+    <tbody>
+      <tr><td>Lakehouse</td><td>products, stores, orders, order_lines, inventory_snapshots, customer_events</td><td>관리형 Delta 테이블</td><td>운영·트랜잭션 데이터</td></tr>
+      <tr><td>ADLS / Databricks</td><td>customer_profiles</td><td>OneLake 테이블 <strong>단축(shortcut)</strong></td><td>복사 없는 외부 거버넌스 접근</td></tr>
+      <tr><td>SharePoint</td><td>RetailPromotionPlan.xlsx</td><td>Dataflow Gen2 → promotions 테이블</td><td>업무 담당자가 관리하는 캠페인 계획</td></tr>
+      <tr><td>Eventhouse</td><td>CustomerEvents</td><td>KQL 테이블 (실시간 분석용 보존)</td><td>행동 신호 30,000행</td></tr>
+    </tbody>
+  </table>
+  <blockquote>
+    <p><strong>설계 메모</strong> — <code>customer_events</code>는 <em>같은 생성 데이터셋</em>을 Eventhouse(JSONL)와 Lakehouse(Delta)에 <strong>각각 한 번씩 적재한 정적 사본</strong>입니다. 둘 사이에 Eventstream이나 연속 동기화는 없습니다. 온톨로지 데이터 바인딩은 정적(비시계열) 매핑에 <strong>OneLake 기반 소스(Lakehouse/Warehouse)</strong>를 요구하므로, <code>CustomerEvent</code> 엔터티는 Lakehouse 테이블에 바인딩됩니다. Eventhouse는 <em>추가 시계열</em> 바인딩에만 사용할 수 있습니다.</p>
+  </blockquote>
+
+  <h2>3. Fabric 자산 (현재 워크스페이스)</h2>
+  <p>라이브 워크스페이스: <a href="https://app.powerbi.com/groups/8653f3c5-60af-4976-9aad-13f7c26b9d93/list?experience=power-bi">Retail Ontology Agent Demo</a> (접근에는 권한 필요)</p>
+  <table>
+    <thead><tr><th>자산</th><th>이름</th><th>ID</th></tr></thead>
+    <tbody>
+      <tr><td>Workspace</td><td>Retail Ontology Agent Demo</td><td><code>8653f3c5-…-13f7c26b9d93</code></td></tr>
+      <tr><td>Capacity</td><td>ykfabricf64 (F16, Korea Central)</td><td><code>e6f53d36-…-5cd17a4843c4</code></td></tr>
+      <tr><td>Lakehouse</td><td>RetailOperationsLH</td><td><code>6afeb90e-…-2c088deb31a6</code></td></tr>
+      <tr><td>SQL 엔드포인트</td><td>RetailOperationsLH</td><td><code>0c56c7b9-…-860fcc3d3b48</code></td></tr>
+      <tr><td>Eventhouse</td><td>CustomerSignalsEH</td><td><code>cbda2912-…-9fe5314512e2</code></td></tr>
+      <tr><td>KQL Database</td><td>CustomerSignalsEH</td><td><code>8b674898-…-092d1271da55</code></td></tr>
+      <tr><td>Ontology (기준)</td><td>RetailCommerceOntologyV2</td><td><code>f7eecc18-…-90f5bb3deb21</code></td></tr>
+      <tr><td>Ontology (실험)</td><td>RetailCommerceOntologyV3</td><td><code>d5b7658a-…-2c9ae43f60a7</code></td></tr>
+      <tr><td>Data Agent (기준)</td><td>RetailInsightAgentV2</td><td><code>990a6399-…-bcac81084ccb</code></td></tr>
+      <tr><td>Data Agent (실험)</td><td>RetailInsightAgentV3</td><td><code>728c9c9c-…-9d7f8731fe35</code></td></tr>
+    </tbody>
+  </table>
+  <p>첫 번째로 공유된 링크(<code>…/Queries/MyQueries/…SQL query 1</code>)는 이 <strong>Lakehouse의 SQL 분석 엔드포인트</strong>에서 실행하는 탐색용 T-SQL 쿼리입니다. 온톨로지가 어떤 물리 테이블을 바인딩하는지 SQL로 직접 확인할 때 사용합니다.</p>
+
+  <h2>4. 데이터 소스 4계층 상세</h2>
+  <h3>4.1 관리형 Delta (운영 데이터)</h3>
+  <p><code>RetailOperationsLH</code>는 8개 Delta 테이블로 구성되며, <code>customer_profiles</code> 하나만 단축이고 나머지 7개는 OneLake 관리형 테이블입니다.</p>
+  <table>
+    <thead><tr><th>테이블</th><th>행 수</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>products</td><td>50</td><td>마스터</td></tr>
+      <tr><td>stores</td><td>6</td><td>마스터</td></tr>
+      <tr><td>orders</td><td>6,000</td><td>운영</td></tr>
+      <tr><td>order_lines</td><td>6,000</td><td>운영</td></tr>
+      <tr><td>inventory_snapshots</td><td>37,200</td><td>운영(재고 스냅샷)</td></tr>
+      <tr><td>customer_events</td><td>30,000</td><td>이벤트(온톨로지 바인딩용 Lakehouse 사본)</td></tr>
+      <tr><td>promotions</td><td>17</td><td>SharePoint Excel → Dataflow</td></tr>
+      <tr><td>customer_profiles</td><td>500</td><td><strong>ADLS 단축</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.2 ADLS 단축 (복사 없는 외부 접근)</h3>
+  <ul>
+    <li>ADLS 경로: <code>abfss://raw@ykexternaldatalake.dfs.core.windows.net/retail-ontology-demo/customer_profiles</code></li>
+    <li>OneLake 단축: <code>RetailOperationsLH/Tables/customer_profiles</code></li>
+    <li>연결: <code>Retail Demo ADLS - Workspace Identity</code> (스토리지 계정 범위에 <code>Storage Blob Data Reader</code> 부여)</li>
+    <li>Databricks 카탈로그 페더레이션과 동일한 "복사 없는 접근" 패턴 — 데이터는 Fabric에 복제되지 않고 외부 ADLS에 그대로 남습니다.</li>
+  </ul>
+
+  <h3>4.3 SharePoint Excel → Dataflow (담당자 관리 데이터)</h3>
+  <table>
+    <thead><tr><th>설정</th><th>값</th></tr></thead>
+    <tbody>
+      <tr><td>사이트</td><td><code>…/sites/Leadership-AWOA04POC</code></td></tr>
+      <tr><td>라이브러리 / 폴더</td><td><code>Shared Documents / ykTEST</code></td></tr>
+      <tr><td>원본 파일 / 테이블</td><td><code>RetailPromotionPlan.xlsx</code> / <code>PromotionPlan</code></td></tr>
+      <tr><td>대상 테이블</td><td><code>RetailOperationsLH/Tables/promotions</code></td></tr>
+    </tbody>
+  </table>
+  <p>Dataflow Gen2가 17개 고유 프로모션을 적재하고 <code>Promotion</code> 엔터티 바인딩을 활성화했습니다. ⚠️ SharePoint <strong>Folder</strong> 커넥터는 <strong>사이트 URL만</strong> 사용하고, <code>/Forms/AllItems.aspx</code>로 끝나는 라이브러리 뷰 URL은 넣지 않습니다.</p>
+
+  <h3>4.4 Eventhouse (행동 신호)</h3>
+  <p><code>CustomerSignalsEH</code>의 <code>CustomerEvents</code> KQL 테이블에 30,000행을 보존합니다. 실시간/시계열 분석용이며, 온톨로지 엔터티 식별·속성은 Lakehouse 사본이 담당합니다(§2 설계 메모).</p>
+
+  <h2>5. 온톨로지 모델 — 7 엔터티 · 12 관계</h2>
+  <h3>5.1 엔터티</h3>
+  <table>
+    <thead><tr><th>엔터티</th><th>식별자</th><th>소스 바인딩</th><th>주요 속성</th></tr></thead>
+    <tbody>
+      <tr><td>Customer</td><td>CustomerID</td><td>ADLS 단축: customer_profiles</td><td>Segment, HomeRegion, LoyaltyTier, LifetimeValue, ConsentForPersonalization</td></tr>
+      <tr><td>Product</td><td>ProductID</td><td>Lakehouse: products</td><td>ProductName, Category, Brand, ListPrice, UnitCost</td></tr>
+      <tr><td>Store</td><td>StoreID</td><td>Lakehouse: stores</td><td>StoreName, Region, StoreFormat</td></tr>
+      <tr><td>Order</td><td>OrderID</td><td>Lakehouse: orders</td><td>OrderTimestampUtc, Channel, OrderStatus, OrderTotal</td></tr>
+      <tr><td>Promotion</td><td>PromotionID</td><td>SharePoint→Lakehouse: promotions</td><td>CampaignName, 기간, DiscountPct, PlannedBudget, TargetSegment, Status</td></tr>
+      <tr><td>InventorySnapshot</td><td>SnapshotID</td><td>Lakehouse: inventory_snapshots</td><td>SnapshotDate, OnHandQuantity, ReorderPoint, InboundQuantity</td></tr>
+      <tr><td>CustomerEvent</td><td>EventID</td><td>Lakehouse: customer_events</td><td>EventTimestampUtc, EventType, SessionID, Channel, DeviceType</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 관계</h3>
+  <table>
+    <thead><tr><th>관계</th><th>소스 → 대상</th><th>컨텍스트 키</th></tr></thead>
+    <tbody>
+      <tr><td>placed</td><td>Customer → Order</td><td>orders.CustomerID</td></tr>
+      <tr><td>fulfilledAt</td><td>Order → Store</td><td>orders.StoreID</td></tr>
+      <tr><td>contains</td><td>Order → Product</td><td>order_lines.OrderID + ProductID</td></tr>
+      <tr><td>appliedPromotion</td><td>Order → Promotion</td><td>order_lines.PromotionID</td></tr>
+      <tr><td>promotes</td><td>Promotion → Product</td><td>promotions.ProductID</td></tr>
+      <tr><td>runsAt</td><td>Promotion → Store</td><td>promotions.StoreID</td></tr>
+      <tr><td>hasInventory</td><td>Store → InventorySnapshot</td><td>inventory_snapshots.StoreID</td></tr>
+      <tr><td>inventoryFor</td><td>InventorySnapshot → Product</td><td>inventory_snapshots.ProductID</td></tr>
+      <tr><td>generated</td><td>Customer → CustomerEvent</td><td>customer_events.CustomerID</td></tr>
+      <tr><td>interactedWith</td><td>CustomerEvent → Product</td><td>customer_events.ProductID</td></tr>
+      <tr><td>attributedTo</td><td>CustomerEvent → Promotion</td><td>customer_events.PromotionID</td></tr>
+      <tr><td>occurredAt</td><td>CustomerEvent → Store</td><td>customer_events.StoreID</td></tr>
+    </tbody>
+  </table>
+  <blockquote>
+    <p><strong>V2 vs V3</strong> — 두 온톨로지는 동일하며, V3만 <code>Order.OrderTimestampUtc</code>와 <code>CustomerEvent.EventTimestampUtc</code>를 <code>String</code> 대신 <code>DateTime</code>으로 선언합니다. <strong>데모 기준은 V2</strong>입니다(V3는 핵심 질문에서 실패 — §6.3).</p>
+  </blockquote>
+
+  <h2>6. Data Agent — RetailInsightAgent</h2>
+  <h3>6.1 그라운딩 지침(핵심)</h3>
+  <p>에이전트는 7개 엔터티를 모두 선택하고, 다음과 같은 <strong>근거 기반 분석 지침</strong>으로 온톨로지 관계를 순회합니다.</p>
+  <ul>
+    <li>이름 매칭이 아니라 <strong>온톨로지 관계를 순회</strong>해서 답한다.</li>
+    <li>행동=CustomerEvent, 재고=InventorySnapshot, 매출=Order, 캠페인=Promotion으로 매핑.</li>
+    <li><strong>한 쿼리로 3개 이상 엔터티를 스팬하지 않는다</strong>. "X가 없다"를 NOT EXISTS/anti-join으로 표현하지 않는다 → 이 온톨로지에서는 0행 반환.</li>
+    <li>대신 <strong>분해(decompose)</strong>: 엔터티별 단순 쿼리로 ID 목록을 얻고, 교집합·차집합을 직접 계산한다.</li>
+    <li><strong>가장 선택적인(작은) 엔터티부터</strong> 시작해 ID 목록을 큰 엔터티로 가져간다(결과 잘림 방지).</li>
+    <li>count가 0보다 큰지 확인하기 전에 나눗셈하지 않는다.</li>
+  </ul>
+  <p>용어 정의도 지침에 고정되어 있습니다 — 구매 의도=AddToCart, 전환=Purchase, 고가치 고객=Segment 'High Value', 접촉 가능=ConsentForPersonalization true, 재고 위험=OnHandQuantity ≤ ReorderPoint 등.</p>
+
+  <h3>6.2 쿼리 방법 (Assistants 스타일 API)</h3>
+  <p><code>?api-version=2024-05-01-preview</code> + <code>https://api.fabric.microsoft.com</code> 베어러 토큰이 필요합니다.</p>
+  <pre><code>BASE = https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/dataAgents/{agentId}/aiassistant/openai
+
+POST {BASE}/assistants                     -> assistant_id
+POST {BASE}/threads                        -> thread_id
+POST {BASE}/threads/{id}/messages          {"role":"user","content":"<질문>"}
+POST {BASE}/threads/{id}/runs              {"assistant_id":"<assistant_id>"}
+GET  {BASE}/threads/{id}/runs/{run_id}     상태가 종료될 때까지 폴링
+GET  {BASE}/threads/{id}/messages          -> 답변
+DELETE {BASE}/threads/{id}</code></pre>
+  <p>❗ 동작하지 않는 엔드포인트: <code>/chat/completions</code>(404), MCP 툴 호출(타임아웃), 2026-08-26 폐기된 OpenAI Assistants API 기반 샘플.</p>
+
+  <h3>6.3 V2 vs V3 비교</h3>
+  <p>12개 데모 질문을 두 에이전트에 재생한 결과, V2는 12개 모두, V3는 11개를 맞혔습니다. V3는 캠페인 전환 질문에서 쿼리를 <em>행 나열</em>로 계획해 200행 잘림에 걸려 답변을 거부했습니다. V2는 <em>집계</em>로 계획해 1,729 vs 36을 반환했습니다. 이 수치가 데모 내러티브의 핵심이므로 <strong>반드시 V2로 발표</strong>합니다.</p>
+
+  <h2>7. 데모 시나리오 (검증된 12개 질문)</h2>
+  <p>2026-09-11 <code>RetailInsightAgentV2</code>로 검증, 모든 기대값이 생성 Delta 테이블과 일치.</p>
+
+  <h3>발표 전 준비</h3>
+  <ol>
+    <li>REST로 재배포했다면 온톨로지를 Fabric 포털에서 한 번 열어 <strong>저장</strong>한다(쿼리 그래프는 이 저장 때 생성됨. 그전엔 <code>The Graph Model is not ready</code>).</li>
+    <li>워밍업 질문 1개로 응답 확인(유휴 후 첫 호출이 가장 느림).</li>
+    <li>질문 사이에 몇 초 간격을 둔다(연속 발사 시 간헐 실패).</li>
+  </ol>
+
+  <h3>Part 1 — 모델은 실제다</h3>
+  <p><code>How many stores are there?</code> → 6 · <code>How many products are there?</code> → 50 · <code>How many orders are there?</code> → 6,000</p>
+
+  <h3>Part 2 — 하나의 비즈니스 객체, 여러 소스</h3>
+  <ul>
+    <li><code>Show the campaign name, store, and product for promotion PR9999.</code> → Seoul Audio Summer Surge / S001 Seoul Flagship / P0001 Audio Series 01</li>
+    <li><code>Which store is promotion PR9999 running at?</code> → S001, Seoul Flagship</li>
+    <li><code>Which product does promotion PR9999 promote?</code> → P0001, Audio Series 01 (Audio/Contoso, 정가 132.02, 원가 82.70)</li>
+  </ul>
+
+  <h3>Part 3 — 인사이트 (핵심)</h3>
+  <ul>
+    <li><code>How many AddToCart and Purchase customer events are attributed to promotion PR9999?</code> → <strong>1,729 vs 36 (전환율 2.08%)</strong></li>
+    <li><code>How many CustomerEvent records have ProductID P0001?</code> → 3,586</li>
+  </ul>
+  <p><strong>내러티브</strong>: 캠페인은 잘 기획됐고 고객은 명확히 상품을 원했지만 거의 아무도 살 수 없었다. 캠페인 기간(2026-08-03~08-16) S001의 P0001 평균 재고는 1개였고, 그 구간 14개 스냅샷 모두 재주문점 이하였다.</p>
+
+  <h3>Part 4 — 액션</h3>
+  <ul>
+    <li><code>How many Customer records have Segment High Value and ConsentForPersonalization true?</code> → 33</li>
+    <li><code>Which high-value customers showed purchase intent for P0001 but did not purchase, and may be contacted under their personalization consent?</code> → 33명 중 약 32명 (C000006, C000021, C000037, …). 에이전트가 질문을 분해해 고가치·동의 고객을 먼저 좁힌 뒤 이벤트를 확인.</li>
+  </ul>
+
+  <h2>8. 알려진 한계 & 문제 해결</h2>
+  <ul>
+    <li><strong>3개 이상 엔터티를 한 문장에 스팬하면 빈 결과</strong> → Part 3·4처럼 분해해서 질문.</li>
+    <li><strong>큰 식별자 목록은 잘림</strong> → 카운트는 신뢰, 완전한 목록은 비신뢰.</li>
+    <li><strong>Instances 탭은 바인딩을 직접 읽어</strong> 그래프가 오래돼도 행을 보여줌 → 그래프 건강성은 에이전트 질문으로 확인.</li>
+    <li><strong>The Graph Model is not ready</strong> → 온톨로지를 포털에서 열고 저장.</li>
+    <li><strong>포털에 안 보이는 에이전트 복구</strong>: 아이템을 수리하지 말고 재생성 — <code>DELETE items/{oldId}</code> → <code>POST items</code>(type:DataAgent) → <code>deploy_data_agent.py</code>로 재배포 → 포털 URL <code>…/aiskills/{agentId}</code> 확인.</li>
+  </ul>
+
+  <h2>9. 재현 방법</h2>
+  <p>리포지토리: <a href="https://github.com/yk2ndorganization/Ontologytesting">yk2ndorganization/Ontologytesting</a></p>
+  <pre><code># 1) 결정적 데모 데이터 생성 (Delta/JSONL/Excel)
+python3 -m pip install -r requirements.txt
+python3 scripts/generate_demo_data.py
+
+# 2) 네이티브 데이터 배포 (Azure CLI 인증 후)
+python3 scripts/deploy_onelake.py     --workspace-id <ws> --lakehouse-id <lh> --source data/lakehouse
+python3 scripts/deploy_eventhouse.py  --cluster <kusto-uri> --database CustomerSignalsEH --source data/eventhouse/customer_events.jsonl
+python3 scripts/deploy_ontology.py    --workspace-id <ws> --ontology-id <ont> --lakehouse-id <lh> --eventhouse-id <eh> --cluster <kusto-uri> --database CustomerSignalsEH
+python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --agent-name RetailInsightAgentV2 --ontology-id <ont> --ontology-name RetailCommerceOntologyV2</code></pre>
+  <p>온톨로지를 REST로 배포한 뒤에는 <strong>포털에서 한 번 열어 저장</strong>해야 쿼리 그래프가 생성됩니다. SharePoint 적재는 UI(Dataflow Gen2)로 진행합니다(§4.3).</p>
+
+  <hr />
+  <h2>참고</h2>
+  <ul>
+    <li>리포지토리 문서: <code>docs/architecture.md</code> · <code>docs/ontology-model.md</code> · <code>docs/demo-script.md</code> · <code>docs/data-agent-operations.md</code> · <code>docs/sharepoint-ingestion.md</code></li>
+    <li>라이브 워크스페이스: <a href="https://app.powerbi.com/groups/8653f3c5-60af-4976-9aad-13f7c26b9d93/list?experience=power-bi">Retail Ontology Agent Demo</a></li>
+    <li>관련 가이드: <a href="../03-fabric-ontology/">03. 온톨로지 심화</a> · <a href="../04-fabric-data-agent/">04. Data Agent</a></li>
+  </ul>
+
+  <p class="meta">최종 수정 2026-09-21 · 상태: Published · 데모 검증일 2026-09-11</p>
+
+  </div>
+
+  <div class="lang-en">
+  <h1>Retail Ontology Agent Demo — Guide & Explainer</h1>
+  <p class="meta">An omnichannel retail demo that unifies four different physical data layers (Lakehouse managed Delta · ADLS shortcut · SharePoint Excel · Eventhouse) into a <strong>single ontology</strong>, on top of which a <strong>Data Agent</strong> answers business questions in natural language. This document explains the demo's architecture, data, scenario, and operations, and shows how to reproduce and present it.</p>
+
+  <blockquote>
+    <p><strong>In one line</strong> — the agent derives, with evidence, the insight that "a well-funded promotion (PR9999, Seoul Audio Summer Surge) created strong purchase intent but failed to convert due to inventory scarcity" by traversing the relationships the ontology draws across multiple sources.</p>
+  </blockquote>
+
+  <h2>1. What the Demo Shows</h2>
+  <ul>
+    <li><strong>Business question</strong>: Why did the Seoul audio summer promotion draw huge customer interest yet produce weak sales?</li>
+    <li><strong>Core message</strong>: an ontology turns tables/columns into <em>business meaning (entities and relationships)</em>, and the Data Agent answers by <strong>traversing the relationship graph</strong> rather than matching names.</li>
+    <li><strong>The decisive signal</strong>: 1,729 add-to-cart vs. 36 actual purchases → a <strong>2.08%</strong> conversion. Average on-hand inventory for that store/product over the same window was <strong>1 unit</strong>.</li>
+    <li><strong>The action</strong>: reallocate campaign budget until inventory recovers, and legally re-contact only high-value customers who have personalization consent.</li>
+  </ul>
+
+  <h2>2. Architecture — Four Physical Layers → One Ontology</h2>
+  <p>The essence of this demo is that <strong>four different physical storage styles</strong> converge into a single ontology.</p>
+  <pre><code>[Generated operations data] ──Managed Delta tables──▶ ┐
+ products/stores/orders/order_lines/                  │
+ inventory_snapshots/customer_events                  │
+                                                      │
+[Externally governed Delta] ─OneLake shortcut (no copy)▶ ┤
+ ADLS: customer_profiles                              ├─▶ RetailOperationsLH ─▶ RetailCommerceOntology ─▶ RetailInsightAgent ─▶ NL analysis
+                                                      │      (Lakehouse)          (7 entities · 12 rels)     (Data Agent)
+[Business-managed data] ─SharePoint Excel→Dataflow────▶┤
+ promotions                                           │
+                                                      │
+[Event data] ──JSONL batch ingest──▶ CustomerSignalsEH (Eventhouse/KQL)  ┘
+             └─Delta batch load────▶ customer_events (Lakehouse)</code></pre>
+  <table>
+    <thead><tr><th>Source</th><th>Dataset</th><th>Fabric representation</th><th>Pattern</th></tr></thead>
+    <tbody>
+      <tr><td>Lakehouse</td><td>products, stores, orders, order_lines, inventory_snapshots, customer_events</td><td>Managed Delta tables</td><td>Operational / transactional data</td></tr>
+      <tr><td>ADLS / Databricks</td><td>customer_profiles</td><td>OneLake table <strong>shortcut</strong></td><td>Copy-free externally governed access</td></tr>
+      <tr><td>SharePoint</td><td>RetailPromotionPlan.xlsx</td><td>Dataflow Gen2 → promotions table</td><td>Business-managed campaign plan</td></tr>
+      <tr><td>Eventhouse</td><td>CustomerEvents</td><td>KQL table (kept for real-time analysis)</td><td>30,000 behavioral signal rows</td></tr>
+    </tbody>
+  </table>
+  <blockquote>
+    <p><strong>Design note</strong> — <code>customer_events</code> is a <strong>static copy of the same generated dataset loaded once each</strong> into the Eventhouse (JSONL) and the Lakehouse (Delta). There is no Eventstream or continuous sync between them. Since ontology data bindings require a <strong>OneLake-backed source (Lakehouse/Warehouse)</strong> for static (non-time-series) mappings, the <code>CustomerEvent</code> entity is bound to the Lakehouse table. Eventhouse can only be used for additional <em>time-series</em> bindings.</p>
+  </blockquote>
+
+  <h2>3. Fabric Assets (Current Workspace)</h2>
+  <p>Live workspace: <a href="https://app.powerbi.com/groups/8653f3c5-60af-4976-9aad-13f7c26b9d93/list?experience=power-bi">Retail Ontology Agent Demo</a> (access requires permission)</p>
+  <table>
+    <thead><tr><th>Asset</th><th>Name</th><th>ID</th></tr></thead>
+    <tbody>
+      <tr><td>Workspace</td><td>Retail Ontology Agent Demo</td><td><code>8653f3c5-…-13f7c26b9d93</code></td></tr>
+      <tr><td>Capacity</td><td>ykfabricf64 (F16, Korea Central)</td><td><code>e6f53d36-…-5cd17a4843c4</code></td></tr>
+      <tr><td>Lakehouse</td><td>RetailOperationsLH</td><td><code>6afeb90e-…-2c088deb31a6</code></td></tr>
+      <tr><td>SQL endpoint</td><td>RetailOperationsLH</td><td><code>0c56c7b9-…-860fcc3d3b48</code></td></tr>
+      <tr><td>Eventhouse</td><td>CustomerSignalsEH</td><td><code>cbda2912-…-9fe5314512e2</code></td></tr>
+      <tr><td>KQL Database</td><td>CustomerSignalsEH</td><td><code>8b674898-…-092d1271da55</code></td></tr>
+      <tr><td>Ontology (baseline)</td><td>RetailCommerceOntologyV2</td><td><code>f7eecc18-…-90f5bb3deb21</code></td></tr>
+      <tr><td>Ontology (experiment)</td><td>RetailCommerceOntologyV3</td><td><code>d5b7658a-…-2c9ae43f60a7</code></td></tr>
+      <tr><td>Data Agent (baseline)</td><td>RetailInsightAgentV2</td><td><code>990a6399-…-bcac81084ccb</code></td></tr>
+      <tr><td>Data Agent (experiment)</td><td>RetailInsightAgentV3</td><td><code>728c9c9c-…-9d7f8731fe35</code></td></tr>
+    </tbody>
+  </table>
+  <p>The first shared link (<code>…/Queries/MyQueries/…SQL query 1</code>) is an exploratory T-SQL query run against this <strong>Lakehouse SQL analytics endpoint</strong> — used to verify directly in SQL which physical tables the ontology binds.</p>
+
+  <h2>4. The Four Data Layers in Detail</h2>
+  <h3>4.1 Managed Delta (operational data)</h3>
+  <p><code>RetailOperationsLH</code> has 8 Delta tables; only <code>customer_profiles</code> is a shortcut and the other 7 are OneLake managed tables.</p>
+  <table>
+    <thead><tr><th>Table</th><th>Rows</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>products</td><td>50</td><td>Master</td></tr>
+      <tr><td>stores</td><td>6</td><td>Master</td></tr>
+      <tr><td>orders</td><td>6,000</td><td>Operational</td></tr>
+      <tr><td>order_lines</td><td>6,000</td><td>Operational</td></tr>
+      <tr><td>inventory_snapshots</td><td>37,200</td><td>Operational (stock snapshots)</td></tr>
+      <tr><td>customer_events</td><td>30,000</td><td>Events (Lakehouse copy for ontology binding)</td></tr>
+      <tr><td>promotions</td><td>17</td><td>SharePoint Excel → Dataflow</td></tr>
+      <tr><td>customer_profiles</td><td>500</td><td><strong>ADLS shortcut</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.2 ADLS shortcut (copy-free external access)</h3>
+  <ul>
+    <li>ADLS path: <code>abfss://raw@ykexternaldatalake.dfs.core.windows.net/retail-ontology-demo/customer_profiles</code></li>
+    <li>OneLake shortcut: <code>RetailOperationsLH/Tables/customer_profiles</code></li>
+    <li>Connection: <code>Retail Demo ADLS - Workspace Identity</code> (granted <code>Storage Blob Data Reader</code> at storage-account scope)</li>
+    <li>Same "no-copy access" pattern as Databricks catalog federation — data is not replicated into Fabric and stays in external ADLS.</li>
+  </ul>
+
+  <h3>4.3 SharePoint Excel → Dataflow (business-managed data)</h3>
+  <table>
+    <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Site</td><td><code>…/sites/Leadership-AWOA04POC</code></td></tr>
+      <tr><td>Library / folder</td><td><code>Shared Documents / ykTEST</code></td></tr>
+      <tr><td>Source file / table</td><td><code>RetailPromotionPlan.xlsx</code> / <code>PromotionPlan</code></td></tr>
+      <tr><td>Destination table</td><td><code>RetailOperationsLH/Tables/promotions</code></td></tr>
+    </tbody>
+  </table>
+  <p>Dataflow Gen2 loaded 17 unique promotions and activated the <code>Promotion</code> entity binding. ⚠️ The SharePoint <strong>Folder</strong> connector must use the <strong>site URL only</strong> — do not pass the library view URL ending in <code>/Forms/AllItems.aspx</code>.</p>
+
+  <h3>4.4 Eventhouse (behavioral signals)</h3>
+  <p>The <code>CustomerEvents</code> KQL table in <code>CustomerSignalsEH</code> retains 30,000 rows. It is for real-time / time-series analysis, while entity identity and properties come from the Lakehouse copy (see §2 design note).</p>
+
+  <h2>5. Ontology Model — 7 Entities · 12 Relationships</h2>
+  <h3>5.1 Entities</h3>
+  <table>
+    <thead><tr><th>Entity</th><th>Identity</th><th>Source binding</th><th>Key properties</th></tr></thead>
+    <tbody>
+      <tr><td>Customer</td><td>CustomerID</td><td>ADLS shortcut: customer_profiles</td><td>Segment, HomeRegion, LoyaltyTier, LifetimeValue, ConsentForPersonalization</td></tr>
+      <tr><td>Product</td><td>ProductID</td><td>Lakehouse: products</td><td>ProductName, Category, Brand, ListPrice, UnitCost</td></tr>
+      <tr><td>Store</td><td>StoreID</td><td>Lakehouse: stores</td><td>StoreName, Region, StoreFormat</td></tr>
+      <tr><td>Order</td><td>OrderID</td><td>Lakehouse: orders</td><td>OrderTimestampUtc, Channel, OrderStatus, OrderTotal</td></tr>
+      <tr><td>Promotion</td><td>PromotionID</td><td>SharePoint→Lakehouse: promotions</td><td>CampaignName, dates, DiscountPct, PlannedBudget, TargetSegment, Status</td></tr>
+      <tr><td>InventorySnapshot</td><td>SnapshotID</td><td>Lakehouse: inventory_snapshots</td><td>SnapshotDate, OnHandQuantity, ReorderPoint, InboundQuantity</td></tr>
+      <tr><td>CustomerEvent</td><td>EventID</td><td>Lakehouse: customer_events</td><td>EventTimestampUtc, EventType, SessionID, Channel, DeviceType</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 Relationships</h3>
+  <table>
+    <thead><tr><th>Relationship</th><th>Source → Target</th><th>Context key</th></tr></thead>
+    <tbody>
+      <tr><td>placed</td><td>Customer → Order</td><td>orders.CustomerID</td></tr>
+      <tr><td>fulfilledAt</td><td>Order → Store</td><td>orders.StoreID</td></tr>
+      <tr><td>contains</td><td>Order → Product</td><td>order_lines.OrderID + ProductID</td></tr>
+      <tr><td>appliedPromotion</td><td>Order → Promotion</td><td>order_lines.PromotionID</td></tr>
+      <tr><td>promotes</td><td>Promotion → Product</td><td>promotions.ProductID</td></tr>
+      <tr><td>runsAt</td><td>Promotion → Store</td><td>promotions.StoreID</td></tr>
+      <tr><td>hasInventory</td><td>Store → InventorySnapshot</td><td>inventory_snapshots.StoreID</td></tr>
+      <tr><td>inventoryFor</td><td>InventorySnapshot → Product</td><td>inventory_snapshots.ProductID</td></tr>
+      <tr><td>generated</td><td>Customer → CustomerEvent</td><td>customer_events.CustomerID</td></tr>
+      <tr><td>interactedWith</td><td>CustomerEvent → Product</td><td>customer_events.ProductID</td></tr>
+      <tr><td>attributedTo</td><td>CustomerEvent → Promotion</td><td>customer_events.PromotionID</td></tr>
+      <tr><td>occurredAt</td><td>CustomerEvent → Store</td><td>customer_events.StoreID</td></tr>
+    </tbody>
+  </table>
+  <blockquote>
+    <p><strong>V2 vs V3</strong> — the two ontologies are identical except V3 declares <code>Order.OrderTimestampUtc</code> and <code>CustomerEvent.EventTimestampUtc</code> as <code>DateTime</code> instead of <code>String</code>. <strong>The demo baseline is V2</strong> (V3 fails the centerpiece question — see §6.3).</p>
+  </blockquote>
+
+  <h2>6. Data Agent — RetailInsightAgent</h2>
+  <h3>6.1 Grounding instructions (key)</h3>
+  <p>The agent selects all 7 entities and traverses ontology relationships under <strong>grounded analysis instructions</strong>:</p>
+  <ul>
+    <li>Answer by <strong>traversing ontology relationships</strong>, not by matching names.</li>
+    <li>Map behavior=CustomerEvent, stock=InventorySnapshot, sales=Order, campaign=Promotion.</li>
+    <li><strong>Never write one query spanning three or more entities</strong>, and never express "has no X" as NOT EXISTS / anti-join → those return zero rows in this ontology.</li>
+    <li>Instead <strong>decompose</strong>: one simple per-entity query for ID lists, then intersect/subtract yourself.</li>
+    <li>Always <strong>begin with the smallest, most selective entity</strong> and carry its ID list into the larger one (avoids truncation).</li>
+    <li>Never divide by a count before confirming it is greater than zero.</li>
+  </ul>
+  <p>Terminology is pinned in the instructions too — purchase intent = AddToCart, conversion = Purchase, high-value customer = Segment 'High Value', contactable = ConsentForPersonalization true, stockout risk = OnHandQuantity ≤ ReorderPoint, etc.</p>
+
+  <h3>6.2 How to query (Assistants-style API)</h3>
+  <p>Requires <code>?api-version=2024-05-01-preview</code> + a bearer token for <code>https://api.fabric.microsoft.com</code>.</p>
+  <pre><code>BASE = https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/dataAgents/{agentId}/aiassistant/openai
+
+POST {BASE}/assistants                     -> assistant_id
+POST {BASE}/threads                        -> thread_id
+POST {BASE}/threads/{id}/messages          {"role":"user","content":"<question>"}
+POST {BASE}/threads/{id}/runs              {"assistant_id":"<assistant_id>"}
+GET  {BASE}/threads/{id}/runs/{run_id}     poll until terminal
+GET  {BASE}/threads/{id}/messages          -> answer
+DELETE {BASE}/threads/{id}</code></pre>
+  <p>❗ Endpoints that don't work here: <code>/chat/completions</code> (404), the MCP tool call (times out), and samples built on the OpenAI Assistants API retired on 2026-08-26.</p>
+
+  <h3>6.3 V2 vs V3 comparison</h3>
+  <p>Replaying the 12 demo questions on both agents, V2 matched all 12 and V3 matched 11. On the campaign-conversion question V3 planned the query as a <em>row listing</em>, hit the 200-row truncation, and declined to answer. V2 planned it as an <em>aggregation</em> and returned 1,729 vs. 36. Because that number carries the narrative, <strong>always present with V2</strong>.</p>
+
+  <h2>7. Demo Scenario (12 Verified Questions)</h2>
+  <p>Verified on 2026-09-11 with <code>RetailInsightAgentV2</code>; every expected value matches the generated Delta tables.</p>
+
+  <h3>Before you present</h3>
+  <ol>
+    <li>If redeployed via REST, open the ontology in the Fabric portal and <strong>save</strong> it once (the query graph is only built by that save; before that you get <code>The Graph Model is not ready</code>).</li>
+    <li>Ask one warm-up question (the first call after idle is the slowest).</li>
+    <li>Leave a few seconds between questions (rapid-fire intermittently fails).</li>
+  </ol>
+
+  <h3>Part 1 — the model is real</h3>
+  <p><code>How many stores are there?</code> → 6 · <code>How many products are there?</code> → 50 · <code>How many orders are there?</code> → 6,000</p>
+
+  <h3>Part 2 — one business object, many sources</h3>
+  <ul>
+    <li><code>Show the campaign name, store, and product for promotion PR9999.</code> → Seoul Audio Summer Surge / S001 Seoul Flagship / P0001 Audio Series 01</li>
+    <li><code>Which store is promotion PR9999 running at?</code> → S001, Seoul Flagship</li>
+    <li><code>Which product does promotion PR9999 promote?</code> → P0001, Audio Series 01 (Audio/Contoso, list 132.02, cost 82.70)</li>
+  </ul>
+
+  <h3>Part 3 — the insight (centerpiece)</h3>
+  <ul>
+    <li><code>How many AddToCart and Purchase customer events are attributed to promotion PR9999?</code> → <strong>1,729 vs 36 (2.08% conversion)</strong></li>
+    <li><code>How many CustomerEvent records have ProductID P0001?</code> → 3,586</li>
+  </ul>
+  <p><strong>Narrative</strong>: the campaign was well funded and customers clearly wanted the product, yet almost nobody could buy it. During the window (2026-08-03–08-16) average on-hand stock for P0001 at S001 was 1 unit, and all 14 snapshots in that window sat at or below the reorder point.</p>
+
+  <h3>Part 4 — the action</h3>
+  <ul>
+    <li><code>How many Customer records have Segment High Value and ConsentForPersonalization true?</code> → 33</li>
+    <li><code>Which high-value customers showed purchase intent for P0001 but did not purchase, and may be contacted under their personalization consent?</code> → about 32 of the 33 (C000006, C000021, C000037, …). The agent decomposes the question, narrowing high-value consented customers first, then checking their events.</li>
+  </ul>
+
+  <h2>8. Known Limits & Troubleshooting</h2>
+  <ul>
+    <li><strong>Spanning 3+ entities in one sentence returns empty</strong> → decompose like Part 3/4.</li>
+    <li><strong>Large identifier lists get truncated</strong> → counts are reliable, exhaustive lists are not.</li>
+    <li><strong>The Instances tab reads bindings directly</strong> and shows rows even when the graph is stale → confirm graph health with an agent question.</li>
+    <li><strong>The Graph Model is not ready</strong> → open and save the ontology in the portal.</li>
+    <li><strong>Recovering an agent invisible in the portal</strong>: recreate rather than repair — <code>DELETE items/{oldId}</code> → <code>POST items</code> (type:DataAgent) → redeploy with <code>deploy_data_agent.py</code> → verify the portal URL <code>…/aiskills/{agentId}</code>.</li>
+  </ul>
+
+  <h2>9. How to Reproduce</h2>
+  <p>Repository: <a href="https://github.com/yk2ndorganization/Ontologytesting">yk2ndorganization/Ontologytesting</a></p>
+  <pre><code># 1) Generate deterministic demo data (Delta/JSONL/Excel)
+python3 -m pip install -r requirements.txt
+python3 scripts/generate_demo_data.py
+
+# 2) Deploy native data (after Azure CLI auth)
+python3 scripts/deploy_onelake.py     --workspace-id <ws> --lakehouse-id <lh> --source data/lakehouse
+python3 scripts/deploy_eventhouse.py  --cluster <kusto-uri> --database CustomerSignalsEH --source data/eventhouse/customer_events.jsonl
+python3 scripts/deploy_ontology.py    --workspace-id <ws> --ontology-id <ont> --lakehouse-id <lh> --eventhouse-id <eh> --cluster <kusto-uri> --database CustomerSignalsEH
+python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --agent-name RetailInsightAgentV2 --ontology-id <ont> --ontology-name RetailCommerceOntologyV2</code></pre>
+  <p>After deploying the ontology via REST, <strong>open and save it once in the portal</strong> to build the query graph. SharePoint ingestion is done through the UI (Dataflow Gen2) — see §4.3.</p>
+
+  <hr />
+  <h2>References</h2>
+  <ul>
+    <li>Repository docs: <code>docs/architecture.md</code> · <code>docs/ontology-model.md</code> · <code>docs/demo-script.md</code> · <code>docs/data-agent-operations.md</code> · <code>docs/sharepoint-ingestion.md</code></li>
+    <li>Live workspace: <a href="https://app.powerbi.com/groups/8653f3c5-60af-4976-9aad-13f7c26b9d93/list?experience=power-bi">Retail Ontology Agent Demo</a></li>
+    <li>Related guides: <a href="../03-fabric-ontology/">03. Ontology deep-dive</a> · <a href="../04-fabric-data-agent/">04. Data Agent</a></li>
+  </ul>
+
+  <p class="meta">Last updated 2026-09-21 · Status: Published · Demo verified 2026-09-11</p>
+
+  </div>
+</main>
+
+<script>
+  document.getElementById("themeToggle").addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme");
+    document.documentElement.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+  });
+</script>
+<!-- 삭제하지 마세요: 가이드 목록으로 돌아가는 공통 링크 -->
+<script src="../../assets/i18n.js"></script>
+<script src="../../assets/guide-nav.js"></script>
+</body>
+</html>

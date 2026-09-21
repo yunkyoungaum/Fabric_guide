@@ -14,6 +14,7 @@ Fabric 도입·운영에서 반복적으로 마주치는 주제를 **가이드 �
 | 02 | Fabric 워크로드 개요 | Lakehouse, Eventhouse, Semantic Model, Ontology, Data/Operation Agent, Copilot | draft | [보기](https://yunkyoungaum.github.io/Fabric_guide/guides/02-fabric-workloads-overview/) |
 | 03 | Fabric 온톨로지 심화 가이드 | Ontology, 시맨틱 레이어, 모델링, 거버넌스 | draft | [보기](https://yunkyoungaum.github.io/Fabric_guide/guides/03-fabric-ontology/) |
 | 04 | Fabric Data Agent 가이드 | Data Agent, 자연어 질의, 데이터 소스 연결, 소비 채널 | draft | [보기](https://yunkyoungaum.github.io/Fabric_guide/guides/04-fabric-data-agent/) |
+| 05 | Retail Ontology Agent 데모 — 가이드 & 설명 | 온톨로지 데모, 4개 소스 통합, Data Agent 시나리오·운영 | published | [보기](https://yunkyoungaum.github.io/Fabric_guide/guides/05-retail-ontology-demo/) |
 
 ### 읽는 순서 추천
 

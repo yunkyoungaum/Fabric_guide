@@ -79,5 +79,20 @@ window.GUIDES = [
     updated: "2026-09-21",
     status: "draft",
     source: "source.md"
+  },
+  {
+    no: "05",
+    slug: "05-retail-ontology-demo",
+    title: "Retail Ontology Agent 데모 — 가이드 & 설명",
+    title_en: "Retail Ontology Agent Demo — Guide & Explainer",
+    summary:
+      "Lakehouse 관리형 Delta · ADLS 단축 · SharePoint Excel · Eventhouse 네 계층을 하나의 온톨로지로 묶고, Data Agent가 자연어로 'PR9999 캠페인이 왜 재고 부족으로 전환에 실패했는가'를 근거와 함께 도출하는 실제 데모의 구조·데이터·시나리오·운영을 문서화합니다.",
+    summary_en:
+      "Documents a real demo that unifies four layers (Lakehouse managed Delta, ADLS shortcut, SharePoint Excel, Eventhouse) into one ontology, where a Data Agent derives — with evidence — why campaign PR9999 failed to convert due to inventory scarcity. Covers architecture, data, scenario, and operations.",
+    tags: ["Ontology", "Data Agent", "데모", "Lakehouse", "Eventhouse", "SharePoint"],
+    tags_en: ["Ontology", "Data Agent", "Demo", "Lakehouse", "Eventhouse", "SharePoint"],
+    updated: "2026-09-21",
+    status: "published",
+    source: "source.md"
   }
 ];
