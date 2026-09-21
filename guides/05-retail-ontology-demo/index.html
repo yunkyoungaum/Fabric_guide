@@ -170,18 +170,49 @@ blockquote p { margin: .35rem 0; }
 
   <h2>2. 아키텍처 — 4개 물리 계층 → 1개 온톨로지</h2>
   <p>이 데모의 핵심은 <strong>네 가지 서로 다른 물리 저장 방식</strong>이 하나의 온톨로지로 통합된다는 점입니다.</p>
-  <pre><code>[생성 운영 데이터]  ──관리형 Delta 테이블──▶ ┐
- products/stores/orders/order_lines/          │
- inventory_snapshots/customer_events          │
-                                              │
-[외부 거버넌스 Delta] ──OneLake 단축(복사 없음)─▶ ┤
- ADLS: customer_profiles                      ├─▶ RetailOperationsLH ─▶ RetailCommerceOntology ─▶ RetailInsightAgent ─▶ 자연어 분석
-                                              │      (Lakehouse)          (7 엔터티·12 관계)        (Data Agent)
-[업무 담당자 관리 데이터] ─SharePoint Excel→Dataflow▶┤
- promotions                                   │
-                                              │
-[이벤트 데이터] ──JSONL 배치 적재──▶ CustomerSignalsEH (Eventhouse/KQL)  ┘
-                └─Delta 배치 적재──▶ customer_events (Lakehouse)</code></pre>
+    <style>
+  .arch{--s1:var(--cp-accent);--s2:var(--cp-link);--s3:var(--cp-success);--s4:var(--cp-warning);margin:1.5rem 0}
+  .arch-sources{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:640px){.arch-sources{grid-template-columns:1fr}}
+  .arch-card{background:var(--cp-surface-soft);border:1px solid var(--cp-border);border-left:5px solid var(--cp-border-strong);border-radius:12px;padding:12px 14px}
+  .arch-card.s1{border-left-color:var(--s1)}
+  .arch-card.s2{border-left-color:var(--s2)}
+  .arch-card.s3{border-left-color:var(--s3)}
+  .arch-card.s4{border-left-color:var(--s4)}
+  .arch-card b{display:block;font-size:14px;margin-bottom:4px}
+  .arch-card .tbl{font-family:Consolas,"Courier New",monospace;font-size:12px;color:var(--cp-text-muted);line-height:1.55;word-break:break-word}
+  .arch-card .pat{display:inline-block;margin-top:9px;font-size:11px;font-weight:650;padding:2px 10px;border-radius:999px;background:var(--cp-accent-soft);color:var(--cp-text)}
+  .arch-merge{text-align:center;color:var(--cp-text-soft);font-size:12.5px;font-weight:600;margin-top:16px}
+  .arch-chev{display:block;text-align:center;color:var(--cp-accent);font-size:18px;line-height:1;margin:5px 0}
+  .arch-pipe{display:flex;flex-direction:column;align-items:center}
+  .arch-stage{width:100%;max-width:540px;text-align:center;border:1px solid var(--cp-border);border-radius:12px;padding:11px 16px;background:var(--cp-surface)}
+  .arch-stage b{font-size:15px}
+  .arch-stage small{display:block;color:var(--cp-text-muted);font-size:12px;margin-top:2px}
+  .arch-stage.lh{border-color:var(--cp-accent);border-width:2px}
+  .arch-stage.result{background:var(--cp-accent);color:var(--cp-accent-fg);border-color:var(--cp-accent)}
+  .arch-stage.result small{color:var(--cp-accent-fg);opacity:.85}
+  .arch-note{font-size:12.5px;color:var(--cp-text-soft);margin-top:14px;border-left:3px solid var(--cp-accent);background:var(--cp-accent-soft);border-radius:0 8px 8px 0;padding:9px 13px}
+  </style>
+  <div class="arch">
+    <div class="arch-sources">
+      <div class="arch-card s1"><b>생성 운영 데이터</b><span class="tbl">products · stores · orders · order_lines · inventory_snapshots · customer_events</span><span class="pat">관리형 Delta 테이블</span></div>
+      <div class="arch-card s2"><b>외부 거버넌스 Delta</b><span class="tbl">ADLS: customer_profiles</span><span class="pat">OneLake 단축 · 복사 없음</span></div>
+      <div class="arch-card s3"><b>업무 담당자 관리 데이터</b><span class="tbl">promotions</span><span class="pat">SharePoint Excel → Dataflow</span></div>
+      <div class="arch-card s4"><b>이벤트 데이터</b><span class="tbl">customer_events</span><span class="pat">JSONL 배치 적재</span></div>
+    </div>
+    <div class="arch-merge">네 소스가 하나로 통합</div>
+    <div class="arch-chev">▼</div>
+    <div class="arch-pipe">
+      <div class="arch-stage lh"><b>RetailOperationsLH</b><small>Lakehouse</small></div>
+      <div class="arch-chev">▼</div>
+      <div class="arch-stage"><b>RetailCommerceOntology</b><small>7 엔터티 · 12 관계</small></div>
+      <div class="arch-chev">▼</div>
+      <div class="arch-stage"><b>RetailInsightAgent</b><small>Data Agent</small></div>
+      <div class="arch-chev">▼</div>
+      <div class="arch-stage result"><b>자연어 분석</b><small>Natural-language insight</small></div>
+    </div>
+    <p class="arch-note"><b>이벤트 데이터 이중 적재</b> — 같은 데이터셋을 JSONL은 <b>CustomerSignalsEH</b>(Eventhouse/KQL)로, Delta는 <b>customer_events</b>(Lakehouse)로 각각 한 번씩 적재합니다. 온톨로지 정적 바인딩은 OneLake 기반 소스가 필요해 <b>Lakehouse 사본</b>을 사용합니다.</p>
+  </div>
   <table>
     <thead><tr><th>소스</th><th>데이터셋</th><th>Fabric 표현</th><th>패턴</th></tr></thead>
     <tbody>
@@ -405,18 +436,26 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
 
   <h2>2. Architecture — Four Physical Layers → One Ontology</h2>
   <p>The essence of this demo is that <strong>four different physical storage styles</strong> converge into a single ontology.</p>
-  <pre><code>[Generated operations data] ──Managed Delta tables──▶ ┐
- products/stores/orders/order_lines/                  │
- inventory_snapshots/customer_events                  │
-                                                      │
-[Externally governed Delta] ─OneLake shortcut (no copy)▶ ┤
- ADLS: customer_profiles                              ├─▶ RetailOperationsLH ─▶ RetailCommerceOntology ─▶ RetailInsightAgent ─▶ NL analysis
-                                                      │      (Lakehouse)          (7 entities · 12 rels)     (Data Agent)
-[Business-managed data] ─SharePoint Excel→Dataflow────▶┤
- promotions                                           │
-                                                      │
-[Event data] ──JSONL batch ingest──▶ CustomerSignalsEH (Eventhouse/KQL)  ┘
-             └─Delta batch load────▶ customer_events (Lakehouse)</code></pre>
+  <div class="arch">
+    <div class="arch-sources">
+      <div class="arch-card s1"><b>Generated operations data</b><span class="tbl">products · stores · orders · order_lines · inventory_snapshots · customer_events</span><span class="pat">Managed Delta tables</span></div>
+      <div class="arch-card s2"><b>Externally governed Delta</b><span class="tbl">ADLS: customer_profiles</span><span class="pat">OneLake shortcut · no copy</span></div>
+      <div class="arch-card s3"><b>Business-managed data</b><span class="tbl">promotions</span><span class="pat">SharePoint Excel → Dataflow</span></div>
+      <div class="arch-card s4"><b>Event data</b><span class="tbl">customer_events</span><span class="pat">JSONL batch ingest</span></div>
+    </div>
+    <div class="arch-merge">Four sources unified into one</div>
+    <div class="arch-chev">▼</div>
+    <div class="arch-pipe">
+      <div class="arch-stage lh"><b>RetailOperationsLH</b><small>Lakehouse</small></div>
+      <div class="arch-chev">▼</div>
+      <div class="arch-stage"><b>RetailCommerceOntology</b><small>7 entities · 12 relationships</small></div>
+      <div class="arch-chev">▼</div>
+      <div class="arch-stage"><b>RetailInsightAgent</b><small>Data Agent</small></div>
+      <div class="arch-chev">▼</div>
+      <div class="arch-stage result"><b>Natural-language analysis</b><small>Grounded insight</small></div>
+    </div>
+    <p class="arch-note"><b>Event data dual-load</b> — the same dataset is loaded once each: JSONL into <b>CustomerSignalsEH</b> (Eventhouse/KQL) and Delta into <b>customer_events</b> (Lakehouse). Ontology static bindings require a OneLake-backed source, so the <b>Lakehouse copy</b> is used.</p>
+  </div>
   <table>
     <thead><tr><th>Source</th><th>Dataset</th><th>Fabric representation</th><th>Pattern</th></tr></thead>
     <tbody>
