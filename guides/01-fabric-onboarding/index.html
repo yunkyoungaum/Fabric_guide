@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- TODO: 문서 제목으로 변경 -->
+<title>Microsoft Fabric 온보딩 가이드</title>
+<script>
+  (() => {
+    const param = new URLSearchParams(window.location.search).get("scoutTheme");
+    const theme =
+      param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  padding: 3.2rem 1rem 4rem;
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15.5px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+main {
+  max-width: 900px; margin: 0 auto;
+  background: var(--cp-surface);
+  border: 1px solid var(--cp-border);
+  border-radius: 16px;
+  padding: 40px 46px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+h1, h2, h3 { font-weight: 650; line-height: 1.35; }
+h1 { font-size: 2rem; margin: 0 0 .6rem; letter-spacing: -0.02em; }
+h2 {
+  font-size: 1.4rem; margin: 2.4rem 0 1rem;
+  padding-bottom: .5rem; border-bottom: 2px solid var(--cp-border);
+}
+h2::before {
+  content: ""; display: inline-block; width: 6px; height: 1.05em; border-radius: 3px;
+  background: var(--cp-accent); margin-right: 10px; vertical-align: -0.16em;
+}
+h3 { font-size: 1.12rem; margin: 1.8rem 0 .5rem; }
+p { margin: .8rem 0; }
+a { color: var(--cp-link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+hr { border: none; border-top: 1px solid var(--cp-border); margin: 2.2rem 0; }
+ul, ol { padding-left: 1.5rem; }
+li { margin: .3rem 0; }
+li::marker { color: var(--cp-accent); }
+table {
+  width: 100%; border-collapse: separate; border-spacing: 0; margin: 1.2rem 0;
+  font-size: 14px; border: 1px solid var(--cp-border); border-radius: 12px; overflow: hidden;
+}
+thead th {
+  background: var(--cp-surface-soft); font-weight: 650; text-align: left;
+  padding: 11px 14px; border-bottom: 1px solid var(--cp-border);
+}
+tbody td { padding: 10px 14px; border-bottom: 1px solid var(--cp-border); vertical-align: top; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--cp-accent-soft); }
+code {
+  font-family: Consolas, "Courier New", Courier, monospace;
+  font-size: .88em; background: var(--cp-surface-soft); color: var(--cp-accent);
+  padding: .12em .38em; border-radius: 5px; border: 1px solid var(--cp-border);
+}
+pre {
+  background: var(--cp-bg-elevated); border: 1px solid var(--cp-border);
+  border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 1.1rem 0;
+}
+html[data-theme="dark"] pre { background: #1f1f1f; }
+pre code { background: none; border: none; padding: 0; color: var(--cp-text); font-size: 13px; }
+blockquote {
+  margin: 1.2rem 0; padding: 12px 18px; background: var(--cp-accent-soft);
+  border-left: 4px solid var(--cp-accent); border-radius: 0 10px 10px 0;
+}
+blockquote p { margin: .35rem 0; }
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--cp-border);
+}
+.badge {
+  display: inline-block; background: var(--cp-accent); color: var(--cp-accent-fg);
+  font-size: 11px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 999px;
+}
+.toggle {
+  cursor: pointer; border: 1px solid var(--cp-border); background: var(--cp-surface-soft);
+  color: var(--cp-text); border-radius: 0.625rem; padding: 7px 14px;
+  font-size: 13px; font-family: inherit;
+}
+.toggle:hover { border-color: var(--cp-accent); color: var(--cp-accent); }
+.meta { color: var(--cp-text-soft); font-size: 13px; }
+@media (max-width: 640px) { main { padding: 26px 18px; } }
+@media print { .toggle { display: none; } main { border: none; box-shadow: none; padding: 0; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <!-- TODO: 배지 문구 변경 -->
+    <span class="badge">Microsoft Fabric · Guide</span>
+    <button class="toggle" id="themeToggle" type="button">테마 전환</button>
+  </div>
+
+  <h1>Microsoft Fabric 온보딩 가이드</h1>
+  <p class="meta">Capacity 생성부터 Workspace 구성, 테넌트 기능 활성화, 역할·권한 설계까지 — Fabric를 처음 도입하는 팀을 위한 온보딩 체크리스트.</p>
+
+  <blockquote>
+    <p><strong>작성 중(Draft)</strong> — 아래는 이 가이드에서 다룰 목차 틀입니다. 각 섹션의 상세 내용은 순차적으로 채워집니다.</p>
+  </blockquote>
+
+  <h2>1. 사전 준비 (Prerequisites)</h2>
+  <ul>
+    <li>Microsoft Entra(테넌트)와 조직 계정 요건</li>
+    <li>필요한 라이선스 개관 — Fabric(F SKU) vs Power BI Premium(P SKU) vs 무료 체험(Trial)</li>
+    <li>관리자 역할: Fabric 관리자 / 용량 관리자 / 테넌트 관리자의 구분</li>
+  </ul>
+
+  <h2>2. Fabric Capacity 생성</h2>
+  <ul>
+    <li>Capacity(용량)란 무엇인가 — CU(Capacity Unit)와 과금 모델</li>
+    <li>SKU 선택 기준: F2 ~ F2048, 워크로드별 권장 시작점</li>
+    <li>Azure Portal에서 Fabric Capacity 프로비저닝(리소스 그룹·리전 선택)</li>
+    <li>일시 중지(Pause)/재개(Resume)와 비용 절감, Autoscale·Smoothing 개념</li>
+    <li>체험(Trial) 용량으로 먼저 검증하기</li>
+  </ul>
+
+  <h2>3. Workspace 생성 및 용량 할당</h2>
+  <ul>
+    <li>Workspace 생성과 Capacity 바인딩</li>
+    <li>Workspace 역할: Admin · Member · Contributor · Viewer</li>
+    <li>도메인(Domains)과 워크스페이스 구성 전략(팀·프로젝트·환경 분리)</li>
+    <li>OneLake와 워크스페이스의 관계</li>
+  </ul>
+
+  <h2>4. 테넌트 설정 — 기능 활성화</h2>
+  <p>온톨로지, Data Agent, Copilot 등 신규 기능은 테넌트 관리 설정에서 명시적으로 켜야 합니다.</p>
+  <ul>
+    <li>관리 포털 → 테넌트 설정 접근 경로</li>
+    <li>Copilot 및 AI 기능 활성화(용량 요건 포함)</li>
+    <li>Data Agent(데이터 에이전트) 생성 허용 설정</li>
+    <li>온톨로지 관련 미리 보기(Preview) 기능 활성화</li>
+    <li>보안 그룹 기반 단계적 배포(파일럿 → 전사)</li>
+  </ul>
+
+  <h2>5. 권한 · 거버넌스 설계</h2>
+  <ul>
+    <li>역할 기반 접근(RBAC)과 아이템 수준 권한</li>
+    <li>OneLake 데이터 접근 권한과 공유 모델</li>
+    <li>민감도 레이블(Sensitivity Label)과 데이터 보호</li>
+    <li>감사 로그와 모니터링</li>
+  </ul>
+
+  <h2>6. 온보딩 체크리스트</h2>
+  <p>도입 완료 여부를 확인하는 단계별 점검표(작성 예정).</p>
+
+  <hr />
+  <p class="meta">최종 수정 2026-09-21 · 상태: Draft</p>
+
+</main>
+
+<script>
+  document.getElementById("themeToggle").addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme");
+    document.documentElement.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+  });
+</script>
+<!-- 삭제하지 마세요: 가이드 목록으로 돌아가는 공통 링크 -->
+<script src="../../assets/guide-nav.js"></script>
+</body>
+</html>
