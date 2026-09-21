@@ -192,6 +192,9 @@ blockquote p { margin: .35rem 0; }
   .arch-stage.result{background:var(--cp-accent);color:var(--cp-accent-fg);border-color:var(--cp-accent)}
   .arch-stage.result small{color:var(--cp-accent-fg);opacity:.85}
   .arch-note{font-size:12.5px;color:var(--cp-text-soft);margin-top:14px;border-left:3px solid var(--cp-accent);background:var(--cp-accent-soft);border-radius:0 8px 8px 0;padding:9px 13px}
+  .fig{margin:1.1rem 0}
+  .fig img{width:100%;border:1px solid var(--cp-border);border-radius:10px;display:block}
+  .fig figcaption{font-size:12.5px;color:var(--cp-text-soft);margin-top:7px;text-align:center}
   </style>
   <div class="arch">
     <div class="arch-sources">
@@ -217,7 +220,7 @@ blockquote p { margin: .35rem 0; }
     <thead><tr><th>소스</th><th>데이터셋</th><th>Fabric 표현</th><th>패턴</th></tr></thead>
     <tbody>
       <tr><td>Lakehouse</td><td>products, stores, orders, order_lines, inventory_snapshots, customer_events</td><td>관리형 Delta 테이블</td><td>운영·트랜잭션 데이터</td></tr>
-      <tr><td>ADLS / Databricks</td><td>customer_profiles</td><td>OneLake 테이블 <strong>단축(shortcut)</strong></td><td>복사 없는 외부 거버넌스 접근</td></tr>
+      <tr><td>ADLS / Databricks</td><td>customer_profiles</td><td>OneLake 테이블 <strong>단축(shortcut)</strong></td><td>복사 없는 접근 — <strong>외부 Databricks Delta 테이블</strong></td></tr>
       <tr><td>SharePoint</td><td>RetailPromotionPlan.xlsx</td><td>Dataflow Gen2 → promotions 테이블</td><td>업무 담당자가 관리하는 캠페인 계획</td></tr>
       <tr><td>Eventhouse</td><td>CustomerEvents</td><td>KQL 테이블 (실시간 분석용 보존)</td><td>행동 신호 30,000행</td></tr>
     </tbody>
@@ -237,13 +240,31 @@ blockquote p { margin: .35rem 0; }
       <tr><td>SQL 엔드포인트</td><td>RetailOperationsLH</td><td><code>0c56c7b9-…-860fcc3d3b48</code></td></tr>
       <tr><td>Eventhouse</td><td>CustomerSignalsEH</td><td><code>cbda2912-…-9fe5314512e2</code></td></tr>
       <tr><td>KQL Database</td><td>CustomerSignalsEH</td><td><code>8b674898-…-092d1271da55</code></td></tr>
-      <tr><td>Ontology (기준)</td><td>RetailCommerceOntologyV2</td><td><code>f7eecc18-…-90f5bb3deb21</code></td></tr>
-      <tr><td>Ontology (실험)</td><td>RetailCommerceOntologyV3</td><td><code>d5b7658a-…-2c9ae43f60a7</code></td></tr>
-      <tr><td>Data Agent (기준)</td><td>RetailInsightAgentV2</td><td><code>990a6399-…-bcac81084ccb</code></td></tr>
-      <tr><td>Data Agent (실험)</td><td>RetailInsightAgentV3</td><td><code>728c9c9c-…-9d7f8731fe35</code></td></tr>
+      <tr><td>Ontology</td><td>RetailCommerceOntology</td><td><code>f7eecc18-…-90f5bb3deb21</code></td></tr>
+      <tr><td>Data Agent</td><td>RetailInsightAgent</td><td><code>990a6399-…-bcac81084ccb</code></td></tr>
     </tbody>
   </table>
   <p>첫 번째로 공유된 링크(<code>…/Queries/MyQueries/…SQL query 1</code>)는 이 <strong>Lakehouse의 SQL 분석 엔드포인트</strong>에서 실행하는 탐색용 T-SQL 쿼리입니다. 온톨로지가 어떤 물리 테이블을 바인딩하는지 SQL로 직접 확인할 때 사용합니다.</p>
+
+  <h3>3.1 리니지 (데이터 계보)</h3>
+  <p>Fabric 리니지 뷰로 본 전체 계보입니다. 여러 소스가 <code>RetailOperationsLH</code>로 모이고, 그 위에 온톨로지와 Data Agent가 얹힙니다.</p>
+  <figure class="fig">
+    <img src="img/lineage.png" alt="Fabric 리니지 뷰 — SharePoint·ADLS·Eventhouse → RetailOperationsLH → RetailCommerceOntology → RetailInsightAgent" />
+    <figcaption>Fabric 리니지 뷰: SharePoint · ADLS(2) · Eventhouse 소스 → RetailOperationsLH → RetailCommerceOntology → RetailInsightAgent</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>리니지 노드</th><th>실제 자산 / 테이블</th></tr></thead>
+    <tbody>
+      <tr><td>SharePoint → Load SharePoint Promotions (Dataflow Gen2)</td><td><code>RetailPromotionPlan.xlsx</code> → <code>promotions</code> 테이블</td></tr>
+      <tr><td>Azure Data Lake Storage Gen2 · Retail Demo ADLS (Workspace Identity)</td><td><code>customer_profiles</code> OneLake 단축</td></tr>
+      <tr><td>Azure Data Lake Storage Gen2 · ykexternaldatalake</td><td>외부 Databricks Delta (customer_profiles 원천)</td></tr>
+      <tr><td>CustomerSignalsEH (Eventhouse → KQL Database)</td><td><code>CustomerEvents</code> KQL 테이블</td></tr>
+      <tr><td>RetailOperationsLH (Lakehouse / SQL analytics endpoint)</td><td>8개 Delta 테이블</td></tr>
+      <tr><td>RetailCommerceOntology (Ontology)</td><td>7 엔터티 · 12 관계</td></tr>
+      <tr><td>RetailCommerceOntology…_lh_… / …_gra…</td><td>온톨로지가 자동 생성한 Lakehouse · Graph model (내부 아티팩트, 이름에 V2 접미사가 남아 있음)</td></tr>
+      <tr><td>RetailInsightAgent (Data agent)</td><td>자연어 질의 에이전트</td></tr>
+    </tbody>
+  </table>
 
   <h2>4. 데이터 소스 4계층 상세</h2>
   <h3>4.1 관리형 Delta (운영 데이터)</h3>
@@ -269,6 +290,11 @@ blockquote p { margin: .35rem 0; }
     <li>연결: <code>Retail Demo ADLS - Workspace Identity</code> (스토리지 계정 범위에 <code>Storage Blob Data Reader</code> 부여)</li>
     <li>Databricks 카탈로그 페더레이션과 동일한 "복사 없는 접근" 패턴 — 데이터는 Fabric에 복제되지 않고 외부 ADLS에 그대로 남습니다.</li>
   </ul>
+  <p><code>customer_profiles</code>는 <strong>외부 Databricks(Unity Catalog)의 관리형 Delta 테이블</strong>에서 비롯되며, ADLS Gen2를 거쳐 OneLake 단축으로 Fabric에 연결됩니다. 아래는 외부 Databricks Unity Catalog에서 관리되는 Delta 테이블의 예시입니다(Type: Managed, Data source: Delta).</p>
+  <figure class="fig">
+    <img src="img/databricks-external-delta.png" alt="Databricks Unity Catalog의 외부 관리형 Delta 테이블" />
+    <figcaption>외부 Databricks Unity Catalog — 관리형 Delta 테이블(이런 외부 거버넌스 Delta가 ADLS를 거쳐 OneLake 단축으로 연결됩니다)</figcaption>
+  </figure>
 
   <h3>4.3 SharePoint Excel → Dataflow (담당자 관리 데이터)</h3>
   <table>
@@ -281,6 +307,14 @@ blockquote p { margin: .35rem 0; }
     </tbody>
   </table>
   <p>Dataflow Gen2가 17개 고유 프로모션을 적재하고 <code>Promotion</code> 엔터티 바인딩을 활성화했습니다. ⚠️ SharePoint <strong>Folder</strong> 커넥터는 <strong>사이트 URL만</strong> 사용하고, <code>/Forms/AllItems.aspx</code>로 끝나는 라이브러리 뷰 URL은 넣지 않습니다.</p>
+  <figure class="fig">
+    <img src="img/sharepoint-library.png" alt="SharePoint ykTEST 폴더의 RetailPromotionPlan.xlsx" />
+    <figcaption>SharePoint <code>Leadership-AWOA04 POC</code> 사이트 → <code>Shared Documents/ykTEST</code> → <code>RetailPromotionPlan.xlsx</code></figcaption>
+  </figure>
+  <figure class="fig">
+    <img src="img/sharepoint-powerquery.png" alt="SharePoint 파일을 promotions 테이블로 변환하는 Dataflow Gen2 Power Query M" />
+    <figcaption>Dataflow Gen2 — <code>SharePoint.Files</code>로 원본을 읽어 <code>RetailPromotionPlan.xlsx</code>를 필터링하고 컬럼 타입을 지정해 <code>promotions</code> 테이블로 적재</figcaption>
+  </figure>
 
   <h3>4.4 Eventhouse (행동 신호)</h3>
   <p><code>CustomerSignalsEH</code>의 <code>CustomerEvents</code> KQL 테이블에 30,000행을 보존합니다. 실시간/시계열 분석용이며, 온톨로지 엔터티 식별·속성은 Lakehouse 사본이 담당합니다(§2 설계 메모).</p>
@@ -318,9 +352,6 @@ blockquote p { margin: .35rem 0; }
       <tr><td>occurredAt</td><td>CustomerEvent → Store</td><td>customer_events.StoreID</td></tr>
     </tbody>
   </table>
-  <blockquote>
-    <p><strong>V2 vs V3</strong> — 두 온톨로지는 동일하며, V3만 <code>Order.OrderTimestampUtc</code>와 <code>CustomerEvent.EventTimestampUtc</code>를 <code>String</code> 대신 <code>DateTime</code>으로 선언합니다. <strong>데모 기준은 V2</strong>입니다(V3는 핵심 질문에서 실패 — §6.3).</p>
-  </blockquote>
 
   <h2>6. Data Agent — RetailInsightAgent</h2>
   <h3>6.1 그라운딩 지침(핵심)</h3>
@@ -348,18 +379,7 @@ GET  {BASE}/threads/{id}/messages          -> 답변
 DELETE {BASE}/threads/{id}</code></pre>
   <p>❗ 동작하지 않는 엔드포인트: <code>/chat/completions</code>(404), MCP 툴 호출(타임아웃), 2026-08-26 폐기된 OpenAI Assistants API 기반 샘플.</p>
 
-  <h3>6.3 V2 vs V3 비교</h3>
-  <p>12개 데모 질문을 두 에이전트에 재생한 결과, V2는 12개 모두, V3는 11개를 맞혔습니다. V3는 캠페인 전환 질문에서 쿼리를 <em>행 나열</em>로 계획해 200행 잘림에 걸려 답변을 거부했습니다. V2는 <em>집계</em>로 계획해 1,729 vs 36을 반환했습니다. 이 수치가 데모 내러티브의 핵심이므로 <strong>반드시 V2로 발표</strong>합니다.</p>
-
   <h2>7. 데모 시나리오 (검증된 12개 질문)</h2>
-  <p>2026-09-11 <code>RetailInsightAgentV2</code>로 검증, 모든 기대값이 생성 Delta 테이블과 일치.</p>
-
-  <h3>발표 전 준비</h3>
-  <ol>
-    <li>REST로 재배포했다면 온톨로지를 Fabric 포털에서 한 번 열어 <strong>저장</strong>한다(쿼리 그래프는 이 저장 때 생성됨. 그전엔 <code>The Graph Model is not ready</code>).</li>
-    <li>워밍업 질문 1개로 응답 확인(유휴 후 첫 호출이 가장 느림).</li>
-    <li>질문 사이에 몇 초 간격을 둔다(연속 발사 시 간헐 실패).</li>
-  </ol>
 
   <h3>Part 1 — 모델은 실제다</h3>
   <p><code>How many stores are there?</code> → 6 · <code>How many products are there?</code> → 50 · <code>How many orders are there?</code> → 6,000</p>
@@ -403,7 +423,7 @@ python3 scripts/generate_demo_data.py
 python3 scripts/deploy_onelake.py     --workspace-id <ws> --lakehouse-id <lh> --source data/lakehouse
 python3 scripts/deploy_eventhouse.py  --cluster <kusto-uri> --database CustomerSignalsEH --source data/eventhouse/customer_events.jsonl
 python3 scripts/deploy_ontology.py    --workspace-id <ws> --ontology-id <ont> --lakehouse-id <lh> --eventhouse-id <eh> --cluster <kusto-uri> --database CustomerSignalsEH
-python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --agent-name RetailInsightAgentV2 --ontology-id <ont> --ontology-name RetailCommerceOntologyV2</code></pre>
+python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --agent-name RetailInsightAgent --ontology-id <ont> --ontology-name RetailCommerceOntology</code></pre>
   <p>온톨로지를 REST로 배포한 뒤에는 <strong>포털에서 한 번 열어 저장</strong>해야 쿼리 그래프가 생성됩니다. SharePoint 적재는 UI(Dataflow Gen2)로 진행합니다(§4.3).</p>
 
   <hr />
@@ -460,7 +480,7 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
     <thead><tr><th>Source</th><th>Dataset</th><th>Fabric representation</th><th>Pattern</th></tr></thead>
     <tbody>
       <tr><td>Lakehouse</td><td>products, stores, orders, order_lines, inventory_snapshots, customer_events</td><td>Managed Delta tables</td><td>Operational / transactional data</td></tr>
-      <tr><td>ADLS / Databricks</td><td>customer_profiles</td><td>OneLake table <strong>shortcut</strong></td><td>Copy-free externally governed access</td></tr>
+      <tr><td>ADLS / Databricks</td><td>customer_profiles</td><td>OneLake table <strong>shortcut</strong></td><td>Copy-free access — <strong>external Databricks Delta table</strong></td></tr>
       <tr><td>SharePoint</td><td>RetailPromotionPlan.xlsx</td><td>Dataflow Gen2 → promotions table</td><td>Business-managed campaign plan</td></tr>
       <tr><td>Eventhouse</td><td>CustomerEvents</td><td>KQL table (kept for real-time analysis)</td><td>30,000 behavioral signal rows</td></tr>
     </tbody>
@@ -480,13 +500,31 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
       <tr><td>SQL endpoint</td><td>RetailOperationsLH</td><td><code>0c56c7b9-…-860fcc3d3b48</code></td></tr>
       <tr><td>Eventhouse</td><td>CustomerSignalsEH</td><td><code>cbda2912-…-9fe5314512e2</code></td></tr>
       <tr><td>KQL Database</td><td>CustomerSignalsEH</td><td><code>8b674898-…-092d1271da55</code></td></tr>
-      <tr><td>Ontology (baseline)</td><td>RetailCommerceOntologyV2</td><td><code>f7eecc18-…-90f5bb3deb21</code></td></tr>
-      <tr><td>Ontology (experiment)</td><td>RetailCommerceOntologyV3</td><td><code>d5b7658a-…-2c9ae43f60a7</code></td></tr>
-      <tr><td>Data Agent (baseline)</td><td>RetailInsightAgentV2</td><td><code>990a6399-…-bcac81084ccb</code></td></tr>
-      <tr><td>Data Agent (experiment)</td><td>RetailInsightAgentV3</td><td><code>728c9c9c-…-9d7f8731fe35</code></td></tr>
+      <tr><td>Ontology</td><td>RetailCommerceOntology</td><td><code>f7eecc18-…-90f5bb3deb21</code></td></tr>
+      <tr><td>Data Agent</td><td>RetailInsightAgent</td><td><code>990a6399-…-bcac81084ccb</code></td></tr>
     </tbody>
   </table>
   <p>The first shared link (<code>…/Queries/MyQueries/…SQL query 1</code>) is an exploratory T-SQL query run against this <strong>Lakehouse SQL analytics endpoint</strong> — used to verify directly in SQL which physical tables the ontology binds.</p>
+
+  <h3>3.1 Lineage</h3>
+  <p>The full lineage as seen in the Fabric lineage view. Several sources converge into <code>RetailOperationsLH</code>, with the ontology and Data Agent layered on top.</p>
+  <figure class="fig">
+    <img src="img/lineage.png" alt="Fabric lineage view — SharePoint · ADLS · Eventhouse → RetailOperationsLH → RetailCommerceOntology → RetailInsightAgent" />
+    <figcaption>Fabric lineage view: SharePoint · ADLS(2) · Eventhouse sources → RetailOperationsLH → RetailCommerceOntology → RetailInsightAgent</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th>Lineage node</th><th>Actual asset / table</th></tr></thead>
+    <tbody>
+      <tr><td>SharePoint → Load SharePoint Promotions (Dataflow Gen2)</td><td><code>RetailPromotionPlan.xlsx</code> → <code>promotions</code> table</td></tr>
+      <tr><td>Azure Data Lake Storage Gen2 · Retail Demo ADLS (Workspace Identity)</td><td><code>customer_profiles</code> OneLake shortcut</td></tr>
+      <tr><td>Azure Data Lake Storage Gen2 · ykexternaldatalake</td><td>External Databricks Delta (origin of customer_profiles)</td></tr>
+      <tr><td>CustomerSignalsEH (Eventhouse → KQL Database)</td><td><code>CustomerEvents</code> KQL table</td></tr>
+      <tr><td>RetailOperationsLH (Lakehouse / SQL analytics endpoint)</td><td>8 Delta tables</td></tr>
+      <tr><td>RetailCommerceOntology (Ontology)</td><td>7 entities · 12 relationships</td></tr>
+      <tr><td>RetailCommerceOntology…_lh_… / …_gra…</td><td>Lakehouse · Graph model auto-generated by the ontology (internal artifacts; names still carry the V2 suffix)</td></tr>
+      <tr><td>RetailInsightAgent (Data agent)</td><td>Natural-language query agent</td></tr>
+    </tbody>
+  </table>
 
   <h2>4. The Four Data Layers in Detail</h2>
   <h3>4.1 Managed Delta (operational data)</h3>
@@ -512,6 +550,11 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
     <li>Connection: <code>Retail Demo ADLS - Workspace Identity</code> (granted <code>Storage Blob Data Reader</code> at storage-account scope)</li>
     <li>Same "no-copy access" pattern as Databricks catalog federation — data is not replicated into Fabric and stays in external ADLS.</li>
   </ul>
+  <p><code>customer_profiles</code> originates from an <strong>externally governed managed Delta table in Databricks (Unity Catalog)</strong>, and reaches Fabric through ADLS Gen2 as a OneLake shortcut. Below is an example of a Delta table managed in an external Databricks Unity Catalog (Type: Managed, Data source: Delta).</p>
+  <figure class="fig">
+    <img src="img/databricks-external-delta.png" alt="External managed Delta table in Databricks Unity Catalog" />
+    <figcaption>External Databricks Unity Catalog — a managed Delta table (this kind of externally governed Delta reaches OneLake as a shortcut via ADLS)</figcaption>
+  </figure>
 
   <h3>4.3 SharePoint Excel → Dataflow (business-managed data)</h3>
   <table>
@@ -524,6 +567,14 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
     </tbody>
   </table>
   <p>Dataflow Gen2 loaded 17 unique promotions and activated the <code>Promotion</code> entity binding. ⚠️ The SharePoint <strong>Folder</strong> connector must use the <strong>site URL only</strong> — do not pass the library view URL ending in <code>/Forms/AllItems.aspx</code>.</p>
+  <figure class="fig">
+    <img src="img/sharepoint-library.png" alt="RetailPromotionPlan.xlsx in the SharePoint ykTEST folder" />
+    <figcaption>SharePoint <code>Leadership-AWOA04 POC</code> site → <code>Shared Documents/ykTEST</code> → <code>RetailPromotionPlan.xlsx</code></figcaption>
+  </figure>
+  <figure class="fig">
+    <img src="img/sharepoint-powerquery.png" alt="Dataflow Gen2 Power Query M that transforms the SharePoint file into the promotions table" />
+    <figcaption>Dataflow Gen2 — reads the source with <code>SharePoint.Files</code>, filters to <code>RetailPromotionPlan.xlsx</code>, types the columns, and loads the <code>promotions</code> table</figcaption>
+  </figure>
 
   <h3>4.4 Eventhouse (behavioral signals)</h3>
   <p>The <code>CustomerEvents</code> KQL table in <code>CustomerSignalsEH</code> retains 30,000 rows. It is for real-time / time-series analysis, while entity identity and properties come from the Lakehouse copy (see §2 design note).</p>
@@ -561,9 +612,6 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
       <tr><td>occurredAt</td><td>CustomerEvent → Store</td><td>customer_events.StoreID</td></tr>
     </tbody>
   </table>
-  <blockquote>
-    <p><strong>V2 vs V3</strong> — the two ontologies are identical except V3 declares <code>Order.OrderTimestampUtc</code> and <code>CustomerEvent.EventTimestampUtc</code> as <code>DateTime</code> instead of <code>String</code>. <strong>The demo baseline is V2</strong> (V3 fails the centerpiece question — see §6.3).</p>
-  </blockquote>
 
   <h2>6. Data Agent — RetailInsightAgent</h2>
   <h3>6.1 Grounding instructions (key)</h3>
@@ -591,18 +639,7 @@ GET  {BASE}/threads/{id}/messages          -> answer
 DELETE {BASE}/threads/{id}</code></pre>
   <p>❗ Endpoints that don't work here: <code>/chat/completions</code> (404), the MCP tool call (times out), and samples built on the OpenAI Assistants API retired on 2026-08-26.</p>
 
-  <h3>6.3 V2 vs V3 comparison</h3>
-  <p>Replaying the 12 demo questions on both agents, V2 matched all 12 and V3 matched 11. On the campaign-conversion question V3 planned the query as a <em>row listing</em>, hit the 200-row truncation, and declined to answer. V2 planned it as an <em>aggregation</em> and returned 1,729 vs. 36. Because that number carries the narrative, <strong>always present with V2</strong>.</p>
-
   <h2>7. Demo Scenario (12 Verified Questions)</h2>
-  <p>Verified on 2026-09-11 with <code>RetailInsightAgentV2</code>; every expected value matches the generated Delta tables.</p>
-
-  <h3>Before you present</h3>
-  <ol>
-    <li>If redeployed via REST, open the ontology in the Fabric portal and <strong>save</strong> it once (the query graph is only built by that save; before that you get <code>The Graph Model is not ready</code>).</li>
-    <li>Ask one warm-up question (the first call after idle is the slowest).</li>
-    <li>Leave a few seconds between questions (rapid-fire intermittently fails).</li>
-  </ol>
 
   <h3>Part 1 — the model is real</h3>
   <p><code>How many stores are there?</code> → 6 · <code>How many products are there?</code> → 50 · <code>How many orders are there?</code> → 6,000</p>
@@ -646,7 +683,7 @@ python3 scripts/generate_demo_data.py
 python3 scripts/deploy_onelake.py     --workspace-id <ws> --lakehouse-id <lh> --source data/lakehouse
 python3 scripts/deploy_eventhouse.py  --cluster <kusto-uri> --database CustomerSignalsEH --source data/eventhouse/customer_events.jsonl
 python3 scripts/deploy_ontology.py    --workspace-id <ws> --ontology-id <ont> --lakehouse-id <lh> --eventhouse-id <eh> --cluster <kusto-uri> --database CustomerSignalsEH
-python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --agent-name RetailInsightAgentV2 --ontology-id <ont> --ontology-name RetailCommerceOntologyV2</code></pre>
+python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --agent-name RetailInsightAgent --ontology-id <ont> --ontology-name RetailCommerceOntology</code></pre>
   <p>After deploying the ontology via REST, <strong>open and save it once in the portal</strong> to build the query graph. SharePoint ingestion is done through the UI (Dataflow Gen2) — see §4.3.</p>
 
   <hr />
