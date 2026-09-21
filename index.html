@@ -200,8 +200,8 @@ footer.page code {
   var toggle = document.getElementById("themeToggle");
 
   var STR = {
-    ko: { placeholder: "제목 · 요약 · 태그 검색 (예: 온보딩, Lakehouse, Ontology, Data Agent)", src: "원본(.md)", updated: "업데이트 " },
-    en: { placeholder: "Search title · summary · tags (e.g. onboarding, Lakehouse, Ontology, Data Agent)", src: "source (.md)", updated: "Updated " }
+    ko: { placeholder: "제목 · 요약 · 태그 검색 (예: 온보딩, Lakehouse, Ontology, Data Agent)", src: "원본(.md)", updated: "업데이트 ", draft: "작성 중", title: "Microsoft Fabric 실무 가이드 모음" },
+    en: { placeholder: "Search title · summary · tags (e.g. onboarding, Lakehouse, Ontology, Data Agent)", src: "source (.md)", updated: "Updated ", draft: "Draft", title: "Microsoft Fabric Practical Guides" }
   };
 
   function lang() {
@@ -225,7 +225,7 @@ footer.page code {
     var tags = (field(g, "tags") || []).map(function (t) {
       return '<span class="tag">' + esc(t) + "</span>";
     }).join("");
-    var draft = g.status === "draft" ? '<span class="draft">draft</span>' : "";
+    var draft = g.status === "draft" ? '<span class="draft">' + esc(L.draft) + '</span>' : "";
     var src = g.source
       ? '<a class="srclink" href="guides/' + esc(g.slug) + "/" + esc(g.source) + '">' + esc(L.src) + "</a>"
       : "";
@@ -254,7 +254,11 @@ footer.page code {
   }
 
   function syncLangUi() {
-    if (search) search.placeholder = STR[lang()].placeholder;
+    document.title = STR[lang()].title;
+    if (search) {
+      search.placeholder = STR[lang()].placeholder;
+      search.setAttribute("aria-label", STR[lang()].placeholder);
+    }
     render(search ? search.value : "");
   }
 

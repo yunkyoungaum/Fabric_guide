@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- TODO: 문서 제목으로 변경 -->
 <title>Fabric Data Agent 가이드 · Guide</title>
 <script>
   (() => {
@@ -147,7 +146,6 @@ blockquote p { margin: .35rem 0; }
 <body data-lang="ko">
 <main>
   <div class="topbar">
-    <!-- TODO: 배지 문구 변경 -->
     <span class="badge">Microsoft Fabric · Guide</span>
     <button class="toggle" id="themeToggle" type="button"><span class="lang-ko">테마 전환</span><span class="lang-en">Theme</span></button>
   </div>
@@ -157,12 +155,12 @@ blockquote p { margin: .35rem 0; }
   <p class="meta">자연어로 데이터를 묻고 답을 얻는 Data Agent — 개념부터 생성·구성, 데이터 소스 연결, 지침 튜닝, 소비 채널까지 정리합니다.</p>
 
   <blockquote>
-    <p><strong>작성 중(Draft)</strong> — 아래는 이 가이드에서 다룰 목차 틀입니다.</p>
+    <p><strong>작성 중(Draft)</strong> — 아래는 이 가이드에서 다룰 목차 틀입니다. 상세 절차는 추후 작성됩니다. 한국어 설명과 제품 언어 지원은 별개이며, 공식 문서는 현재 질문·지침·예제에 영어 사용을 안내합니다.</p>
   </blockquote>
 
   <h2>1. Data Agent란</h2>
   <ul>
-    <li>자연어 → 질의(NL2SQL/NL2KQL) → 답변 흐름</li>
+    <li>자연어 → 읽기 전용 질의(SQL·DAX·KQL 등) → 답변 흐름</li>
     <li>사용 시나리오와 기대 효과</li>
     <li>사전 요건: 테넌트 설정 활성화·용량·권한(→ <a href="../01-fabric-onboarding/">01. 온보딩</a>)</li>
   </ul>
@@ -175,7 +173,7 @@ blockquote p { margin: .35rem 0; }
 
   <h2>3. 데이터 소스 연결</h2>
   <ul>
-    <li>연결 가능한 소스: Lakehouse · Warehouse · Semantic Model · KQL Database</li>
+    <li>연결 가능한 소스 예: Lakehouse · Warehouse · Power BI Semantic Model · KQL Database · Ontology</li>
     <li>소스별 특징과 선택 기준</li>
     <li>온톨로지와 연계했을 때의 이점(→ <a href="../03-fabric-ontology/">03. 온톨로지</a>)</li>
   </ul>
@@ -183,14 +181,14 @@ blockquote p { margin: .35rem 0; }
   <h2>4. 정확도 높이기 — 지침 · 예제 튜닝</h2>
   <ul>
     <li>에이전트 지침(Instructions) 작성 요령</li>
-    <li>예제 질의/응답(Example queries)로 성능 개선</li>
+    <li>질문·쿼리 쌍(Example queries)으로 정확도 개선 — Power BI 시맨틱 모델 소스에는 현재 미지원</li>
     <li>용어·별칭 정의와 모호성 해소</li>
     <li>검증 루프와 반복 개선</li>
   </ul>
 
   <h2>5. 소비(Consumption) 채널</h2>
   <ul>
-    <li>Fabric 내 Copilot에서 사용</li>
+    <li>Fabric Data Agent 대화 화면과 Microsoft 365 Copilot 연동</li>
     <li>Teams·외부 앱 연동</li>
     <li>프로그래밍 방식(API/SDK) 호출</li>
   </ul>
@@ -203,6 +201,7 @@ blockquote p { margin: .35rem 0; }
   </ul>
 
   <hr />
+  <p class="meta">검증 근거: <a href="https://learn.microsoft.com/en-us/fabric/data-science/concept-data-agent">Data Agent 개념·구성·제약</a></p>
   <p class="meta">최종 수정 2026-09-21 · 상태: Draft</p>
 
 
@@ -213,12 +212,12 @@ blockquote p { margin: .35rem 0; }
   <p class="meta">Ask questions of your data in natural language and get answers — from concept to creation, data source connection, instruction tuning, and consumption channels.</p>
 
   <blockquote>
-    <p><strong>Draft</strong> — the outline below shows what this guide will cover.</p>
+    <p><strong>Draft</strong> — the outline below shows what this guide will cover; detailed procedures will be added later. This guide's translation does not imply product language support: official documentation currently directs users to use English for questions, instructions, and examples.</p>
   </blockquote>
 
   <h2>1. What Is a Data Agent</h2>
   <ul>
-    <li>The natural language → query (NL2SQL/NL2KQL) → answer flow</li>
+    <li>The natural language → read-only query (SQL, DAX, KQL, etc.) → answer flow</li>
     <li>Use scenarios and expected benefits</li>
     <li>Prerequisites: tenant setting enabled, capacity, permissions (→ <a href="../01-fabric-onboarding/">01. Onboarding</a>)</li>
   </ul>
@@ -231,7 +230,7 @@ blockquote p { margin: .35rem 0; }
 
   <h2>3. Connecting Data Sources</h2>
   <ul>
-    <li>Connectable sources: Lakehouse · Warehouse · Semantic Model · KQL Database</li>
+    <li>Example supported sources: Lakehouse · Warehouse · Power BI Semantic Model · KQL Database · Ontology</li>
     <li>Characteristics and selection criteria per source</li>
     <li>Benefits of pairing with an ontology (→ <a href="../03-fabric-ontology/">03. Ontology</a>)</li>
   </ul>
@@ -239,14 +238,14 @@ blockquote p { margin: .35rem 0; }
   <h2>4. Improving Accuracy — Instruction & Example Tuning</h2>
   <ul>
     <li>Tips for writing agent instructions</li>
-    <li>Improving performance with example queries/answers</li>
+    <li>Improving accuracy with question-query pairs — currently unsupported for Power BI semantic model sources</li>
     <li>Defining terms/aliases and resolving ambiguity</li>
     <li>Validation loops and iterative improvement</li>
   </ul>
 
   <h2>5. Consumption Channels</h2>
   <ul>
-    <li>Use inside Copilot in Fabric</li>
+    <li>Fabric Data Agent chat and integration with Microsoft 365 Copilot</li>
     <li>Teams and external app integration</li>
     <li>Programmatic (API/SDK) invocation</li>
   </ul>
@@ -259,6 +258,7 @@ blockquote p { margin: .35rem 0; }
   </ul>
 
   <hr />
+  <p class="meta">Reference checked: <a href="https://learn.microsoft.com/en-us/fabric/data-science/concept-data-agent">Data Agent concepts, configuration, and limitations</a></p>
   <p class="meta">Last updated 2026-09-21 · Status: Draft</p>
 
   </div>

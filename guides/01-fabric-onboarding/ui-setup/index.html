@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UI 기반 환경 설정 · UI-based environment setup</title>
+<script>
+  (() => {
+    const param = new URLSearchParams(window.location.search).get("scoutTheme");
+    const theme =
+      param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 64px 16px 48px; background: var(--cp-bg); color: var(--cp-text); font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; font-size: 16px; line-height: 1.75; }
+main { max-width: 1000px; margin: auto; padding: 40px 44px; border: 1px solid var(--cp-border); border-radius: 16px; background: var(--cp-surface); }
+h1, h2, h3 { line-height: 1.35; font-weight: 650; }
+h1 { font-size: 2rem; letter-spacing: -.02em; }
+h2 { margin-top: 40px; padding-bottom: 12px; border-bottom: 2px solid var(--cp-border); }
+h3 { margin-top: 0; }
+a { color: var(--cp-link); text-underline-offset: .2em; overflow-wrap: anywhere; }
+a:hover { color: var(--cp-accent); }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--cp-accent); outline-offset: 4px; }
+p { margin: 12px 0; }
+li { margin: 6px 0; }
+li::marker { color: var(--cp-accent); }
+code { font-family: Consolas, "Courier New", Courier, monospace; background: var(--cp-surface-soft); color: var(--cp-accent); border: 1px solid var(--cp-border); border-radius: 4px; padding: 2px 4px; font-size: .9em; overflow-wrap: anywhere; }
+.topbar, .navlinks { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+.topbar { padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--cp-border); }
+.badge { background: var(--cp-accent); color: var(--cp-accent-fg); border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 650; }
+button { font: inherit; color: var(--cp-text); background: var(--cp-surface-soft); border: 1px solid var(--cp-border); border-radius: .625rem; padding: 6px 12px; cursor: pointer; }
+.meta, figcaption { color: var(--cp-text-soft); font-size: .875rem; }
+.notice { border-left: 4px solid var(--cp-accent); padding: 12px 20px; margin: 20px 0; border-radius: 0 .625rem .625rem 0; background: var(--cp-accent-soft); }
+.toc, .entry { padding: 20px; background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: 16px; margin: 20px 0; }
+.toc ol { columns: 2; margin-bottom: 0; padding-left: 24px; }
+.toc li { break-inside: avoid; }
+.step { border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; margin: 24px 0; }
+.step h3 { color: var(--cp-accent); }
+.path { padding: 12px 16px; border-radius: .625rem; background: var(--cp-surface-soft); overflow-wrap: anywhere; }
+.result { border-top: 1px solid var(--cp-border); padding-top: 12px; }
+figure { margin: 20px 0; }
+figure a { display: block; }
+img { display: block; max-width: 100%; height: auto; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface-soft); }
+figcaption { margin-top: 8px; }
+.table-wrap { overflow-x: auto; margin: 20px 0; }
+table { width: 100%; border-collapse: collapse; font-size: .925rem; }
+th, td { text-align: left; vertical-align: top; padding: 12px; border: 1px solid var(--cp-border); }
+th { background: var(--cp-surface-soft); }
+fieldset { border: 1px solid var(--cp-border); border-radius: .625rem; margin: 20px 0; padding: 16px 20px; min-width: 0; }
+legend { font-weight: 650; padding: 0 8px; }
+fieldset label { display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; }
+input[type="checkbox"] { flex: 0 0 auto; margin-top: 7px; accent-color: var(--cp-accent); width: 18px; height: 18px; }
+footer { margin-top: 36px; border-top: 1px solid var(--cp-border); padding-top: 20px; }
+[id] { scroll-margin-top: 64px; }
+body[data-lang="ko"] .lang-en, body[data-lang="en"] .lang-ko { display: none; }
+@media (max-width: 640px) { body { padding: 56px 8px 24px; } main { padding: 24px 16px; } .step { padding: 16px; } h1 { font-size: 1.7rem; } .toc ol { columns: 1; } th, td { padding: 8px; } }
+@media print { body { padding: 0; } main { max-width: none; padding: 0; border: 0; } .topbar button { display: none; } figure, .result { break-inside: avoid; } }
+</style>
+</head>
+<body data-lang="ko">
+<main>
+  <div class="topbar">
+    <span class="badge">Microsoft Fabric · 01 / UI</span>
+    <button id="themeToggle" type="button"><span class="lang-ko">테마 전환</span><span class="lang-en">Change theme</span></button>
+  </div>
+
+  <div class="lang-ko" lang="ko">
+    <nav class="navlinks" aria-label="상위 탐색"><a href="../?lang=ko">← 01. Fabric 온보딩</a><a href="../../../?lang=ko">가이드 허브</a></nav>
+    <header id="top-ko">
+      <h1>UI 기반 환경 설정</h1>
+      <p class="meta">01. Fabric 온보딩의 화면 따라 하기 · 공식 문서 확인: 2026-09-21 · 관리자 / 참가자</p>
+      <p>브라우저만으로 실습 전 <strong>빈 Fabric 실습 환경</strong>을 준비합니다. 관리자에게는 보안 그룹·용량·워크스페이스·필요한 기능 설정을, 참가자에게는 로그인과 메뉴 접근 확인을 안내합니다. 명령줄 작업은 없습니다.</p>
+      <div class="notice"><strong>화면 예시와 실제 설정을 구분하세요.</strong> 모든 스크린샷은 테넌트·사용자·회사·리소스 식별자를 영구 마스킹한 익명화 예시입니다. <strong>원본 화면은 한국어</strong>이며 영문판의 클릭 경로와 캡션은 대응하는 영어 컨트롤을 안내합니다. 현재 포털의 이름·위치와 다를 수 있습니다. 본문의 리소스 이름은 모두 가상 예시입니다. 이미지를 누르면 이미지 파일 자체가 열립니다. 화면에 조직 전체 활성화가 보여도 그대로 따라 하지 말고 <strong>승인된 보안 그룹 범위</strong>를 선택하세요.</div>
+    </header>
+
+    <section id="scope-ko">
+      <h2>1. 범위와 역할별 시작점</h2>
+      <div class="entry"><p><strong>관리자:</strong> <a href="#prerequisites-ko">사전 준비</a> → <a href="#admin-ko">Fabric 설정 A1–A9</a> → <a href="#handoff-ko">인계</a>.</p><p><strong>참가자:</strong> 관리자의 준비 완료 안내를 받은 뒤 <a href="#participant-ko">참가자 확인 P1</a>부터 시작하세요. 테넌트 관리자 역할은 필요하지 않습니다.</p></div>
+      <p><strong>완료 상태:</strong> 승인된 참가자가 지정 워크스페이스에 들어가 Notebook/Lakehouse의 새 항목 메뉴를 사용할 수 있습니다. 데이터 업로드, Lakehouse·Notebook 실제 생성, 모델 배포, 온톨로지·에이전트 작성/배포는 이 문서의 범위 밖입니다.</p>
+      <p>Microsoft 365로의 직접 게시에는 별도의 제품 라이선스·관리자 정책·배포 요건이 있으며 여기서는 게시하지 않습니다.</p>
+    </section>
+    <nav class="toc" aria-label="목차"><strong>목차</strong><ol>
+      <li><a href="#scope-ko">범위와 역할별 시작점</a></li><li><a href="#prerequisites-ko">사전 준비·이름·권한</a></li>
+      <li><a href="#admin-ko">Fabric 관리자 설정</a></li>
+      <li><a href="#participant-ko">참가자 접근 확인</a></li><li><a href="#handoff-ko">체크리스트와 인계</a></li>
+      <li><a href="#troubleshooting-ko">문제 해결</a></li><li><a href="#references-ko">공식 참고 문서</a></li>
+    </ol></nav>
+
+    <section id="prerequisites-ko">
+      <h2>2. 사전 준비·이름·권한</h2>
+      <p>Fabric와 Azure 구독은 같은 Entra 테넌트를 사용합니다. 조직 계정, MFA/조건부 접근 정책, 승인된 구독·리전·예산·실습 기능 목록을 먼저 확인하세요. 기존 유료 용량이 준비되어 있다면 재사용 승인을 받고 신규 구매와 체험 시작을 건너뜁니다.</p>
+      <div class="table-wrap"><table><caption>역할은 서로 대체되지 않습니다</caption><thead><tr><th scope="col">담당</th><th scope="col">필요 권한과 경계</th></tr></thead><tbody>
+        <tr><td>그룹 담당자</td><td>Entra <strong>Groups Administrator</strong>가 보안 그룹과 참가자 멤버십을 관리합니다. 사용자 계정 생성이 필요하면 사용자 관리 담당자에게 요청합니다.</td></tr>
+        <tr><td>테넌트 설정 담당자</td><td><strong>Fabric Administrator</strong>는 Entra 테넌트 역할입니다. Privileged Role Administrator 또는 Global Administrator가 승인된 운영자에게 할당합니다. 적격(Eligible) 역할이면 먼저 PIM에서 활성화합니다.</td></tr>
+        <tr><td>Azure 리소스 담당자</td><td>해당 범위의 Contributor 또는 승인된 사용자 지정 역할은 리소스 생성을 허용합니다. <strong>Contributor만으로 역할 할당은 할 수 없습니다.</strong></td></tr>
+        <tr><td>Azure 권한 할당 담당자</td><td>대상 범위의 <code>Microsoft.Authorization/roleAssignments/write</code>가 필요합니다. Owner, User Access Administrator 또는 Role Based Access Control Administrator 등의 권한과 할당 조건을 확인합니다. UI에서도 동일합니다.</td></tr>
+        <tr><td>용량 / 워크스페이스 담당자</td><td>Capacity admin은 특정 용량을, Workspace Admin은 해당 작업 영역을 관리합니다. 직접 용량을 연결하는 운영자는 <strong>Workspace Admin과 대상 용량의 Contributor 권한</strong>(또는 용량 관리 권한)이 필요합니다. Workspace Contributor와 Capacity Contributor는 다르며 Fabric 테넌트 관리자와도 별개입니다.</td></tr>
+        <tr><td>참가자</td><td>Fabric 사용자 라이선스와 워크스페이스 Contributor 권한. 참가자에게 테넌트 관리자나 구독 Owner를 주지 않습니다.</td></tr>
+      </tbody></table></div>
+      <div class="table-wrap"><table><caption>본문에서 사용하는 가상 이름</caption><thead><tr><th scope="col">용도</th><th scope="col">예시</th></tr></thead><tbody>
+        <tr><td>리소스 그룹</td><td><code>rg-fabric-workshop</code></td></tr><tr><td>Fabric 용량</td><td><code>capfabricworkshop01</code> — 고유한 소문자/숫자 접미사를 추가하고 포털 유효성 검사를 통과시킵니다.</td></tr>
+        <tr><td>워크스페이스</td><td><code>ws-fabric-workshop</code></td></tr><tr><td>참가자 보안 그룹</td><td><code>grp-fabric-workshop-participants</code></td></tr>
+      </tbody></table></div>
+      <div class="notice"><strong>구독 공급자 확인:</strong> Azure Portal → <strong>Subscriptions → 대상 구독 → Resource providers</strong>에서 <code>Microsoft.Fabric</code>을 검색합니다. 필요하면 <strong>Register</strong>를 선택하고 등록 상태를 확인합니다. 등록에는 구독 범위의 등록 권한이 필요하며, 리소스 그룹 Contributor만으로 충분하지 않을 수 있습니다. 불필요한 공급자는 등록하지 않습니다.</div>
+      <p>구매 전 <a href="https://learn.microsoft.com/en-us/fabric/admin/region-availability">리전별 워크로드·미리 보기 기능 가용성</a>·가용 CU 쿼터·가격을 확인합니다. <strong>F8을 모든 실습의 정답으로 간주하거나 고정 Spark 동시 실행 수를 가정하지 마세요.</strong> 필요한 워크로드, 인원, 예산에 맞는 유료 SKU를 운영자가 선택합니다.</p>
+      <p><strong>진행 전 확인:</strong> A3의 구매 운영자도 Fabric Free 또는 Power BI 라이선스가 필요합니다. 없으면 A4의 라이선스 확인을 먼저 수행하세요. A5의 작성자가 워크스페이스 생성 정책의 허용 범위에 있는지도 확인합니다. 이 UI 가이드는 후속 AI 실습을 위해 승인된 <strong>유료 용량</strong>을 사용하며, 상위 가이드의 선택적 체험 경로와는 다릅니다. F2는 Copilot/Data Agent의 최소 용량 요건이지 모든 미리 보기 기능·리전·실습 성능의 보장은 아닙니다.</p>
+    </section>
+
+    <section id="admin-ko">
+      <h2>3. Fabric 관리자 설정</h2>
+      <article class="step" id="a1-ko">
+        <h3>A1. 참가자 확인 후 보안 그룹 만들기</h3>
+        <p><strong>목표:</strong> 워크스페이스 권한과 승인된 테넌트 기능의 대상을 하나의 검토된 멤버 목록으로 관리합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Entra 관리 센터 → Entra ID → Users → All users에서 참가자 확인 → Groups → All groups → New group.</p>
+        <p><strong>입력:</strong> Group type은 <strong>Security</strong>, Group name은 <code>grp-fabric-workshop-participants</code>, Membership type은 <strong>Assigned</strong>를 선택합니다. Members에서 승인된 참가자를 추가하고 Create를 누릅니다. 이 참가자 그룹에 Entra 역할을 할당하도록 설정하지 않습니다.</p>
+        <figure><a href="img/security-group.png"><img src="img/security-group.png" loading="lazy" alt="식별자가 마스킹된 Entra 보안 그룹 생성 화면"></a><figcaption>한국어 화면 예시 — 그룹 → 새 그룹에서 보안 유형과 할당됨 멤버십을 확인합니다.</figcaption></figure>
+        <p class="result"><strong>기대 결과:</strong> 생성한 보안 그룹의 Members 목록에 승인된 참가자만 표시됩니다. 동명이인은 실제 계정 정보를 비공개로 대조합니다. 그룹 생성 자체는 Fabric 접근 권한을 주지 않습니다.</p>
+      </article>
+      <article class="step" id="a2-ko">
+        <h3>A2. 운영자에게 Fabric Administrator 지정</h3>
+        <p><strong>목표:</strong> 용량 관리자와 별도로 테넌트 설정을 관리할 운영자를 준비합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Entra 관리 센터 → Roles &amp; admins → <strong>Fabric</strong> 검색 → Fabric Administrator → Add assignments → 승인된 운영자 선택 → Add.</p>
+        <p><strong>입력:</strong> 참가자 그룹이 아니라 승인된 운영자 계정을 선택합니다. Privileged Role Administrator / Global Administrator가 수행하며, PIM으로 적격 할당을 받은 운영자는 <strong>Privileged Identity Management → My roles → Microsoft Entra roles → Activate</strong>에서 필요한 승인을 완료합니다.</p>
+        <figure><a href="img/fabric-admin-role.png"><img src="img/fabric-admin-role.png" loading="lazy" alt="역할 및 관리자에서 Fabric 관리자 역할을 찾는 익명화 화면"></a><figcaption>한국어 화면 예시 — 역할 및 관리자에서 Fabric Administrator 역할을 선택합니다.</figcaption></figure>
+        <figure><a href="img/fabric-admin-assignment.png"><img src="img/fabric-admin-assignment.png" loading="lazy" alt="선택한 운영자에게 Fabric 관리자 역할을 할당하는 익명화 화면"></a><figcaption>한국어 화면 예시 — 할당 추가. 실습 참가자에게 이 역할을 부여하지 않습니다.</figcaption></figure>
+        <p class="result"><strong>기대 결과:</strong> 운영자의 역할이 활성 상태이고 재로그인 후 테넌트 설정을 볼 수 있습니다. 역할/그룹 변경 전파에는 시간이 걸릴 수 있으며 고정 최대 시간을 보장하지 않습니다.</p>
+      </article>
+      <article class="step" id="a3-ko">
+        <h3>A3. 승인된 유료 Fabric 용량 준비</h3>
+        <p><strong>목표:</strong> 실습 워크스페이스를 호스팅할 유료 용량을 준비합니다. 기존 승인 용량이 있다면 생성 대신 상태·리전·할당 권한을 확인합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Azure Portal → Microsoft Fabric 검색 → Create Fabric Capacity → Basics → Review + create → Create → 리소스 Overview.</p>
+        <p><strong>입력:</strong> 승인된 Subscription, <code>rg-fabric-workshop</code>, 고유 접미사를 붙인 <code>capfabricworkshop01</code>, 지원되는 승인 Region, 예산에 맞는 Size/SKU, Fabric capacity administrator를 지정합니다. 관리자는 <strong>같은 테넌트의 사용자이며 B2B 게스트는 불가</strong>합니다. 가격과 정책 검증 결과를 검토한 뒤에만 생성합니다.</p>
+        <figure><a href="img/capacity-basics.png"><img src="img/capacity-basics.png" loading="lazy" alt="구독 리소스 그룹 용량 이름 리전 SKU 관리자 필드가 있는 익명화 Fabric 용량 생성 화면"></a><figcaption>한국어 화면 예시 — Fabric 용량 만들기 → 기본. 화면의 크기·리전은 권장 기본값이 아닙니다.</figcaption></figure>
+        <p class="result"><strong>기대 결과:</strong> 배포 성공 후 용량 상태가 <strong>Active</strong>입니다. 중지 상태라면 승인된 담당자가 재개합니다. 용량 생성은 워크스페이스 생성이나 참가자 권한 부여와 다릅니다.</p>
+      </article>
+      <article class="step" id="a4-ko">
+        <h3>A4. Fabric 사용자 라이선스 확인</h3>
+        <p><strong>목표:</strong> 개인 라이선스와 조직 용량을 구분하고 불필요한 체험을 시작하지 않습니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Fabric 포털 → 조직 계정 로그인 → 프로필의 계정/라이선스 정보 확인. 라이선스가 없을 때만 허용된 Free 가입 화면을 사용하거나 라이선스 관리자에게 할당 요청.</p>
+        <p><strong>입력:</strong> 승인된 조직 계정으로 진행합니다. <strong>Microsoft Fabric (Free)</strong> 사용자 라이선스는 체험 용량이 아닙니다. 셀프서비스 가입은 필요한 경우에만 조직 정책이 허용할 때 사용합니다. 차단되면 전체 테넌트 가입 정책을 바꾸지 말고 라이선스 관리자에게 요청합니다.</p>
+        <figure><a href="img/fabric-free-license.png"><img src="img/fabric-free-license.png" loading="lazy" alt="식별자가 마스킹된 Fabric Free 사용자 라이선스 안내 화면"></a><figcaption>한국어 화면 예시 — Free 사용자 라이선스 확인. 체험 용량 시작과 구분하세요.</figcaption></figure>
+        <p class="result"><strong>기대 결과:</strong> 참가자가 적절한 사용자 라이선스로 로그인하고 준비된 유료 용량의 워크스페이스를 사용합니다. 체험 권유만으로 접근 차단을 단정하지 않습니다. Power BI 작성·공유·열람 라이선스는 <a href="../?lang=ko">상위 가이드 §1.2</a>와 <a href="https://learn.microsoft.com/en-us/fabric/enterprise/licenses">공식 라이선스 문서</a>를 별도로 확인합니다.</p>
+      </article>
+      <article class="step" id="a5-ko">
+        <h3>A5. Fabric 포털에서 워크스페이스 생성·용량 연결</h3>
+        <p><strong>목표:</strong> Azure 리소스가 아니라 Fabric 작업 영역을 만들고 올바른 용량에 연결합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Fabric → Workspaces → New workspace → 이름 → Advanced / Apply. 이후 Workspace settings → <strong>Workspace type</strong> (화면에 따라 License info / Premium) → Edit → Fabric capacity → 대상 용량 → Apply.</p>
+        <p><strong>입력:</strong> 이름은 <code>ws-fabric-workshop</code>. Fabric capacity 유형에서 A3의 승인된 유료 용량을 선택합니다. 생성 화면에서 연결할 수 있으면 바로 지정하고, 생성 후에도 설정을 다시 확인합니다. 목록에 용량이 없으면 임의 체험을 시작하지 말고 용량 담당자에게 <strong>Capacity settings → 대상 용량 → Contributor permissions</strong>에서 해당 Workspace Admin/운영자 그룹의 할당 권한을 확인하도록 요청합니다.</p>
+        <figure><a href="img/workspace-create.png"><img src="img/workspace-create.png" loading="lazy" alt="Fabric 포털 작업 영역 메뉴의 새 작업 영역 버튼"></a><figcaption>한국어 화면 예시 — 작업 영역 → 새 작업 영역. Azure Portal에서 만드는 것이 아닙니다.</figcaption></figure>
+        <figure><a href="img/workspace-capacity.png"><img src="img/workspace-capacity.png" loading="lazy" alt="작업 영역 설정에서 Fabric 용량을 연결하는 익명화 화면"></a><figcaption>한국어 화면 예시 — 라이선스 정보/작업 영역 유형에서 Fabric capacity와 대상 용량을 선택합니다.</figcaption></figure>
+        <p class="result"><strong>기대 결과:</strong> 빈 워크스페이스가 보이며 설정에 올바른 유료 용량이 표시됩니다. My workspace, Pro/PPU 또는 의도하지 않은 Trial로 남아 있지 않은지 확인합니다.</p>
+      </article>
+      <article class="step" id="a6-ko">
+        <h3>A6. 참가자 그룹에 Contributor 부여</h3>
+        <p><strong>목표:</strong> 작성 실습에 필요한 워크스페이스 권한만 부여합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Fabric → 해당 워크스페이스 → Manage access → Add people or groups → 그룹 검색 → 역할 선택 → Add.</p>
+        <p><strong>입력:</strong> <code>grp-fabric-workshop-participants</code>를 선택하고 <strong>Contributor</strong>로 추가합니다. 동명이 그룹을 주의하고 승인된 그룹인지 확인합니다. 참가자 편의를 위해 Admin을 부여하지 않습니다.</p>
+        <figure><a href="img/workspace-contributor.png"><img src="img/workspace-contributor.png" loading="lazy" alt="참가자 보안 그룹에 작업 영역 Contributor 역할을 주는 익명화 화면"></a><figcaption>한국어 화면 예시 — 액세스 관리에서 그룹 역할을 기여자(Contributor)로 지정합니다.</figcaption></figure>
+        <p class="result"><strong>기대 결과:</strong> Manage access에 그룹과 Contributor 역할이 표시됩니다. 이 공유 워크스페이스는 참가자별 데이터 격리 환경이 아닙니다. 개인별 격리가 필요하면 별도 워크스페이스와 권한 설계를 사용합니다.</p>
+      </article>
+      <article class="step" id="a7-ko">
+        <h3>A7. 관리 포털에서 Fabric 항목 생성 허용</h3>
+        <p><strong>목표:</strong> 라이선스·워크스페이스 권한과 별도로 승인 그룹에 Fabric 기능을 허용합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Fabric → Settings(톱니바퀴) → Admin portal → Tenant settings → <strong>Users can create Fabric items</strong> 검색 → 설정 펼치기 → Apply.</p>
+        <p><strong>입력:</strong> 승인된 범위에서 Enabled와 <strong>Specific security groups</strong>를 선택하고 <code>grp-fabric-workshop-participants</code>를 지정합니다. 기존 운영용 허용/제외 그룹을 임의 삭제하지 말고 변경 승인을 따릅니다. 용량 담당자는 Capacity settings의 Delegated tenant settings에서도 유효 설정을 확인합니다.</p>
+        <figure><a href="img/admin-portal.png"><img src="img/admin-portal.png" loading="lazy" alt="Fabric 설정에서 관리 포털을 여는 익명화 화면"></a><figcaption>한국어 화면 예시 — 설정 → 관리 포털 → 테넌트 설정으로 진입한 뒤 항목 생성 설정을 검색합니다.</figcaption></figure>
+        <p class="result"><strong>기대 결과:</strong> 승인 그룹이 유효 허용 범위에 있고 용량 수준의 설정이 실습을 차단하지 않습니다. 테넌트 설정이 안 보이면 참가자 역할을 올리지 말고 지정 Fabric 관리자에게 요청합니다.</p>
+      </article>
+      <article class="step" id="a8-ko">
+        <h3>A8. 필요한 경우 Ontology와 Graph 설정 검토</h3>
+        <p><strong>목표:</strong> 후속 온톨로지 실습이 승인된 경우에만 <strong>Fabric IQ의 Ontology (preview)</strong> 접근을 준비합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Admin portal → Tenant settings → <strong>Ontology</strong> 검색 → Enable Ontology item (preview) → 승인 범위 지정 → Apply. 다음으로 <strong>Graph</strong>를 검색하여 표시되는 종속성·생성 설정을 확인합니다.</p>
+        <p><strong>입력:</strong> 기능을 사용할 승인 그룹 <code>grp-fabric-workshop-participants</code>를 지정합니다. 실습에 온톨로지가 없으면 생략합니다. Graph 설정을 별도로 요구하는 포털에서는 해당 설정에도 동일하게 승인된 그룹 범위를 적용합니다.</p>
+        <figure><a href="img/ontology-setting.png"><img src="img/ontology-setting.png" loading="lazy" alt="Graph 종속성 안내가 있는 익명화 Ontology 미리 보기 테넌트 설정 화면"></a><figcaption>한국어 화면 예시 — Ontology 활성화와 Graph 필요 안내. 조직 전체 선택은 따라 하지 않습니다.</figcaption></figure>
+        <figure><a href="img/graph-setting.png"><img src="img/graph-setting.png" loading="lazy" alt="Fabric Graph 기능의 익명화 테넌트 설정 화면"></a><figcaption>한국어 화면 예시 — Graph 설정을 검색하고 승인 그룹 및 포털의 종속성 안내를 확인합니다.</figcaption></figure>
+        <p class="notice"><strong>문서와 화면의 차이:</strong> 제공 화면은 Ontology에 Graph가 필요하다고 안내합니다. 2026-09-21 확인한 Learn은 온톨로지 그래프가 Fabric Graph 기반임을 설명하지만, 현재 필수 테넌트 설정 문서는 별도 Graph 토글을 명시하지 않습니다. 따라서 모든 테넌트의 고정 필수 토글이라고 단정하지 않습니다. 현재 포털이 요구하면 승인 후 적용하고, 불일치가 있으면 관리자에게 확인합니다.</p>
+        <p><strong>후속 실습의 데이터 요건:</strong> 현재 Ontology 바인딩 문서는 Lakehouse의 managed 테이블과 OneLake security/column mapping 비활성 상태를 요구합니다. 운영 데이터의 보안을 해제하지 말고 승인된 별도 실습 데이터를 준비하세요. Data Agent로 질의할 경우 A9의 유료 용량·리전·데이터 권한 요건도 적용됩니다. 이 단계에서는 데이터를 만들거나 보안 설정을 바꾸지 않습니다.</p>
+        <p class="result"><strong>기대 결과:</strong> 필요한 미리 보기 설정과 종속성이 승인 그룹에 적용됩니다. 이후 New item에서 메뉴 가용성만 확인하며 Ontology나 Graph 항목을 만들지는 않습니다.</p>
+      </article>
+      <article class="step" id="a9-ko">
+        <h3>A9. Copilot·Data Agent와 데이터 경계 승인</h3>
+        <p><strong>목표:</strong> 후속 AI 실습에 필요한 설정만 허용하고 처리·저장·대화 기록의 지리적 경계를 검토합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Admin portal → Tenant settings → <strong>Copilot / Azure OpenAI / Data agent</strong> 검색 → 해당 설정 펼치기 → 승인 그룹 범위 검토 → Apply.</p>
+        <p><strong>입력:</strong> <strong>Users can use Copilot and other features powered by Azure OpenAI</strong>를 승인 그룹 <code>grp-fabric-workshop-participants</code>에 허용합니다. Data Agent 생성·공유 관련 설정도 검색하되, 현재 공식 문서는 Copilot/Azure OpenAI 설정과 일반 워크스페이스 권한을 설명하며 모든 테넌트에 동일한 이름의 독립 토글이 있다고 가정하지 않습니다.</p>
+        <figure><a href="img/copilot-setting.png"><img src="img/copilot-setting.png" loading="lazy" alt="Copilot 및 Azure OpenAI 사용을 제어하는 익명화 테넌트 설정 화면"></a><figcaption>한국어 화면 예시 — Copilot 및 Azure OpenAI 설정. 승인된 보안 그룹으로 범위를 제한합니다.</figcaption></figure>
+        <p>현재 일반 Copilot/Data Agent 요건은 지원 리전의 <strong>유료 F2 이상</strong>(또는 Fabric 사용 P1 이상)이며, 모든 F64 미만 용량에 별도 Fabric Copilot capacity를 의무 지정하는 것은 아닙니다. Data Agent 설정 문서가 요구하는 <em>Capacities can be designated as Fabric Copilot capacities</em>(관리자 문서의 <em>Copilot in Fabric capacities</em>)를 승인된 용량 관리자 범위에 허용하세요. 이 <strong>지정 허용</strong>과 실제 중앙 청구 용량 지정/사용자 그룹 할당은 다릅니다. 중앙 청구를 선택하면 최소 F2/P1 용량이 <strong>테넌트 홈 리전</strong>에 있어야 합니다. 워크스페이스를 이전하는 것이 아닙니다. 필요한 용량 위임 설정도 확인합니다. Standalone Copilot in Power BI 토글은 기본 Data Agent 생성의 필수 설정이 아닙니다.</p>
+        <p><strong>경계 결정:</strong> 실제 용량 리전과 사용할 기능의 현행 요건을 확인하세요. Azure OpenAI 기반 기능에서 용량이 <strong>EU 데이터 경계와 미국 밖</strong>에 있으면 지역 외 <strong>처리</strong> 허용이 필요하며, Notebook Copilot/Data Agent에는 지역 외 <strong>저장</strong> 허용도 필요합니다. 특정 국가라고 일괄 가정하지 않습니다. 보안·개인정보 승인을 받은 해당 설정만 켜고, 승인이 없으면 해당 AI 실습을 생략합니다.</p>
+        <figure><a href="img/crossgeo-processing.png"><img src="img/crossgeo-processing.png" loading="lazy" alt="용량 지리적 경계 밖 Azure OpenAI 데이터 처리를 허용하는 익명화 설정 화면"></a><figcaption>한국어 화면 예시 — 지역 외 처리 설정. 실제 리전·기능의 필요성과 승인 범위를 먼저 확인합니다.</figcaption></figure>
+        <figure><a href="img/crossgeo-storage.png"><img src="img/crossgeo-storage.png" loading="lazy" alt="지역 외 Azure OpenAI 데이터 저장을 허용하는 익명화 설정 화면"></a><figcaption>한국어 화면 예시 — 지역 외 저장 설정. 처리 허용과 저장/대화 기록 허용은 별도 결정입니다.</figcaption></figure>
+        <p>대화 기록이 저장되는 경험은 현재 문서상 사용자가 삭제하지 않으면 최대 28일 보관될 수 있습니다. OpenAI를 Microsoft 하위 처리자로 사용하는 새 설정이 보이면 Azure OpenAI 설정과 동일시하지 말고 별도의 기능·계약·국외 처리 검토를 거칩니다. 승인이 없으면 해당 AI 실습을 생략합니다.</p>
+        <p><strong>후속 Data Agent 실습:</strong> 에이전트와 데이터 소스 워크스페이스의 용량 리전을 맞추고, 소비자에게 에이전트와 원본 데이터 각각의 읽기 권한이 있는지 확인하세요. 에이전트 공유만으로 원본 권한이 생기지 않습니다. 현재 비영어 지원을 가정하지 말고 질문·지침·예제는 영어로 준비합니다. 여기서는 에이전트를 생성하거나 호출하지 않습니다.</p>
+        <p class="result"><strong>기대 결과:</strong> 필요한 설정·허용/제외 그룹·위임 설정·경계 승인을 비공개 변경 기록으로 남깁니다. 전파 후 메뉴를 확인하되 고정 반영 시간이나 실제 AI 실행 성공을 보장하지 않습니다. 에이전트 생성·공유·Microsoft 365 게시 자체는 후속 실습입니다.</p>
+      </article>
+    </section>
+
+    <section id="participant-ko">
+      <h2>4. 참가자 접근 확인 — 만들지 말고 확인만</h2>
+      <article class="step" id="p1-ko">
+        <h3>P1. 조직 계정과 Notebook/Lakehouse 메뉴 확인</h3>
+        <p><strong>목표:</strong> 실제 생성 없이 로그인·워크스페이스 접근·항목 메뉴 가용성을 검증합니다.</p>
+        <p class="path"><strong>클릭 경로:</strong> Fabric 포털 → 조직 계정 로그인 → 프로필에서 계정/테넌트 확인 → Workspaces → 배정된 워크스페이스 → <strong>New item</strong> → Notebook 검색 → Lakehouse 검색.</p>
+        <p><strong>입력:</strong> 관리자가 비공개로 안내한 계정과 <code>ws-fabric-workshop</code>을 사용합니다. MFA/조건부 접근을 완료하고 올바른 디렉터리를 선택합니다. 검색어는 <strong>Notebook</strong>, <strong>Lakehouse</strong>입니다. 카드를 선택해 생성되는 경우가 있으므로 <strong>검색 결과의 표시/활성 상태만 확인하고 생성 카드는 누르지 않습니다.</strong> 이름을 입력하거나 Create를 누르지 않습니다.</p>
+        <figure><a href="img/new-notebook.png"><img src="img/new-notebook.png" loading="lazy" alt="새 항목 메뉴에서 Notebook 항목을 찾는 익명화 Fabric 화면"></a><figcaption>한국어 화면 예시 — 새 항목 → Notebook 검색. 선택/생성하지 않고 사용 가능한지 확인합니다.</figcaption></figure>
+        <figure><a href="img/new-lakehouse.png"><img src="img/new-lakehouse.png" loading="lazy" alt="새 항목 메뉴에서 Lakehouse 항목을 찾는 익명화 Fabric 화면"></a><figcaption>한국어 화면 예시 — 새 항목 → Lakehouse 검색. 생성 화면이 열렸다면 저장하지 말고 취소합니다.</figcaption></figure>
+        <p class="result"><strong>기대 결과:</strong> 지정 워크스페이스가 보이고 두 항목이 비활성화되지 않은 상태로 표시됩니다. 메뉴를 닫아도 워크스페이스는 빈 상태입니다. 이는 UI 접근 확인이며 실제 Spark 실행·데이터 쓰기·AI 기능 성공을 검증한 것은 아닙니다.</p>
+      </article>
+    </section>
+
+    <section id="handoff-ko">
+      <h2>5. 체크리스트와 안전한 인계</h2>
+      <p>체크박스는 이 페이지에서만 확인하는 보조 도구이며 서버 전송이나 별도 저장을 하지 않습니다. 실계정·테넌트 URL·키를 입력하는 필드는 없습니다.</p>
+      <fieldset><legend>관리자 체크리스트</legend>
+        <label><input type="checkbox"><span>구독/테넌트·예산·지원 리전·공급자 등록·역할 할당 권한을 확인했다.</span></label>
+        <label><input type="checkbox"><span>참가자 그룹 멤버십, 활성 Fabric 관리자, 사용자 라이선스를 확인했다.</span></label>
+        <label><input type="checkbox"><span>승인된 유료 용량이 Active이며 워크스페이스가 연결되어 있고 그룹은 Contributor다.</span></label>
+        <label><input type="checkbox"><span>필요한 기능만 승인 그룹에 허용하고 위임/제외 설정과 국외 처리·저장 승인을 확인했다.</span></label>
+        <label><input type="checkbox"><span>참가자 계정으로 메뉴를 확인했고 비공개 인계 및 종료 후 비용 관리 담당자를 정했다.</span></label>
+      </fieldset>
+      <fieldset><legend>참가자 체크리스트</legend>
+        <label><input type="checkbox"><span>올바른 조직 계정/테넌트로 MFA를 완료했다.</span></label>
+        <label><input type="checkbox"><span>배정 워크스페이스에서 Notebook과 Lakehouse의 새 항목 메뉴를 확인했으며 아무 항목도 만들지 않았다.</span></label>
+        <label><input type="checkbox"><span>문제는 민감 정보를 제거한 오류와 발생 시각을 담당자에게 비공개로 전달한다.</span></label>
+      </fieldset>
+      <p><strong>비공개 인계:</strong> 승인된 내부 채널로 실제 조직 계정, 테넌트/디렉터리 안내, 워크스페이스 링크와 권한 범위, 실습 가능 시간, 담당자를 전달합니다. 공개 가이드·이슈·스크린샷에 실제 UPN, 테넌트 URL, 구독/리소스 ID, 키를 게시하지 않습니다. 오류는 식별자·토큰을 제거하고 오류 코드, 발생 단계, 시각 등 필요한 최소 정보만 공유합니다.</p>
+      <p><strong>종료 후 비용:</strong> 필요한 Azure RBAC 권한이 있는 운영자는 사용 중인 사람이 없는지 확인하고 승인된 경우 Azure Portal → Microsoft Fabric → 해당 용량 → <strong>Pause → Yes</strong>로 중지합니다. Fabric Capacity admin 역할만으로 Azure 중지 권한이 생기지 않습니다. 중지하면 콘텐츠가 사용 불가해질 수 있고 남은 초과/스무딩 사용량이 청구됩니다. <strong>OneLake 저장 비용과 예약 약정은 중지로 사라지지 않습니다.</strong> 비용·보존·삭제 정책을 검토하고 임의로 공유 리소스를 삭제하지 않습니다.</p>
+    </section>
+    <section id="troubleshooting-ko">
+      <h2>6. 문제 해결</h2>
+      <p>먼저 실제 계정/테넌트와 마지막 변경을 확인하고 전파 후 다시 로그인해 봅니다. 전파 지연을 고정 SLA로 해석하지 말고, 해결을 위해 조직 전체 허용이나 과도한 관리자 권한을 부여하지 않습니다.</p>
+      <div class="table-wrap"><table><thead><tr><th scope="col">증상</th><th scope="col">확인과 다음 조치</th><th scope="col">담당</th></tr></thead><tbody>
+        <tr><td>워크스페이스가 안 보임</td><td>올바른 테넌트, 배정 링크, 보안 그룹 실제 멤버십, 워크스페이스 Manage access의 그룹/역할을 확인합니다.</td><td>그룹 / 워크스페이스 관리자</td></tr>
+        <tr><td>New item 비활성화 / 항목 없음</td><td>Contributor, 사용자 라이선스, 유료 용량 연결과 Active 상태, Fabric 항목 생성 설정, 용량 위임·제외 그룹을 확인합니다.</td><td>워크스페이스 / 용량 / Fabric 관리자</td></tr>
+        <tr><td>Tenant settings가 안 보임</td><td>Capacity admin만으로는 부족합니다. 운영자의 Fabric Administrator 활성 역할과 PIM을 확인합니다. 참가자는 관리자에게 요청합니다.</td><td>역할 할당 담당자</td></tr>
+        <tr><td>Copilot / Data Agent / Ontology 메뉴 없음</td><td>해당 기능의 지원 리전·유료 용량·승인 범위·위임 설정·경계 승인·미리 보기 가용성을 확인합니다. Ontology/Graph 종속성은 현재 포털과 Learn을 대조합니다.</td><td>Fabric 관리자</td></tr>
+        <tr><td>Free 가입 차단 / Trial 권유</td><td>Free 사용자 라이선스와 체험 용량은 다릅니다. 기존 라이선스·대상 워크스페이스 용량을 확인하고 필요할 때 라이선스 관리자에게 요청합니다. Trial 권유만으로 차단을 단정하거나 새 체험을 시작하지 않습니다.</td><td>라이선스 / 워크스페이스 관리자</td></tr>
+        <tr><td>공급자 미등록 / 생성 실패</td><td>대상 구독 → Resource providers에서 Microsoft.Fabric을 확인합니다. 등록 권한·정책·지원 리전·쿼터·이름 유효성도 점검합니다.</td><td>Azure 구독 담당자</td></tr>
+      </tbody></table></div>
+    </section>
+    <section id="references-ko">
+      <h2>7. 공식 참고 문서</h2>
+      <p class="meta">링크 및 관련 내용 확인일: 2026-09-21. 아래 문서는 공식 영어 원문입니다. 포털 배포 시점·역할 이름·미리 보기 요건은 바뀔 수 있습니다.</p>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/entra/fundamentals/how-to-manage-groups">Entra 그룹 만들기와 멤버 관리</a> · <a href="https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/manage-roles-portal">Entra 역할 할당</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal">Azure Portal 역할 할당과 필요 권한</a> · <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types">리소스 공급자 등록</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/enterprise/buy-capacity">Fabric 유료 용량 구매</a> · <a href="https://learn.microsoft.com/en-us/fabric/enterprise/licenses">사용자 라이선스와 용량</a> · <a href="https://learn.microsoft.com/en-us/fabric/enterprise/pause-resume">용량 중지/재개</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/fundamentals/create-workspaces">워크스페이스 생성·용량 연결</a> · <a href="https://learn.microsoft.com/en-us/fabric/admin/capacity-settings">용량 할당 권한</a> · <a href="https://learn.microsoft.com/en-us/fabric/admin/roles">Fabric 관리자 역할</a> · <a href="https://learn.microsoft.com/en-us/fabric/admin/fabric-switch">Fabric 항목 생성 허용</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/fundamentals/copilot-enable-fabric">Copilot 설정</a> · <a href="https://learn.microsoft.com/en-us/fabric/admin/service-admin-portal-copilot">Copilot/Agent 및 지역 외 처리·저장 설정</a> · <a href="https://learn.microsoft.com/en-us/fabric/enterprise/fabric-copilot-capacity">Copilot 중앙 청구 용량</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-tenant-settings">Data Agent 테넌트 설정</a> · <a href="https://learn.microsoft.com/en-us/fabric/data-science/concept-data-agent">Data Agent 용량·데이터·언어·리전 요건</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/overview">Ontology 개요와 Graph 기반 구조</a> · <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/overview-tenant-settings">현재 Ontology 필수 테넌트 설정</a> · <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-bind-data">바인딩 요건</a></li>
+      </ul>
+    </section>
+    <footer><nav class="navlinks" aria-label="하단 탐색"><a href="../?lang=ko">← 01. Fabric 온보딩</a><a href="../../../?lang=ko">가이드 허브</a><a href="#top-ko">맨 위로 ↑</a></nav></footer>
+  </div>
+
+  <div class="lang-en" lang="en">
+    <nav class="navlinks" aria-label="Parent navigation"><a href="../?lang=en">← 01. Fabric onboarding</a><a href="../../../?lang=en">Guide hub</a></nav>
+    <header id="top-en">
+      <h1>UI-based environment setup</h1>
+      <p class="meta">A screen-by-screen companion to 01. Fabric onboarding · Official documentation checked: 2026-09-21 · Administrators / participants</p>
+      <p>Prepare an <strong>empty Fabric workshop environment</strong> using only your browser. Administrators configure security groups, capacity, a workspace, and required features; participants validate sign-in and menu access. There are no command-line steps.</p>
+      <div class="notice"><strong>Distinguish screenshot examples from your configuration.</strong> All screenshots are anonymized examples with tenant, user, company, and resource identifiers permanently masked. <strong>The source screenshots are in Korean</strong>; the English click paths and captions below identify the corresponding controls. Names and locations may differ in the current portal. All resource values in the prose are fictional. Click an image to open the image file directly. Even if a screenshot shows organization-wide enablement, choose an <strong>approved security-group scope</strong> instead.</div>
+    </header>
+
+    <section id="scope-en">
+      <h2>1. Scope and role-based entry points</h2>
+      <div class="entry"><p><strong>Administrators:</strong> <a href="#prerequisites-en">Prerequisites</a> → <a href="#admin-en">Fabric setup A1–A9</a> → <a href="#handoff-en">Handoff</a>.</p><p><strong>Participants:</strong> after the administrator confirms readiness, start at <a href="#participant-en">Participant validation P1</a>. You do not need a tenant administrator role.</p></div>
+      <p><strong>Completion state:</strong> approved participants can open their assigned workspace and access the New item options for Notebook/Lakehouse. Uploading data, actually creating a Lakehouse or Notebook, deploying models, and building/deploying ontologies or agents are outside this guide.</p>
+      <p>Direct publishing to Microsoft 365 has its own product licensing, administrator policies, and deployment requirements; no publishing is performed here.</p>
+    </section>
+    <nav class="toc" aria-label="Table of contents"><strong>Contents</strong><ol>
+      <li><a href="#scope-en">Scope and role-based entry points</a></li><li><a href="#prerequisites-en">Prerequisites, names, and permissions</a></li>
+      <li><a href="#admin-en">Fabric administrator setup</a></li>
+      <li><a href="#participant-en">Participant access validation</a></li><li><a href="#handoff-en">Checklists and handoff</a></li>
+      <li><a href="#troubleshooting-en">Troubleshooting</a></li><li><a href="#references-en">Official references</a></li>
+    </ol></nav>
+
+    <section id="prerequisites-en">
+      <h2>2. Prerequisites, names, and permissions</h2>
+      <p>Fabric and the Azure subscription must use the same Entra tenant. Confirm organizational accounts, MFA/Conditional Access policies, the approved subscription, region, budget, and workshop feature list first. If a paid capacity is already prepared, obtain approval to reuse it and skip both a new purchase and starting a trial.</p>
+      <div class="table-wrap"><table><caption>These roles do not replace one another</caption><thead><tr><th scope="col">Responsibility</th><th scope="col">Permission and boundary</th></tr></thead><tbody>
+        <tr><td>Group administrator</td><td>An Entra <strong>Groups Administrator</strong> manages the security group and participant membership. If accounts must be created, request that from the user administration team.</td></tr>
+        <tr><td>Tenant settings operator</td><td><strong>Fabric Administrator</strong> is an Entra tenant role. A Privileged Role Administrator or Global Administrator assigns it to an approved operator. Activate an eligible role through PIM before proceeding.</td></tr>
+        <tr><td>Azure resource operator</td><td>Contributor or an approved custom role at the appropriate scope permits resource creation. <strong>Contributor alone cannot assign roles.</strong></td></tr>
+        <tr><td>Azure access administrator</td><td><code>Microsoft.Authorization/roleAssignments/write</code> is required at the target scope. Check permissions and assignment conditions for roles such as Owner, User Access Administrator, or Role Based Access Control Administrator. This applies to the UI too.</td></tr>
+        <tr><td>Capacity / workspace administrator</td><td>A Capacity admin manages a particular capacity; a Workspace Admin manages that workspace. Direct assignment requires <strong>Workspace Admin and target-capacity Contributor permissions</strong> (or capacity administration permissions). Workspace Contributor and Capacity Contributor are different roles; neither is the Fabric tenant administrator role.</td></tr>
+        <tr><td>Participant</td><td>A Fabric per-user license and workspace Contributor access. Do not give participants tenant administrator or subscription Owner roles.</td></tr>
+      </tbody></table></div>
+      <div class="table-wrap"><table><caption>Fictional names used in this guide</caption><thead><tr><th scope="col">Purpose</th><th scope="col">Example</th></tr></thead><tbody>
+        <tr><td>Resource group</td><td><code>rg-fabric-workshop</code></td></tr><tr><td>Fabric capacity</td><td><code>capfabricworkshop01</code> — add a unique lowercase-letter/digit suffix and pass the portal's name validation.</td></tr>
+        <tr><td>Workspace</td><td><code>ws-fabric-workshop</code></td></tr><tr><td>Participant security group</td><td><code>grp-fabric-workshop-participants</code></td></tr>
+      </tbody></table></div>
+      <div class="notice"><strong>Check subscription providers:</strong> Azure Portal → <strong>Subscriptions → target subscription → Resource providers</strong> → search for <code>Microsoft.Fabric</code>. Select <strong>Register</strong> if needed and verify its registration status. Registration needs subscription-level registration permissions; resource-group Contributor alone might not suffice. Do not register unnecessary providers.</div>
+      <p>Before purchasing, check <a href="https://learn.microsoft.com/en-us/fabric/admin/region-availability">regional workload and preview feature availability</a>, available CU quota, and pricing. <strong>Do not treat F8 as a universal workshop size or assume fixed Spark concurrency.</strong> The operator selects a paid SKU based on the workloads, participant count, and budget.</p>
+      <p><strong>Before proceeding:</strong> the purchasing operator in A3 also needs a Fabric Free or Power BI license. If missing, perform A4's license check first. Check that the A5 author is allowed by the workspace creation policy. This UI guide uses approved <strong>paid capacity</strong> for subsequent AI labs, unlike the optional trial path in the parent guide. F2 meets Copilot/Data Agent minimum capacity requirements; it does not guarantee every preview feature, region, or workshop performance.</p>
+    </section>
+
+    <section id="admin-en">
+      <h2>3. Fabric administrator setup</h2>
+      <article class="step" id="a1-en">
+        <h3>A1. Verify participants and create a security group</h3>
+        <p><strong>Goal:</strong> manage workspace access and approved tenant features through one reviewed membership list.</p>
+        <p class="path"><strong>Click path:</strong> Entra admin center → Entra ID → Users → All users to verify participants → Groups → All groups → New group.</p>
+        <p><strong>Input:</strong> set Group type to <strong>Security</strong>, Group name to <code>grp-fabric-workshop-participants</code>, and Membership type to <strong>Assigned</strong>. Add approved participants under Members and select Create. Do not configure this participant group to receive Entra roles.</p>
+        <figure><a href="img/security-group.png"><img src="img/security-group.png" loading="lazy" alt="Anonymized Korean Entra security-group creation screen"></a><figcaption>Korean screenshot — English path: Groups → New group; confirm Security and Assigned membership.</figcaption></figure>
+        <p class="result"><strong>Expected result:</strong> the group's Members list contains only approved participants. Privately compare actual account details to distinguish people with the same name. Creating the group does not itself grant Fabric access.</p>
+      </article>
+      <article class="step" id="a2-en">
+        <h3>A2. Assign Fabric Administrator to the operator</h3>
+        <p><strong>Goal:</strong> prepare a tenant settings operator, separately from the capacity administrator.</p>
+        <p class="path"><strong>Click path:</strong> Entra admin center → Roles &amp; admins → search <strong>Fabric</strong> → Fabric Administrator → Add assignments → select the approved operator → Add.</p>
+        <p><strong>Input:</strong> select the approved operator account, not the participant group. A Privileged Role Administrator / Global Administrator performs the assignment. An operator with an eligible PIM assignment completes required approvals at <strong>Privileged Identity Management → My roles → Microsoft Entra roles → Activate</strong>.</p>
+        <figure><a href="img/fabric-admin-role.png"><img src="img/fabric-admin-role.png" loading="lazy" alt="Anonymized Korean Roles and administrators screen locating Fabric Administrator"></a><figcaption>Korean screenshot — English path: Roles &amp; admins → Fabric Administrator.</figcaption></figure>
+        <figure><a href="img/fabric-admin-assignment.png"><img src="img/fabric-admin-assignment.png" loading="lazy" alt="Anonymized Korean Fabric Administrator role-assignment screen"></a><figcaption>Korean screenshot — English action: Add assignments. Do not assign this role to workshop participants.</figcaption></figure>
+        <p class="result"><strong>Expected result:</strong> the operator's role is active and tenant settings are accessible after signing in again. Role and group changes can take time to propagate; there is no guaranteed maximum time here.</p>
+      </article>
+      <article class="step" id="a3-en">
+        <h3>A3. Prepare an approved paid Fabric capacity</h3>
+        <p><strong>Goal:</strong> prepare paid capacity to host the workshop workspace. If approved capacity already exists, check its state, region, and assignment permissions instead of creating another.</p>
+        <p class="path"><strong>Click path:</strong> Azure Portal → search Microsoft Fabric → Create Fabric Capacity → Basics → Review + create → Create → resource Overview.</p>
+        <p><strong>Input:</strong> choose the approved Subscription, <code>rg-fabric-workshop</code>, <code>capfabricworkshop01</code> with a unique suffix, an approved supported Region, a budgeted Size/SKU, and a Fabric capacity administrator. The administrator must be a <strong>user in the same tenant, not a B2B guest</strong>. Create only after reviewing pricing and policy validation.</p>
+        <figure><a href="img/capacity-basics.png"><img src="img/capacity-basics.png" loading="lazy" alt="Anonymized Korean Fabric capacity Basics form with subscription, resource group, name, region, SKU, and administrator fields"></a><figcaption>Korean screenshot — English path: Create Fabric Capacity → Basics. The pictured size and region are not recommended defaults.</figcaption></figure>
+        <p class="result"><strong>Expected result:</strong> deployment succeeds and the capacity reaches <strong>Active</strong>. If paused, an authorized operator resumes it. Creating capacity does not create a workspace or grant participants access.</p>
+      </article>
+      <article class="step" id="a4-en">
+        <h3>A4. Verify the Fabric per-user license</h3>
+        <p><strong>Goal:</strong> distinguish individual licensing from organizational capacity and avoid an unintended trial.</p>
+        <p class="path"><strong>Click path:</strong> Fabric portal → sign in with an organizational account → inspect account/license information in the profile. Only if a license is missing, use the permitted Free sign-up screen or request assignment from the license administrator.</p>
+        <p><strong>Input:</strong> use the approved organizational account. A <strong>Microsoft Fabric (Free)</strong> per-user license is not a trial capacity. Use self-service sign-up only if needed and allowed by organizational policy. If blocked, contact the license administrator rather than changing sign-up policy for the whole tenant.</p>
+        <figure><a href="img/fabric-free-license.png"><img src="img/fabric-free-license.png" loading="lazy" alt="Anonymized Korean Fabric Free per-user license screen"></a><figcaption>Korean screenshot — check the Fabric Free per-user license; this is distinct from starting a trial capacity.</figcaption></figure>
+        <p class="result"><strong>Expected result:</strong> participants sign in with an appropriate per-user license and use the workspace on prepared paid capacity. A trial offer alone does not prove access is blocked. Check Power BI authoring, sharing, and viewing requirements separately in <a href="../?lang=en">the parent guide §1.2</a> and the <a href="https://learn.microsoft.com/en-us/fabric/enterprise/licenses">official licensing documentation</a>.</p>
+      </article>
+      <article class="step" id="a5-en">
+        <h3>A5. Create a workspace in Fabric and attach capacity</h3>
+        <p><strong>Goal:</strong> create a Fabric workspace, not an Azure resource, and connect it to the correct capacity.</p>
+        <p class="path"><strong>Click path:</strong> Fabric → Workspaces → New workspace → name → Advanced / Apply. Then Workspace settings → <strong>Workspace type</strong> (License info / Premium in some versions) → Edit → Fabric capacity → target capacity → Apply.</p>
+        <p><strong>Input:</strong> name it <code>ws-fabric-workshop</code>. Choose the approved paid capacity from A3 under Fabric capacity. If assignment is available during creation, select it there, then recheck settings afterward. If the capacity is absent, do not start a trial: ask the capacity administrator to check the Workspace Admin/operator group's assignment permission under <strong>Capacity settings → target capacity → Contributor permissions</strong>.</p>
+        <figure><a href="img/workspace-create.png"><img src="img/workspace-create.png" loading="lazy" alt="New workspace button in the Korean Fabric Workspaces menu"></a><figcaption>Korean screenshot — English path: Workspaces → New workspace. This is not created in Azure Portal.</figcaption></figure>
+        <figure><a href="img/workspace-capacity.png"><img src="img/workspace-capacity.png" loading="lazy" alt="Anonymized Korean workspace settings screen assigning a Fabric capacity"></a><figcaption>Korean screenshot — English equivalent: License info / Workspace type → Fabric capacity → target capacity.</figcaption></figure>
+        <p class="result"><strong>Expected result:</strong> an empty workspace is visible and its settings show the correct paid capacity. Confirm that it is not My workspace, Pro/PPU, or an unintended Trial workspace.</p>
+      </article>
+      <article class="step" id="a6-en">
+        <h3>A6. Give the participant group Contributor access</h3>
+        <p><strong>Goal:</strong> grant only the workspace permissions required for authoring labs.</p>
+        <p class="path"><strong>Click path:</strong> Fabric → target workspace → Manage access → Add people or groups → search group → choose role → Add.</p>
+        <p><strong>Input:</strong> select <code>grp-fabric-workshop-participants</code> and add it as <strong>Contributor</strong>. Verify that it is the approved group rather than another with the same display name. Do not grant Admin just for participant convenience.</p>
+        <figure><a href="img/workspace-contributor.png"><img src="img/workspace-contributor.png" loading="lazy" alt="Anonymized Korean workspace access screen assigning Contributor to a security group"></a><figcaption>Korean screenshot — English path: Manage access; choose Contributor for the participant group.</figcaption></figure>
+        <p class="result"><strong>Expected result:</strong> Manage access lists the group with Contributor. This shared workspace does not isolate each participant's data. Use separate workspaces and an appropriate permission design if individual isolation is required.</p>
+      </article>
+      <article class="step" id="a7-en">
+        <h3>A7. Allow Fabric item creation in the admin portal</h3>
+        <p><strong>Goal:</strong> allow Fabric features for the approved group in addition to licensing and workspace access.</p>
+        <p class="path"><strong>Click path:</strong> Fabric → Settings (gear) → Admin portal → Tenant settings → search <strong>Users can create Fabric items</strong> → expand setting → Apply.</p>
+        <p><strong>Input:</strong> within the approved change scope, select Enabled and <strong>Specific security groups</strong>, then specify <code>grp-fabric-workshop-participants</code>. Do not remove existing production allow/exclusion groups without approval. The capacity operator also checks effective configuration under Capacity settings → Delegated tenant settings.</p>
+        <figure><a href="img/admin-portal.png"><img src="img/admin-portal.png" loading="lazy" alt="Anonymized Korean Fabric settings menu opening the admin portal"></a><figcaption>Korean screenshot — English path: Settings → Admin portal → Tenant settings; then search for item creation.</figcaption></figure>
+        <p class="result"><strong>Expected result:</strong> the approved group is effectively allowed and capacity-level settings do not block the lab. If tenant settings are hidden, contact the designated Fabric administrator; do not elevate participants.</p>
+      </article>
+      <article class="step" id="a8-en">
+        <h3>A8. Review Ontology and Graph settings if required</h3>
+        <p><strong>Goal:</strong> prepare access to <strong>Ontology (preview) in Fabric IQ</strong> only if a later ontology lab is approved.</p>
+        <p class="path"><strong>Click path:</strong> Admin portal → Tenant settings → search <strong>Ontology</strong> → Enable Ontology item (preview) → approved scope → Apply. Then search <strong>Graph</strong> and inspect the displayed dependency and creation settings.</p>
+        <p><strong>Input:</strong> specify the approved feature group <code>grp-fabric-workshop-participants</code>. Skip this if the workshop does not use ontology. If your portal separately requires the Graph setting, apply the same approved group scope to it.</p>
+        <figure><a href="img/ontology-setting.png"><img src="img/ontology-setting.png" loading="lazy" alt="Anonymized Korean Ontology preview tenant setting with a Graph dependency notice"></a><figcaption>Korean screenshot — Ontology enablement and a notice requiring Graph. Do not copy an organization-wide selection.</figcaption></figure>
+        <figure><a href="img/graph-setting.png"><img src="img/graph-setting.png" loading="lazy" alt="Anonymized Korean Fabric Graph tenant setting"></a><figcaption>Korean screenshot — search Graph in Tenant settings; review the approved group and the portal's dependency notice.</figcaption></figure>
+        <p class="notice"><strong>Screenshot/documentation difference:</strong> the supplied screenshot says Ontology requires Graph. Learn checked on 2026-09-21 describes ontology graphs as powered by Fabric Graph, but its current required tenant settings page does not explicitly list a separate Graph toggle. Therefore this guide does not assert a universal, fixed toggle requirement. Apply it with approval if the current portal requires it, and escalate any discrepancy to the administrator.</p>
+        <p><strong>Data prerequisites for the later lab:</strong> current Ontology binding guidance requires managed Lakehouse tables without OneLake security or column mapping enabled. Prepare approved separate lab data rather than disabling protection on production data. Querying through Data Agent also requires A9's paid capacity, region, and data-access prerequisites. Do not create data or change data security at this step.</p>
+        <p class="result"><strong>Expected result:</strong> required preview settings and dependencies apply to the approved group. Later check only menu availability in New item; do not create an Ontology or Graph item.</p>
+      </article>
+      <article class="step" id="a9-en">
+        <h3>A9. Approve Copilot, Data Agent, and data boundaries</h3>
+        <p><strong>Goal:</strong> allow only the settings needed for subsequent AI labs and review geographic boundaries for processing, storage, and conversation history.</p>
+        <p class="path"><strong>Click path:</strong> Admin portal → Tenant settings → search <strong>Copilot / Azure OpenAI / Data agent</strong> → expand the relevant setting → review approved group scope → Apply.</p>
+        <p><strong>Input:</strong> allow <strong>Users can use Copilot and other features powered by Azure OpenAI</strong> for the approved group <code>grp-fabric-workshop-participants</code>. Also search for Data Agent creation/sharing controls, but do not assume every tenant has an identically named standalone toggle: current official guidance describes Copilot/Azure OpenAI controls and standard workspace permissions.</p>
+        <figure><a href="img/copilot-setting.png"><img src="img/copilot-setting.png" loading="lazy" alt="Anonymized Korean tenant setting controlling Copilot and Azure OpenAI use"></a><figcaption>Korean screenshot — English setting: Users can use Copilot and other features powered by Azure OpenAI. Limit scope to approved security groups.</figcaption></figure>
+        <p>Current general Copilot/Data Agent prerequisites include a <strong>paid F2 or higher</strong> capacity (or Fabric-enabled P1 or higher) in a supported region; separate Fabric Copilot capacity designation is not universally mandatory below F64. Allow <em>Capacities can be designated as Fabric Copilot capacities</em>, required by Data Agent settings guidance (called <em>Copilot in Fabric capacities</em> in admin guidance), for approved capacity administrators. This <strong>permission to designate</strong> is distinct from actually designating centralized billing capacity and assigning user groups. If centralized billing is selected, the capacity must be at least F2/P1 and in the <strong>tenant home region</strong>. It is not a workspace migration. Check relevant delegated capacity settings too. Standalone Copilot in Power BI is not a prerequisite for basic Data Agent creation.</p>
+        <p><strong>Boundary decision:</strong> check the actual capacity region and current requirements for the selected feature. Azure OpenAI-powered features on capacities <strong>outside both the EU data boundary and the US</strong> require cross-geography <strong>processing</strong> permission; Notebook Copilot/Data Agent also require cross-geography <strong>storage</strong> permission. Do not assume a particular country. Enable only applicable settings with security/privacy approval; skip the affected AI lab without that approval.</p>
+        <figure><a href="img/crossgeo-processing.png"><img src="img/crossgeo-processing.png" loading="lazy" alt="Anonymized Korean setting allowing Azure OpenAI processing outside the capacity geographic boundary"></a><figcaption>Korean screenshot — English setting: Data sent to Azure OpenAI can be processed outside your capacity's geographic region, compliance boundary, or national cloud instance. Establish need and approval first.</figcaption></figure>
+        <figure><a href="img/crossgeo-storage.png"><img src="img/crossgeo-storage.png" loading="lazy" alt="Anonymized Korean setting allowing Azure OpenAI storage outside the capacity geographic boundary"></a><figcaption>Korean screenshot — English setting: Data sent to Azure OpenAI can be stored outside your capacity's geographic region, compliance boundary, or national cloud instance. Storage/history approval is separate from processing.</figcaption></figure>
+        <p>For experiences that retain conversation history, current documentation describes retention of up to 28 days unless users delete it. If new settings for OpenAI as a Microsoft subprocessor appear, do not equate them with Azure OpenAI settings: separately review feature requirements, contractual terms, and cross-border processing. Skip the affected AI lab if approval is unavailable.</p>
+        <p><strong>Later Data Agent labs:</strong> align the capacity regions of the agent and source workspaces, and verify consumers have read access to both the agent and the source data. Sharing the agent does not grant source permissions. Do not assume non-English support; prepare questions, instructions, and examples in English. Do not create or invoke an agent here.</p>
+        <p class="result"><strong>Expected result:</strong> privately record required settings, included/excluded groups, delegated configuration, and boundary approvals. Check menus after propagation without promising a fixed propagation deadline or successful AI execution. Agent creation, sharing, and Microsoft 365 publishing are subsequent labs.</p>
+      </article>
+    </section>
+
+    <section id="participant-en">
+      <h2>4. Participant validation — inspect, do not create</h2>
+      <article class="step" id="p1-en">
+        <h3>P1. Verify the organizational account and Notebook/Lakehouse menus</h3>
+        <p><strong>Goal:</strong> validate sign-in, workspace access, and item-menu availability without creating items.</p>
+        <p class="path"><strong>Click path:</strong> Fabric portal → organizational sign-in → verify account/tenant in the profile → Workspaces → assigned workspace → <strong>New item</strong> → search Notebook → search Lakehouse.</p>
+        <p><strong>Input:</strong> use the account and <code>ws-fabric-workshop</code> supplied privately by the administrator. Complete MFA/Conditional Access and select the correct directory. Search terms are <strong>Notebook</strong> and <strong>Lakehouse</strong>. Selecting a card may create an item immediately, so <strong>only inspect visibility/enabled state; do not select creation cards.</strong> Do not enter an item name or select Create.</p>
+        <figure><a href="img/new-notebook.png"><img src="img/new-notebook.png" loading="lazy" alt="Anonymized Korean Fabric New item screen locating Notebook"></a><figcaption>Korean screenshot — English path: New item → search Notebook. Check availability without selecting or creating it.</figcaption></figure>
+        <figure><a href="img/new-lakehouse.png"><img src="img/new-lakehouse.png" loading="lazy" alt="Anonymized Korean Fabric New item screen locating Lakehouse"></a><figcaption>Korean screenshot — English path: New item → search Lakehouse. If a creation dialog opens, cancel without saving.</figcaption></figure>
+        <p class="result"><strong>Expected result:</strong> the assigned workspace is visible and both item options appear without being disabled. Closing the menu leaves the workspace empty. This validates UI access, not successful Spark execution, data writes, or AI functionality.</p>
+      </article>
+    </section>
+
+    <section id="handoff-en">
+      <h2>5. Checklists and safe handoff</h2>
+      <p>The checkboxes are a page-only aid with no server submission or custom persistence. There are no fields for real accounts, tenant URLs, or keys.</p>
+      <fieldset><legend>Administrator checklist</legend>
+        <label><input type="checkbox"><span>Verified subscription/tenant, budget, supported region, provider registration, and role-assignment permissions.</span></label>
+        <label><input type="checkbox"><span>Verified participant membership, an active Fabric administrator, and per-user licensing.</span></label>
+        <label><input type="checkbox"><span>Approved paid capacity is Active, the workspace is attached, and the group is Contributor.</span></label>
+        <label><input type="checkbox"><span>Allowed only needed features for approved groups; checked delegation/exclusions and cross-geography processing/storage approvals.</span></label>
+        <label><input type="checkbox"><span>Checked menus with a participant account and assigned private handoff and post-event cost-management owners.</span></label>
+      </fieldset>
+      <fieldset><legend>Participant checklist</legend>
+        <label><input type="checkbox"><span>Completed MFA using the correct organizational account and tenant.</span></label>
+        <label><input type="checkbox"><span>Verified Notebook and Lakehouse in the assigned workspace's New item menu without creating anything.</span></label>
+        <label><input type="checkbox"><span>Will privately report problems with sanitized errors and the time of occurrence.</span></label>
+      </fieldset>
+      <p><strong>Private handoff:</strong> use an approved internal channel for actual organizational accounts, tenant/directory instructions, workspace links and permission scopes, access windows, and support contacts. Do not publish real UPNs, tenant URLs, subscription/resource IDs, or keys in public guides, issues, or screenshots. Remove identifiers and tokens from errors; share only necessary details such as the error code, failing step, and time.</p>
+      <p><strong>Post-event cost review:</strong> an operator with the required Azure RBAC permissions confirms that nobody is using the capacity and, if approved, selects Azure Portal → Microsoft Fabric → target capacity → <strong>Pause → Yes</strong>. The Fabric Capacity admin role alone does not grant Azure pause permissions. Pausing may make content unavailable and bills remaining overages/smoothed usage. <strong>Pausing does not eliminate OneLake storage charges or reservation commitments.</strong> Review cost, retention, and deletion policies; do not arbitrarily delete shared resources.</p>
+    </section>
+    <section id="troubleshooting-en">
+      <h2>6. Troubleshooting</h2>
+      <p>First verify the actual account/tenant and last change, then retry sign-in after propagation. Do not treat propagation estimates as a fixed SLA or resolve issues by enabling the entire organization or granting excessive administrator privileges.</p>
+      <div class="table-wrap"><table><thead><tr><th scope="col">Symptom</th><th scope="col">Checks and next action</th><th scope="col">Owner</th></tr></thead><tbody>
+        <tr><td>Workspace missing</td><td>Check the tenant, assigned link, actual security-group membership, and the group/role in workspace Manage access.</td><td>Group / workspace administrator</td></tr>
+        <tr><td>New item disabled / item missing</td><td>Check Contributor, per-user license, paid capacity assignment and Active state, Fabric item creation, delegated settings, and excluded groups.</td><td>Workspace / capacity / Fabric administrator</td></tr>
+        <tr><td>Tenant settings hidden</td><td>Capacity admin alone is insufficient. Verify the operator's active Fabric Administrator role and PIM. Participants should contact the administrator.</td><td>Role assignment administrator</td></tr>
+        <tr><td>Copilot / Data Agent / Ontology missing</td><td>Check feature-supported regions, paid capacity, approved groups, delegation, boundary approvals, and preview availability. Compare Ontology/Graph dependencies in the current portal with Learn.</td><td>Fabric administrator</td></tr>
+        <tr><td>Free sign-up blocked / Trial prompt</td><td>A Free per-user license is not trial capacity. Check the existing license and target workspace capacity; request a license administrator's help if needed. A Trial offer alone does not prove a block or justify starting another trial.</td><td>License / workspace administrator</td></tr>
+        <tr><td>Provider unregistered / creation fails</td><td>Under target subscription → Resource providers, check Microsoft.Fabric. Also inspect registration permission, policy, supported region, quota, and name validation.</td><td>Azure subscription operator</td></tr>
+      </tbody></table></div>
+    </section>
+    <section id="references-en">
+      <h2>7. Official references</h2>
+      <p class="meta">Links and relevant content checked: 2026-09-21. These are the official English documents. Portal rollout, role names, and preview requirements can change.</p>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/entra/fundamentals/how-to-manage-groups">Create Entra groups and manage members</a> · <a href="https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/manage-roles-portal">Assign Entra roles</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal">Azure Portal role assignments and required permissions</a> · <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types">Register resource providers</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/enterprise/buy-capacity">Buy paid Fabric capacity</a> · <a href="https://learn.microsoft.com/en-us/fabric/enterprise/licenses">Per-user licenses and capacity</a> · <a href="https://learn.microsoft.com/en-us/fabric/enterprise/pause-resume">Pause/resume capacity</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/fundamentals/create-workspaces">Create workspaces and assign capacity</a> · <a href="https://learn.microsoft.com/en-us/fabric/admin/capacity-settings">Capacity assignment permissions</a> · <a href="https://learn.microsoft.com/en-us/fabric/admin/roles">Fabric administrator roles</a> · <a href="https://learn.microsoft.com/en-us/fabric/admin/fabric-switch">Allow Fabric item creation</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/fundamentals/copilot-enable-fabric">Configure Copilot</a> · <a href="https://learn.microsoft.com/en-us/fabric/admin/service-admin-portal-copilot">Copilot/Agent and cross-geography processing/storage settings</a> · <a href="https://learn.microsoft.com/en-us/fabric/enterprise/fabric-copilot-capacity">Centralized Copilot billing capacity</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-tenant-settings">Data Agent tenant settings</a> · <a href="https://learn.microsoft.com/en-us/fabric/data-science/concept-data-agent">Data Agent capacity, data, language, and region prerequisites</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/overview">Ontology overview and Graph foundation</a> · <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/overview-tenant-settings">Current required Ontology tenant settings</a> · <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-bind-data">Binding prerequisites</a></li>
+      </ul>
+    </section>
+    <footer><nav class="navlinks" aria-label="Footer navigation"><a href="../?lang=en">← 01. Fabric onboarding</a><a href="../../../?lang=en">Guide hub</a><a href="#top-en">Back to top ↑</a></nav></footer>
+  </div>
+</main>
+<script src="../../../assets/i18n.js"></script>
+<script>
+  document.getElementById("themeToggle").addEventListener("click", function () {
+    document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  });
+  function localizeTitle() {
+    document.title = document.body.dataset.lang === "en"
+      ? "UI-based environment setup · Fabric onboarding"
+      : "UI 기반 환경 설정 · Fabric 온보딩";
+  }
+  window.addEventListener("langchange", localizeTitle);
+  localizeTitle();
+</script>
+</body>
+</html>

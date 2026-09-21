@@ -32,6 +32,16 @@
   var a = document.createElement("a");
   a.id = "guide-nav-back";
   a.href = "../../index.html";
-  a.textContent = "← 가이드 목록";
+  function syncLabel(e) {
+    var lang = e && e.detail && e.detail.lang;
+    if (!lang) {
+      lang = window.FabricI18n ? window.FabricI18n.get() :
+        (document.body.dataset.lang || document.documentElement.lang);
+    }
+    a.textContent = lang === "en" ? "← Guide list" : "← 가이드 목록";
+  }
+  // i18n may have already dispatched its initial event before this script loads.
+  window.addEventListener("langchange", syncLabel);
+  syncLabel();
   document.body.insertBefore(a, document.body.firstChild);
 })();

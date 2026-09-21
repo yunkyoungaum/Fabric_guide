@@ -32,8 +32,7 @@ window.GUIDES = [
     tags: ["온보딩", "Capacity", "Workspace", "테넌트 설정", "권한"],
     tags_en: ["Onboarding", "Capacity", "Workspace", "Tenant settings", "Permissions"],
     updated: "2026-09-21",
-    status: "published",
-    source: "source.md"
+    status: "published"
   },
   {
     no: "02",
@@ -41,14 +40,13 @@ window.GUIDES = [
     title: "Fabric 워크로드 개요 — Lakehouse · Eventhouse · Semantic Model · Ontology · Agent",
     title_en: "Fabric Workloads Overview — Lakehouse · Eventhouse · Semantic Model · Ontology · Agent",
     summary:
-      "OneLake 위에서 동작하는 핵심 아이템을 한눈에 정리합니다. Lakehouse·Eventhouse의 역할, Fabric Semantic Model과 Power BI 시맨틱 모델 비교, Ontology·Data Agent·Operation Agent·Copilot의 관계와 선택 기준을 다룹니다.",
+      "작성 중인 목차입니다. Lakehouse·Eventhouse의 역할, Fabric의 Power BI 시맨틱 모델과 저장 모드(Import·DirectQuery·Direct Lake), Ontology·Data Agent·Operations Agent·Copilot의 관계와 선택 기준을 다룰 예정입니다.",
     summary_en:
-      "A one-page map of the core items that run on OneLake. Covers the roles of Lakehouse and Eventhouse, Fabric Semantic Model vs. Power BI semantic models, and how Ontology, Data Agent, Operation Agent, and Copilot relate and when to use each.",
+      "Draft outline. Planned topics include Lakehouse and Eventhouse, Power BI semantic models in Fabric and their storage modes (Import, DirectQuery, Direct Lake), and how Ontology, Data Agent, Operations Agent, and Copilot relate.",
     tags: ["Lakehouse", "Eventhouse", "Semantic Model", "Ontology", "Data Agent", "Copilot"],
     tags_en: ["Lakehouse", "Eventhouse", "Semantic Model", "Ontology", "Data Agent", "Copilot"],
     updated: "2026-09-21",
-    status: "draft",
-    source: "source.md"
+    status: "draft"
   },
   {
     no: "03",
@@ -56,14 +54,13 @@ window.GUIDES = [
     title: "Fabric 온톨로지 심화 가이드",
     title_en: "Fabric Ontology Deep-Dive Guide",
     summary:
-      "온톨로지의 개념과 필요성부터 엔터티·관계 모델링, 데이터 소스 매핑, 시맨틱 레이어 구성, 거버넌스와 재사용까지 온톨로지를 실무에 적용하는 방법을 심화해서 다룹니다.",
+      "작성 중인 목차입니다. Fabric IQ의 Ontology(미리 보기)의 개념, 엔터티·관계 모델링, 데이터 바인딩, 시맨틱 레이어, 거버넌스와 재사용을 다룰 예정입니다.",
     summary_en:
-      "A deep dive into applying ontology in practice: from the concept and why it matters to entity/relationship modeling, data source mapping, building a semantic layer, and governance and reuse.",
+      "Draft outline for Ontology (preview) in Fabric IQ: concepts, entity/relationship modeling, data bindings, the semantic layer, governance, and reuse. Detailed procedures are still to be written.",
     tags: ["Ontology", "시맨틱 레이어", "모델링", "지식 그래프", "거버넌스"],
     tags_en: ["Ontology", "Semantic layer", "Modeling", "Knowledge graph", "Governance"],
     updated: "2026-09-21",
-    status: "draft",
-    source: "source.md"
+    status: "draft"
   },
   {
     no: "04",
@@ -71,14 +68,13 @@ window.GUIDES = [
     title: "Fabric Data Agent 가이드",
     title_en: "Fabric Data Agent Guide",
     summary:
-      "자연어로 데이터를 질의하는 Data Agent의 개념부터 생성·구성, 데이터 소스(Lakehouse·Warehouse·Semantic Model·KQL) 연결, 지침·예제 튜닝, Copilot·Teams·API를 통한 소비까지 정리합니다.",
+      "작성 중인 목차입니다. Data Agent의 개념, 생성·구성, 지원 데이터 소스 연결, 지침·예제 튜닝, Microsoft 365 Copilot·Teams·API 연동을 다룰 예정입니다.",
     summary_en:
-      "Everything about Data Agent — from the concept of querying data in natural language to creating and configuring it, connecting data sources (Lakehouse, Warehouse, Semantic Model, KQL), tuning instructions and examples, and consuming it through Copilot, Teams, and APIs.",
+      "Draft outline covering Data Agent concepts, creation, supported data sources, instructions and example queries, and integration with Microsoft 365 Copilot, Teams, and APIs. Detailed procedures are still to be written.",
     tags: ["Data Agent", "Copilot", "자연어 질의", "NL2SQL", "대화형 분석"],
     tags_en: ["Data Agent", "Copilot", "NL query", "NL2SQL", "Conversational analytics"],
     updated: "2026-09-21",
-    status: "draft",
-    source: "source.md"
+    status: "draft"
   },
   {
     no: "05",
@@ -86,13 +82,12 @@ window.GUIDES = [
     title: "Retail Ontology Agent 데모 — 가이드 & 설명",
     title_en: "Retail Ontology Agent Demo — Guide & Explainer",
     summary:
-      "Lakehouse 관리형 Delta · ADLS 단축 · SharePoint Excel · Eventhouse 네 계층을 하나의 온톨로지로 묶고, Data Agent가 자연어로 'PR9999 캠페인이 왜 재고 부족으로 전환에 실패했는가'를 근거와 함께 도출하는 실제 데모의 구조·데이터·시나리오·운영을 문서화합니다.",
+      "Lakehouse · 외부 Delta 단축 · SharePoint Excel · Eventhouse를 활용한 리테일 데모 기록입니다. 온톨로지와 Data Agent로 PR9999 캠페인의 이벤트 비율과 재고 부족의 연관성을 살펴보고, 공식 바인딩 제한과 재현 시 주의사항을 구분합니다.",
     summary_en:
-      "Documents a real demo that unifies four layers (Lakehouse managed Delta, ADLS shortcut, SharePoint Excel, Eventhouse) into one ontology, where a Data Agent derives — with evidence — why campaign PR9999 failed to convert due to inventory scarcity. Covers architecture, data, scenario, and operations.",
+      "Records a retail demo using Lakehouse, external Delta shortcuts, SharePoint Excel, and Eventhouse. Ontology and Data Agent explore associations between PR9999 event ratios and inventory scarcity, with official binding restrictions and reproduction caveats distinguished from observations.",
     tags: ["Ontology", "Data Agent", "데모", "Lakehouse", "Eventhouse", "SharePoint"],
     tags_en: ["Ontology", "Data Agent", "Demo", "Lakehouse", "Eventhouse", "SharePoint"],
     updated: "2026-09-21",
-    status: "published",
-    source: "source.md"
+    status: "published"
   }
 ];

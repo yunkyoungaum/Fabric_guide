@@ -157,19 +157,19 @@ blockquote p { margin: .35rem 0; }
   <p class="meta">4개의 서로 다른 물리 데이터 계층(Lakehouse 관리형 Delta · ADLS 단축 · SharePoint Excel · Eventhouse)을 <strong>하나의 온톨로지</strong>로 묶고, 그 위에서 <strong>Data Agent</strong>가 자연어로 비즈니스 질문에 답하는 옴니채널 리테일 데모입니다. 이 문서는 데모의 구조·데이터·시나리오·운영을 설명하고, 그대로 재현·발표하는 방법을 안내합니다.</p>
 
   <blockquote>
-    <p><strong>한 줄 요약</strong> — "잘 기획된 프로모션(PR9999, Seoul Audio Summer Surge)이 강한 구매 의도를 만들었지만, 재고 부족으로 전환에 실패했다"는 인사이트를, 온톨로지가 연결한 여러 소스를 Data Agent가 관계로 추적해 근거와 함께 도출합니다.</p>
+    <p><strong>한 줄 요약</strong> — 생성 데이터의 프로모션(PR9999, Seoul Audio Summer Surge)에서 높은 장바구니 이벤트 수·낮은 구매 이벤트 수·낮은 재고가 함께 관찰됩니다. Data Agent가 온톨로지 관계로 근거를 연결해 <strong>재고 제약 가설</strong>을 설명하는 데모이지, 재고 부족의 인과 효과를 입증하는 분석은 아닙니다.</p>
   </blockquote>
 
   <h2>1. 데모가 보여주는 것</h2>
   <ul>
     <li><strong>비즈니스 질문</strong>: 서울 오디오 여름 프로모션은 왜 고객 관심이 폭발했는데 매출은 저조했나?</li>
     <li><strong>핵심 메시지</strong>: 온톨로지는 테이블·컬럼을 <em>비즈니스 의미(엔터티·관계)</em>로 바꾸고, Data Agent는 이름 매칭이 아니라 <strong>관계 그래프를 순회</strong>해 답을 만든다.</li>
-    <li><strong>결정적 신호</strong>: 장바구니 담기 1,729건 vs 실제 구매 36건 → 전환율 <strong>2.08%</strong>. 같은 기간 해당 매장·상품의 평균 재고는 <strong>1개</strong>였다.</li>
-    <li><strong>액션</strong>: 재고 확보 전까지 캠페인 예산 재배분 + 개인화 동의를 가진 고가치 고객만 합법적으로 재접촉.</li>
+    <li><strong>주요 신호</strong>: PR9999에 귀속된 AddToCart 1,729건 vs Purchase 36건 → 이벤트 수 비율 <strong>2.08%</strong>(36÷1,729). 고유 고객·세션 기준 전환율은 아닙니다. 캠페인 기간 해당 매장·상품의 평균 재고는 <strong>1개</strong>로 보고되었습니다.</li>
+    <li><strong>액션 제안</strong>: 재고 확보 전 캠페인 예산 재배분을 검토하고, 개인화 동의를 가진 고가치 고객을 재접촉 후보로 선별합니다. 동의 플래그만으로 연락의 적법성이 보장되지는 않으며 채널별 동의·철회·정책을 별도 확인해야 합니다.</li>
   </ul>
 
   <h2>2. 아키텍처 — 4개 물리 계층 → 1개 온톨로지</h2>
-  <p>이 데모의 핵심은 <strong>네 가지 서로 다른 물리 저장 방식</strong>이 하나의 온톨로지로 통합된다는 점입니다.</p>
+  <p>이 데모는 <strong>네 가지 물리 저장 방식</strong>을 비교하지만, 네 시스템에 대한 실시간 연합 질의를 뜻하지는 않습니다. 이 모델은 Lakehouse 테이블과 보고된 ADLS 단축을 사용하며, SharePoint는 적재된 사본, Eventhouse는 별도 배치 사본입니다. Customer 단축 바인딩의 현재 공식 지원 제한은 §4.2에 명시합니다.</p>
     <style>
   .arch{--s1:var(--cp-accent);--s2:var(--cp-link);--s3:var(--cp-success);--s4:var(--cp-warning);margin:1.5rem 0}
   .arch-sources{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
@@ -232,6 +232,7 @@ blockquote p { margin: .35rem 0; }
   </blockquote>
 
   <h2>3. Fabric 자산 (현재 워크스페이스)</h2>
+  <p class="meta">자산·행 수·질의 결과는 제공된 데모 기록 기준입니다. 2026-09-21 검토에서는 공식 문서와 문서 내부 일관성만 확인했으며, 라이브 Fabric 호출이나 데이터 재검증은 하지 않았습니다. <code>ykfabricf64</code>는 이름이며 F16은 기록된 SKU입니다.</p>
   <p>라이브 워크스페이스: <a href="https://app.powerbi.com/groups/8653f3c5-60af-4976-9aad-13f7c26b9d93/list?experience=power-bi">Retail Ontology Agent Demo</a> (접근에는 권한 필요)</p>
   <table>
     <thead><tr><th>자산</th><th>이름</th><th>ID</th></tr></thead>
@@ -247,7 +248,7 @@ blockquote p { margin: .35rem 0; }
     </tbody>
   </table>
   <h3>3.1 리니지 (데이터 계보)</h3>
-  <p>Fabric 리니지 뷰로 본 전체 계보입니다. 여러 소스가 <code>RetailOperationsLH</code>로 모이고, 그 위에 온톨로지와 Data Agent가 얹힙니다.</p>
+  <p>아래는 데모 리니지 화면과 자산 매핑입니다. 여러 소스의 Lakehouse 표현 위에 온톨로지와 Data Agent가 구성되지만, Eventhouse 노드의 존재가 Eventhouse → Lakehouse 동기화 파이프라인을 의미하지는 않습니다. 이벤트는 §2처럼 같은 생성 데이터셋을 각각 적재했습니다.</p>
   <figure class="fig">
     <img src="img/lineage.png" alt="Fabric 리니지 뷰 — SharePoint·ADLS·Eventhouse → RetailOperationsLH → RetailCommerceOntology → RetailInsightAgent" />
     <figcaption>Fabric 리니지 뷰: SharePoint · ADLS(2) · Eventhouse 소스 → RetailOperationsLH → RetailCommerceOntology → RetailInsightAgent</figcaption>
@@ -287,9 +288,10 @@ blockquote p { margin: .35rem 0; }
     <li>ADLS 경로: <code>abfss://raw@ykexternaldatalake.dfs.core.windows.net/retail-ontology-demo/customer_profiles</code></li>
     <li>OneLake 단축: <code>RetailOperationsLH/Tables/customer_profiles</code></li>
     <li>연결: <code>Retail Demo ADLS - Workspace Identity</code> (스토리지 계정 범위에 <code>Storage Blob Data Reader</code> 부여)</li>
-    <li>Databricks 카탈로그 페더레이션과 동일한 "복사 없는 접근" 패턴 — 데이터는 Fabric에 복제되지 않고 외부 ADLS에 그대로 남습니다.</li>
+    <li><a href="https://learn.microsoft.com/en-us/fabric/onelake/create-adls-shortcut">ADLS 단축</a>은 외부 파일을 참조하며 별도 수집 복사를 요구하지 않습니다. Databricks 카탈로그 페더레이션과 동일한 기능은 아니며 Unity Catalog 정책을 자동 상속하지 않습니다. ADLS 접근에는 단축 연결의 자격 증명이 사용되므로 Fabric 권한과 스토리지 권한을 함께 검토합니다.</li>
   </ul>
-  <p><code>customer_profiles</code>는 <strong>외부 Databricks(Unity Catalog)의 관리형 Delta 테이블</strong>에서 비롯되며, ADLS Gen2를 거쳐 OneLake 단축으로 Fabric에 연결됩니다. 아래는 외부 Databricks Unity Catalog에서 관리되는 Delta 테이블의 예시입니다(Type: Managed, Data source: Delta).</p>
+  <p>데모 기록은 <code>customer_profiles</code>를 외부 ADLS Delta에 대한 단축으로 설명합니다. 아래 Unity Catalog 화면은 관리형 Delta 테이블의 <strong>예시</strong>이며, 이 화면만으로 해당 ADLS 경로와 같은 데이터이거나 UC 관리형 테이블을 직접 읽는다고 검증할 수는 없습니다.</p>
+  <blockquote><p><strong>중요한 지원 범위 차이</strong> — 현재 <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-bind-data#limitations-and-troubleshooting">온톨로지 바인딩 문서</a>는 관리형 Lakehouse 테이블만 지원하고 외부 위치의 테이블은 지원하지 않는다고 명시합니다. 따라서 이 데모의 <code>Customer → customer_profiles</code> 단축 바인딩은 보고된 구성이지 일반 지원 보장이 아닙니다. 재현 시 관리형 Delta로 적재하고 바인딩을 변경하는 경로를 검토하세요(복사·갱신 필요). OneLake security 또는 Delta column mapping이 활성화된 소스에도 제한이 있으므로, 동작을 위해 보안 기능을 임의로 해제하지 말고 승인된 별도 데모 데이터를 사용합니다.</p></blockquote>
   <figure class="fig">
     <img src="img/databricks-external-delta.png" alt="Databricks Unity Catalog의 외부 관리형 Delta 테이블" />
     <figcaption>외부 Databricks Unity Catalog — 관리형 Delta 테이블(이런 외부 거버넌스 Delta가 ADLS를 거쳐 OneLake 단축으로 연결됩니다)</figcaption>
@@ -305,7 +307,7 @@ blockquote p { margin: .35rem 0; }
       <tr><td>대상 테이블</td><td><code>RetailOperationsLH/Tables/promotions</code></td></tr>
     </tbody>
   </table>
-  <p>Dataflow Gen2가 17개 고유 프로모션을 적재하고 <code>Promotion</code> 엔터티 바인딩을 활성화했습니다. ⚠️ SharePoint <strong>Folder</strong> 커넥터는 <strong>사이트 URL만</strong> 사용하고, <code>/Forms/AllItems.aspx</code>로 끝나는 라이브러리 뷰 URL은 넣지 않습니다.</p>
+  <p>데모 기록상 Dataflow Gen2가 17개 고유 프로모션을 적재했고, <code>Promotion</code>은 별도로 대상 테이블에 바인딩되었습니다. 적재 자체가 온톨로지 바인딩을 생성하지는 않습니다. ⚠️ <a href="https://learn.microsoft.com/en-us/power-query/connectors/sharepoint-folder">SharePoint Folder 커넥터</a>에는 <strong>사이트 URL</strong>을 사용하고, <code>/Forms/AllItems.aspx</code>로 끝나는 라이브러리 뷰 URL은 넣지 않습니다.</p>
   <figure class="fig">
     <img src="img/sharepoint-library.png" alt="SharePoint ykTEST 폴더의 RetailPromotionPlan.xlsx" />
     <figcaption>SharePoint <code>Leadership-AWOA04 POC</code> 사이트 → <code>Shared Documents/ykTEST</code> → <code>RetailPromotionPlan.xlsx</code></figcaption>
@@ -319,6 +321,7 @@ blockquote p { margin: .35rem 0; }
   <p><code>CustomerSignalsEH</code>의 <code>CustomerEvents</code> KQL 테이블에 30,000행을 보존합니다. 실시간/시계열 분석용이며, 온톨로지 엔터티 식별·속성은 Lakehouse 사본이 담당합니다(§2 설계 메모).</p>
 
   <h2>5. 온톨로지 모델 — 7 엔터티 · 12 관계</h2>
+  <p>아래는 데모 기록의 논리 모델입니다. 실제 배포 정의와 속성 매핑은 재현 시 확인해야 하며, Customer 단축 바인딩의 공식 지원 제한은 §4.2를 참고하세요. 관계 키 열은 조인 컨텍스트를 요약한 것으로 전체 바인딩 정의를 대체하지 않습니다.</p>
   <h3>5.1 엔터티</h3>
   <table>
     <thead><tr><th>엔터티</th><th>식별자</th><th>소스 바인딩</th><th>주요 속성</th></tr></thead>
@@ -358,22 +361,22 @@ blockquote p { margin: .35rem 0; }
     <div class="ograph-wrap">
 <svg class="ograph" viewBox="0 0 820 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Retail Commerce Ontology graph">
   <defs>
-    <marker id="oarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="oarrow-ko" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#8a8a8a"/>
     </marker>
   </defs>
-  <path d="M121.5,228.0 Q214.1,185.0 273.5,102.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M109.5,272.0 Q150.8,381.8 235.5,463.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M343.5,102.0 Q505.8,213.2 691.5,278.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M378.0,85.8 Q500.6,120.9 627.0,104.2" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M315.0,102.0 Q353.5,204.6 435.0,278.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M273.8,463.0 Q367.7,411.6 426.2,322.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M276.7,463.0 Q494.0,317.6 678.3,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M307.7,463.0 Q501.8,416.8 677.3,322.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M479.5,278.0 Q593.0,225.8 675.5,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M528.0,300.0 Q592.5,326.0 657.0,300.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M711.3,322.0 Q612.3,378.4 548.7,473.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
-  <path d="M535.3,473.0 Q638.6,313.5 694.7,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M121.5,228.0 Q214.1,185.0 273.5,102.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M109.5,272.0 Q150.8,381.8 235.5,463.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M343.5,102.0 Q505.8,213.2 691.5,278.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M378.0,85.8 Q500.6,120.9 627.0,104.2" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M315.0,102.0 Q353.5,204.6 435.0,278.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M273.8,463.0 Q367.7,411.6 426.2,322.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M276.7,463.0 Q494.0,317.6 678.3,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M307.7,463.0 Q501.8,416.8 677.3,322.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M479.5,278.0 Q593.0,225.8 675.5,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M528.0,300.0 Q592.5,326.0 657.0,300.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M711.3,322.0 Q612.3,378.4 548.7,473.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
+  <path d="M535.3,473.0 Q638.6,313.5 694.7,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow-ko)"/>
   <rect x="181.6" y="166.0" width="48.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
   <text x="205.8" y="178.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">placed</text>
   <rect x="127.8" y="365.7" width="67.6" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
@@ -437,27 +440,28 @@ blockquote p { margin: .35rem 0; }
   <ul>
     <li>이름 매칭이 아니라 <strong>온톨로지 관계를 순회</strong>해서 답한다.</li>
     <li>행동=CustomerEvent, 재고=InventorySnapshot, 매출=Order, 캠페인=Promotion으로 매핑.</li>
-    <li><strong>한 쿼리로 3개 이상 엔터티를 스팬하지 않는다</strong>. "X가 없다"를 NOT EXISTS/anti-join으로 표현하지 않는다 → 이 온톨로지에서는 0행 반환.</li>
+    <li>데모에서 빈 결과가 보고된 <strong>3개 이상 엔터티 쿼리·NOT EXISTS/anti-join 패턴을 피하도록</strong> 지시합니다. Fabric 전체의 엔터티 수 제한이나 모든 anti-join 실패를 뜻하지는 않습니다.</li>
     <li>대신 <strong>분해(decompose)</strong>: 엔터티별 단순 쿼리로 ID 목록을 얻고, 교집합·차집합을 직접 계산한다.</li>
-    <li><strong>가장 선택적인(작은) 엔터티부터</strong> 시작해 ID 목록을 큰 엔터티로 가져간다(결과 잘림 방지).</li>
+    <li><strong>가장 선택적인(작은) 엔터티부터</strong> 시작해 ID 목록을 큰 엔터티로 가져간다(잘림 위험 감소). 차집합 계산 전에는 양쪽 목록의 완전성을 확인해야 합니다.</li>
     <li>count가 0보다 큰지 확인하기 전에 나눗셈하지 않는다.</li>
   </ul>
-  <p>용어 정의도 지침에 고정되어 있습니다 — 구매 의도=AddToCart, 전환=Purchase, 고가치 고객=Segment 'High Value', 접촉 가능=ConsentForPersonalization true, 재고 위험=OnHandQuantity ≤ ReorderPoint 등.</p>
+  <p>데모 용어 정의 — 구매 의도=AddToCart, 구매 이벤트=Purchase, 고가치 고객=Segment 'High Value', 재접촉 후보=ConsentForPersonalization true, 재고 위험=OnHandQuantity ≤ ReorderPoint입니다. 지침은 모델 행동을 유도할 뿐, 접근 통제나 동의 정책을 강제하지 않습니다.</p>
 
-  <h3>6.2 쿼리 방법 (Assistants 스타일 API)</h3>
-  <p><code>?api-version=2024-05-01-preview</code> + <code>https://api.fabric.microsoft.com</code> 베어러 토큰이 필요합니다.</p>
+  <h3>6.2 과거 쿼리 경로와 현재 권장 경로</h3>
+  <p><a href="https://learn.microsoft.com/en-us/fabric/data-science/consume-data-agent-python">현재 Microsoft Learn</a>은 OpenAI Assistants API 종료(2026-08-26)에 따라 <strong>MCP로 이전</strong>하도록 안내합니다(§8). 아래는 제공된 데모의 Assistants 스타일 호출 기록(<code>?api-version=2024-05-01-preview</code>, Fabric 리소스 토큰)이며 현재 지원되는 실행 레시피가 아닙니다. 이 Fabric 경로의 현재 가용성은 재검증하지 않았습니다.</p>
   <pre><code>BASE = https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/dataAgents/{agentId}/aiassistant/openai
 
 POST {BASE}/assistants                     -> assistant_id
 POST {BASE}/threads                        -> thread_id
-POST {BASE}/threads/{id}/messages          {"role":"user","content":"<질문>"}
-POST {BASE}/threads/{id}/runs              {"assistant_id":"<assistant_id>"}
+POST {BASE}/threads/{id}/messages          {"role":"user","content":"&lt;질문&gt;"}
+POST {BASE}/threads/{id}/runs              {"assistant_id":"&lt;assistant_id&gt;"}
 GET  {BASE}/threads/{id}/runs/{run_id}     상태가 종료될 때까지 폴링
 GET  {BASE}/threads/{id}/messages          -> 답변
 DELETE {BASE}/threads/{id}</code></pre>
-  <p>❗ 동작하지 않는 엔드포인트: <code>/chat/completions</code>(404), MCP 툴 호출(타임아웃), 2026-08-26 폐기된 OpenAI Assistants API 기반 샘플.</p>
+  <p>과거 <code>/chat/completions</code>의 404와 MCP 타임아웃은 해당 호출에서 보고된 결과입니다. §8의 MCP 성공 기록 및 공식 MCP 지원과 구분하며, 이를 MCP 자체가 동작하지 않는다는 뜻으로 해석하지 않습니다.</p>
 
-  <h2>7. 데모 시나리오 (검증된 12개 질문)</h2>
+  <h2>7. 데모 시나리오 (10개 질문 예시)</h2>
+  <p>아래 수치는 제공된 데모 기록의 기대 결과이며 이번 검토에서 다시 실행하지 않았습니다. 이벤트 집계의 PromotionID·시간 범위·매장·상품 필터를 확인하세요. PR9999 귀속 이벤트와 캠페인 기간 재고는 서로 다른 집계 범위일 수 있습니다.</p>
 
   <h3>Part 1 — 모델은 실제다</h3>
   <p><code>How many stores are there?</code> → 6 · <code>How many products are there?</code> → 50 · <code>How many orders are there?</code> → 6,000</p>
@@ -471,26 +475,30 @@ DELETE {BASE}/threads/{id}</code></pre>
 
   <h3>Part 3 — 인사이트 (핵심)</h3>
   <ul>
-    <li><code>How many AddToCart and Purchase customer events are attributed to promotion PR9999?</code> → <strong>1,729 vs 36 (전환율 2.08%)</strong></li>
+    <li><code>How many AddToCart and Purchase customer events are attributed to promotion PR9999?</code> → <strong>1,729 vs 36 (이벤트 수 비율 2.08%)</strong></li>
     <li><code>How many CustomerEvent records have ProductID P0001?</code> → 3,586</li>
   </ul>
-  <p><strong>내러티브</strong>: 캠페인은 잘 기획됐고 고객은 명확히 상품을 원했지만 거의 아무도 살 수 없었다. 캠페인 기간(2026-08-03~08-16) S001의 P0001 평균 재고는 1개였고, 그 구간 14개 스냅샷 모두 재주문점 이하였다.</p>
+  <p><strong>내러티브</strong>: 캠페인 기간(2026-08-03~08-16) S001의 P0001 평균 재고는 1개, 14개 스냅샷 모두 재주문점 이하로 보고되었습니다. 낮은 재고와 낮은 구매 이벤트 비율은 재고 제약 가설과 부합하지만, 재주문점 이하는 품절과 같지 않으며 스냅샷만으로 구매 실패 원인을 입증할 수 없습니다.</p>
 
   <h3>Part 4 — 액션</h3>
   <ul>
     <li><code>How many Customer records have Segment High Value and ConsentForPersonalization true?</code> → 33</li>
-    <li><code>Which high-value customers showed purchase intent for P0001 but did not purchase, and may be contacted under their personalization consent?</code> → 33명 중 약 32명 (C000006, C000021, C000037, …). 에이전트가 질문을 분해해 고가치·동의 고객을 먼저 좁힌 뒤 이벤트를 확인.</li>
+    <li><code>Which high-value customers showed purchase intent for P0001 but did not purchase, and may be contacted under their personalization consent?</code> → 데모 보고 결과는 33명 중 약 32명 (C000006, C000021, C000037, …). 고가치·동의 고객을 먼저 좁힌 뒤 동일 기간의 AddToCart/Purchase 고객 집합을 비교합니다. 잘린 목록이나 근사값을 실제 연락 명단으로 사용하지 말고 원본 데이터와 최신 동의 상태를 검증합니다.</li>
   </ul>
 
     <h2>8. MCP로 외부 노출</h2>
-  <p>외부 노출은 <strong>두 개의 MCP 엔드포인트</strong>로 가능합니다. 둘 다 Fabric이 기본 제공하므로 별도 서버를 만들 필요가 없습니다. 아래는 이 워크스페이스에서 실제로 호출해 확인한 내용입니다.</p>
+  <p>Fabric은 <strong>Ontology MCP와 Data Agent MCP</strong>를 제공합니다. 아래에서는 <strong>공식 문서의 지원 범위</strong>와 <strong>사용자가 제공한 데모 호출 기록</strong>을 구분합니다. 이번 검토에서 엔드포인트를 호출하지 않았으며, 관찰된 응답·오류·시간이 모든 환경에서 재현된다고 보장하지 않습니다.</p>
 
   <h3>8.1 엔드포인트</h3>
-  <pre><code># Ontology MCP — 온톨로지 직접 노출
+  <pre><code># Ontology MCP — 현재 Microsoft Learn 경로
+https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/{workspaceId}/items/{ontologyId}/ontologyEndpoint
+
+# Ontology MCP — 데모에서 성공이 보고된 별도 경로 (일반 지원 미확인)
 POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/ontologies/{ontologyId}
 
 # Data Agent MCP — 에이전트를 통한 노출
 POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents/{agentId}/agent</code></pre>
+  <p>출처: <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-use-ontology-mcp-server">Ontology MCP</a> · <a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-mcp-server">Data Agent MCP</a>. 온톨로지의 두 경로를 동등한 공식 별칭으로 가정하지 마세요. Data Agent는 게시 후 Settings → Model Context Protocol에서 URL과 도구 정보를 확인할 수 있습니다.</p>
   <p>이 데모의 실제 값입니다.</p>
   <table>
     <thead><tr><th>항목</th><th>ID</th></tr></thead>
@@ -501,32 +509,34 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
     </tbody>
   </table>
   <blockquote>
-    <p><strong>온톨로지 경로는 ID 뒤에 아무것도 붙이지 않습니다.</strong> <code>ontology</code>, <code>/mcp</code>, <code>/agent</code>를 붙이면 <code>404 EntityNotFound</code>입니다. 반대로 에이전트 경로는 <code>/agent</code>가 반드시 필요합니다.</p>
+    <p>데모의 <code>/ontologies/{ontologyId}</code> 경로에는 접미사가 없으며, 접미사 추가 시 404가 보고되었습니다. 이것은 <code>/ontologyEndpoint</code>로 끝나는 공식 경로를 부정하는 근거가 아닙니다. 공식 Data Agent 경로에는 <code>/agent</code>가 포함됩니다.</p>
   </blockquote>
 
   <h3>8.2 인증</h3>
-  <p>Entra ID 토큰이며, 익명 접근은 불가능합니다. 호출자는 워크스페이스 권한을 그대로 상속합니다.</p>
+  <p>Entra ID 인증이 필요하며 익명 공개가 아닙니다. 호출자에게 해당 항목과 필요한 원본 데이터의 유효 읽기 권한이 있어야 합니다. 에이전트 공유만으로 원본 접근이 부여되지는 않습니다(<a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-sharing">권한 문서</a>). 아래는 로그인 후 사용하는 <strong>Bash/Azure CLI 예시</strong>입니다. MCP의 Fabric 토큰 scope는 <code>https://api.fabric.microsoft.com/.default</code>이며 토큰을 코드·로그·Git에 저장하지 않습니다.</p>
   <pre><code>TOKEN=$(az account get-access-token \
   --resource https://api.fabric.microsoft.com \
   --query accessToken -o tsv)</code></pre>
-  <p>프로덕션이라면 서비스 주체를 쓰고, 테넌트 설정에서 <strong>"서비스 주체가 Fabric API를 사용할 수 있음"</strong>이 켜져 있어야 합니다.</p>
+  <p><a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-mcp-server#authentication">Data Agent MCP 문서</a>는 사용자 및 서비스 주체 토큰을 명시적으로 지원합니다. 이는 테넌트의 <strong>Service principals can use Fabric APIs</strong> 스위치만으로 추론한 지원이 아닙니다. <a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-service-principal">SPN 안내</a>의 워크스페이스·소스 권한 및 제한(KQL 연결 에이전트와 managed identity 미지원)을 확인하세요. 해당 안내의 토큰 리소스 표기와 MCP 문서가 다르므로 MCP에는 위의 엔드포인트별 scope를 따릅니다. <strong>직접 Ontology MCP의 SPN 지원은 확인한 문서에 명시되지 않아 별도 검증이 필요</strong>합니다. ADLS 단축의 Workspace Identity는 에이전트 호출 인증과 다른 계층입니다.</p>
 
   <h3>8.3 호출 방법</h3>
-  <p>MCP는 JSON-RPC 2.0이고, <code>Accept</code> 헤더에 <code>text/event-stream</code>이 포함되어야 합니다.</p>
-  <pre><code>curl -X POST "$URL" \
+  <p>MCP는 JSON-RPC 2.0 / Streamable HTTP를 사용합니다. <strong>먼저 initialize 협상과 notifications/initialized를 완료</strong>하고, 협상된 프로토콜 버전 및 서버가 발급한 세션 ID가 있으면 후속 요청에 전달해야 합니다. 공식 문서의 MCP SDK 예시가 이 흐름을 처리합니다. 아래 Bash 조각은 이미 초기화된 세션의 <code>tools/list</code> 메시지 예시이며 독립 실행 가능한 전체 클라이언트가 아닙니다. <code>URL</code>은 §8.1에서 선택하고 필요한 세션 헤더를 추가합니다.</p>
+  <pre><code># After MCP initialization; include negotiated protocol/session headers as applicable
+curl -X POST "$URL" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'</code></pre>
 
-  <h4>Ontology MCP가 주는 도구 2개</h4>
+  <h4>Ontology MCP 도구 2개 (인수는 데모 기록)</h4>
+  <p><a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-create-agent-copilot-studio">공식 Copilot Studio 연결 문서</a>는 아래 두 도구 이름을 확인합니다. 인수와 반환 구조는 반드시 연결한 서버의 <code>tools/list</code> 스키마로 확인하세요.</p>
   <pre><code>{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{
   "name":"list_ontology_entity_types",
   "arguments":{"includeProperties":true}}}</code></pre>
   <pre><code>{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{
   "name":"search_ontology",
   "arguments":{"naturalLanguageQuery":"...","naturalLanguageResponse":true}}}</code></pre>
-  <p><code>search_ontology</code>는 <code>structuredContent.raw</code>에 집계된 테이블을 담아 줍니다.</p>
+  <p>데모 기록에서 <code>search_ontology</code>는 <code>structuredContent.raw</code>에 집계 테이블을 반환했습니다. 아래는 생략된 응답 예시로, <code>...</code>를 포함하므로 완전한 JSON은 아닙니다. 모든 호출의 반환 형식을 보장하지 않습니다.</p>
   <pre><code>{"Fields": ["promotion_id", "event_type", "event_count"],
  "Value": [["PR9999", "AddToCart", 1729], ["PR9999", "Purchase", 36], ...]}</code></pre>
 
@@ -534,29 +544,33 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
   <pre><code>{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{
   "name":"DataAgent_RetailInsightAgent",
   "arguments":{"userQuestion":"How many stores are there?"}}}</code></pre>
-  <p>도구 이름이 <strong>에이전트 표시 이름을 따라갑니다.</strong> 에이전트 이름을 바꾸면 도구 이름도 바뀌므로, 클라이언트 설정이 깨질 수 있습니다.</p>
+  <p><code>DataAgent_RetailInsightAgent</code>와 <code>userQuestion</code>은 데모 기록의 예시입니다. 공식 문서는 이름·인수를 하드코딩하지 않고 <strong>tools/list의 name과 inputSchema로 검색</strong>하도록 안내합니다. 표시 이름 변경 시 도구 이름이 반드시 바뀐다고 가정하지 말고 재확인합니다.</p>
 
   <h3>8.4 MCP 클라이언트 등록</h3>
-  <p>VS Code, Claude Desktop 등 MCP 클라이언트에 HTTP 서버로 등록합니다.</p>
+  <p>아래는 <strong>VS Code의 .vscode/mcp.json 형식</strong>이며 공식 Ontology URL을 사용합니다. 다른 클라이언트는 Streamable HTTP 및 Fabric 토큰 헤더 지원과 자체 설정 형식을 확인해야 합니다. 토큰 입력은 마스킹되지만 만료 후 갱신은 별도 필요합니다. Data Agent MCP는 dynamic client registration을 지원하지 않으므로 자동 OAuth 등록을 전제로 하지 마세요.</p>
   <pre><code>{
   "servers": {
     "fabric-ontology": {
       "type": "http",
-      "url": "https://api.fabric.microsoft.com/v1/mcp/workspaces/8653f3c5-60af-4976-9aad-13f7c26b9d93/ontologies/f7eecc18-db38-46f4-8815-90f5bb3deb21",
+      "url": "https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/8653f3c5-60af-4976-9aad-13f7c26b9d93/items/f7eecc18-db38-46f4-8815-90f5bb3deb21/ontologyEndpoint",
       "headers": { "Authorization": "Bearer ${input:fabricToken}" }
     }
-  }
+  },
+  "inputs": [
+    { "id": "fabricToken", "type": "promptString", "description": "Fabric access token", "password": true }
+  ]
 }</code></pre>
   <blockquote>
-    <p><strong>타임아웃을 늘려야 합니다.</strong> 온톨로지 질의가 17초, 에이전트 질의가 31초였고, 유휴 후 첫 호출은 더 걸립니다. 기본 타임아웃이 짧은 클라이언트는 실패합니다.</p>
+    <p><strong>클라이언트 타임아웃을 검토하세요.</strong> 17초(Ontology)·31초(Data Agent)는 제공된 개별 데모 관찰값이지 SLA나 동일 조건 벤치마크가 아닙니다. 첫 호출·질문·부하에 따라 달라질 수 있습니다. 공식 Data Agent MCP는 장기 요청에 tasks 확장도 설명하지만, 클라이언트의 지원 여부를 확인해야 합니다.</p>
   </blockquote>
 
   <h3>8.5 사전 조건</h3>
+  <p>공식 문서 기준 유료 F2 이상 또는 Fabric이 활성화된 P1 이상 용량, 필요한 테넌트 기능과 권한이 필요합니다. Ontology item 설정 및 Data Agent의 AI 처리·저장 지역 설정도 조직 정책에 따라 확인합니다. F16/Korea Central이라는 데모 기록만으로 모든 기능의 가용성을 보장하지 않습니다.</p>
   <table>
     <thead><tr><th>경로</th><th>필요한 것</th></tr></thead>
     <tbody>
-      <tr><td>Ontology MCP</td><td>온톨로지를 포털에서 1회 저장 (쿼리 그래프 생성)</td></tr>
-      <tr><td>Data Agent MCP</td><td>에이전트 <strong>publish</strong> 필요. published 스테이지가 없으면 <code>Stage configuration not found</code></td></tr>
+      <tr><td>Ontology MCP</td><td>온톨로지 항목·지원되는 바인딩·정상 쿼리 그래프. 포털 저장은 데모의 보고된 복구 방법이며 최신 원본 반영에는 §9의 그래프 새로 고침 확인</td></tr>
+      <tr><td>Data Agent MCP</td><td>공식적으로 <strong>게시된 에이전트</strong> 필요. <code>Stage configuration not found</code>는 미게시 상태에서 보고된 데모 오류</td></tr>
     </tbody>
   </table>
 
@@ -565,83 +579,86 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
     <thead><tr><th></th><th>Ontology MCP</th><th>Data Agent MCP</th></tr></thead>
     <tbody>
       <tr><td>도구</td><td>스키마 탐색 + 질의 (2개)</td><td>질의 (1개)</td></tr>
-      <tr><td>반환</td><td><strong>구조화 테이블</strong> + 선택적 산문</td><td>산문만</td></tr>
-      <tr><td>속도</td><td>17초</td><td>31초</td></tr>
-      <tr><td>데이터 범위</td><td>해당 온톨로지</td><td>에이전트에 연결된 모든 소스</td></tr>
-      <tr><td><strong>분석 지침</strong></td><td><strong>적용 안 됨</strong></td><td>적용됨</td></tr>
+      <tr><td>관찰된 반환</td><td><strong>구조화 테이블</strong> + 산문</td><td>데모에서는 텍스트 답변</td></tr>
+      <tr><td>개별 관찰 시간 (SLA 아님)</td><td>17초</td><td>31초</td></tr>
+      <tr><td>데이터 범위</td><td>권한이 허용하는 해당 온톨로지</td><td>설정된 소스 중 호출자가 접근 가능한 범위</td></tr>
+      <tr><td><strong>Data Agent 분석 지침</strong></td><td><strong>전달되지 않음</strong></td><td>모델의 분석을 유도 (강제 통제 아님)</td></tr>
     </tbody>
   </table>
-  <p>마지막 행이 실질적인 판단 기준입니다. <code>deploy_data_agent.py</code>에 넣어둔 규칙 — "구매 의도는 <code>AddToCart</code>로 판단한다", "전환 판정에 <code>Order</code>를 쓰지 말고 <code>CustomerEvent</code>의 <code>Purchase</code>를 쓴다", "동의한 고객만 접촉 대상이다" — 이런 도메인 가드레일은 <strong>에이전트에만 적용됩니다.</strong></p>
+  <p>마지막 행은 선택 기준 중 하나입니다. 데모 기록은 <code>deploy_data_agent.py</code>의 분석 지침을 "구매 의도는 <code>AddToCart</code>", "이벤트 비율의 구매 수는 <code>Order</code>가 아니라 <code>CustomerEvent</code>의 <code>Purchase</code>", "동의 고객만 재접촉 후보"로 설명합니다. 이 Data Agent 지침은 <strong>직접 Ontology MCP에 자동 전달되지 않으며</strong>, 결과의 정확성이나 동의 준수를 보장하지 않습니다.</p>
   <ul>
     <li>외부 에이전트가 스스로 추론하고 구조화된 데이터를 원한다 → <strong>Ontology MCP</strong></li>
-    <li>분석 규칙을 서버 쪽에서 강제하고 싶다, 혹은 여러 Fabric 소스를 묶는다 → <strong>Data Agent MCP</strong></li>
+    <li>분석 지침을 중앙에서 관리하거나 여러 지원 Fabric 소스를 묶는다 → <strong>Data Agent MCP</strong></li>
   </ul>
+  <p><strong>보안 경계는 지침이 아닙니다.</strong> 최소 권한, 소스별 접근 제어와 지원되는 행·열 보안, 동의 검증, 감사·출력 정책을 별도로 구현·검증해야 합니다. 직접 Ontology MCP는 Data Agent 지침을 거치지 않습니다. §4.2의 바인딩 제한 때문에 모든 소스의 보안 기능이 이 온톨로지 경로에서도 그대로 지원된다고 가정하지 마세요.</p>
 
   <h3>8.7 M365 Copilot에 게시</h3>
-  <p>Data Agent는 <strong>Copilot Studio 없이 Microsoft 365 Copilot에 직접 게시</strong>할 수 있습니다. Fabric의 게시(Publish) 대화 상자에 <strong>"Also publish to Microsoft 365 Copilot"</strong> 토글이 있어, 이 토글 하나로 온톨로지 기반 에이전트가 M365 Copilot에 바로 등장합니다.</p>
+  <p><a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-microsoft-365-copilot">공식 문서</a>는 <strong>Copilot Studio 없이 Data Agent를 M365 Copilot에 직접 게시</strong>하는 Preview 경로와 온톨로지 소스를 지원합니다. 문서의 UI 명칭은 <strong>Publish to Agent Store</strong>이며, <strong>Also publish to Microsoft 365 Copilot</strong>은 사용자가 보고한 데모 UI 문구입니다. 같은 테넌트·같은 로그인 계정, 사용자별 적격 M365 라이선스/구독, Fabric 용량·소스 권한 및 관리자의 Copilot 확장 허용이 필요합니다. 토글 하나가 이 조건들을 대체하지 않습니다.</p>
 
   <h4>게시 후 보이는 곳</h4>
   <table>
     <thead><tr><th>위치</th><th>무엇이 보이는지</th></tr></thead>
     <tbody>
-      <tr><td><strong>M365 Copilot</strong> (<code>m365.cloud.microsoft/chat</code>)</td><td>우측 <strong>Agents</strong> 패널에 <code>RetailInsightAgent</code>가 나타납니다. 선택하면 바로 대화 가능</td></tr>
-      <tr><td><strong>Teams</strong></td><td>Copilot 앱 내 에이전트 목록에 동일하게 표시</td></tr>
-      <tr><td><strong>Fabric 포털</strong></td><td>에이전트 항목의 published 버전. 이후 REST·MCP 호출이 이 버전을 사용</td></tr>
+      <tr><td><strong>M365 Copilot</strong> (<code>m365.cloud.microsoft/chat</code>)</td><td>Agent Store에서 사용 가능한 에이전트를 선택하거나 @멘션. 데모에서는 Agents 패널에 표시된 것으로 보고됨</td></tr>
+      <tr><td><strong>Teams</strong></td><td>공식 문서는 Teams에서 사용 가능하다고 설명. 표시 위치·가용성은 테넌트 정책과 UI에 따라 확인</td></tr>
+      <tr><td><strong>Fabric 포털</strong></td><td>게시된 버전과 편집 초안은 분리됩니다. Data Agent MCP는 게시된 버전을 사용하며 초안 변경은 재게시 전까지 반영되지 않습니다</td></tr>
     </tbody>
   </table>
-  <p>토글 설명대로 <strong>본인은 즉시 사용 가능</strong>하고, 동료에게 보이게 하려면 별도 공유가 필요합니다. 토글이 <strong>Off</strong>이면 M365 Copilot에 나타나지 않으므로, 켜고 Publish해야 합니다.</p>
+  <p>게시 후 목록 반영에는 시간이 걸릴 수 있습니다. 나타나지 않으면 탐색을 새로 고치고 관리자 설정을 확인하세요. 동료에게는 에이전트뿐 아니라 <strong>연결된 원본의 읽기 권한</strong>도 필요합니다. 이 게시 옵션은 M365 배포를 위한 것이며, Off로 바꾸는 것을 기존 게시 취소·권한 회수로 간주하지 마세요.</p>
 
   <h4>두 가지 노출 경로</h4>
   <table>
     <thead><tr><th></th><th>경로 A · Data Agent</th><th>경로 B · Ontology MCP</th></tr></thead>
     <tbody>
-      <tr><td>방법</td><td>Fabric에서 <strong>직접 게시</strong> (토글 하나)</td><td>Copilot Studio 경유</td></tr>
+      <tr><td>방법</td><td>사전 조건 충족 후 Fabric에서 <strong>직접 게시</strong></td><td>Copilot Studio 경유 (문서화된 선택지)</td></tr>
       <tr><td>중간 구성 요소</td><td>없음</td><td>Copilot Studio 에이전트</td></tr>
-      <tr><td>도메인 규칙</td><td><code>aiInstructions</code> 그대로 적용</td><td>Copilot Studio에 다시 작성</td></tr>
-      <tr><td>M365 Copilot 등록</td><td>토글로 자동</td><td>Copilot Studio에서 MCP 등록 후 게시</td></tr>
+      <tr><td>도메인 지침</td><td>Data Agent 지침이 분석을 유도. M365가 최종 답변을 재구성할 수 있음</td><td>Copilot Studio에서 별도 설정·검증</td></tr>
+      <tr><td>M365 Copilot 등록</td><td>Agent Store 게시 옵션 및 공유·권한 확인</td><td>Fabric IQ MCP 연결 후 Teams/M365 채널 설정·게시·배포</td></tr>
     </tbody>
   </table>
-  <p><strong>M365 Copilot은 MCP 엔드포인트를 직접 등록할 수 없습니다.</strong> 따라서 <strong>온톨로지 MCP</strong>를 M365 Copilot에서 쓰려면 여전히 <strong>Copilot Studio</strong>가 필요합니다(경로 B). 반면 <strong>Data Agent</strong>는 Fabric 게시 토글만으로 등장하므로 Copilot Studio가 필요 없습니다(경로 A).</p>
+  <p>임의 MCP URL을 일반 M365 채팅에 붙이는 것과 에이전트 통합·배포는 다릅니다. <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-create-agent-copilot-studio">Copilot Studio의 Fabric IQ MCP 연결</a>과 <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/publication-add-bot-to-microsoft-teams">Teams/M365 채널 게시</a>는 문서화된 경로 B입니다. 이를 <strong>온톨로지를 M365에서 사용하는 유일한 경로</strong>라고 일반화하지 않습니다. 온톨로지를 소스로 가진 Data Agent의 직접 게시(경로 A)도 가능하며, 다른 개발자 통합은 별도 지원 검토가 필요합니다.</p>
   <blockquote>
-    <p><strong>데모 관점</strong> — 경로 A가 훨씬 강력합니다. 토글 하나로 Fabric 온톨로지 기반 에이전트가 M365 Copilot에 등장하는 장면은 설명이 거의 필요 없습니다. 온톨로지 MCP(경로 B)는 "외부 에이전트가 스키마를 스스로 탐색하고 구조화된 데이터를 받는다"는 다른 메시지를 보여줄 때 쓰는 것이 좋습니다.</p>
+    <p><strong>데모 관점</strong> — 경로 A는 구성된 Data Agent를 M365에 배포하는 흐름을, 경로 B는 외부 에이전트가 온톨로지 도구를 사용하는 흐름을 보여줍니다. 어느 경로든 실제 대상 사용자 권한으로 검증하고, M365 오케스트레이터가 답변을 요약·재해석할 수 있음을 설명하세요.</p>
   </blockquote>
 
   <h4>게시 시 주의할 점</h4>
   <ul>
-    <li>게시 대화 상자의 설명 문구는 <code>publish_info.json</code>의 description에서 옵니다. 현재 값은 <code>deploy_data_agent.py</code>가 쓴 것이라, 스크립트를 다시 돌리면 여기서 수정한 내용이 덮어써집니다.</li>
-    <li>"You can't undo this action" — published 버전은 되돌릴 수 없고, 변경하려면 다시 게시해야 합니다.</li>
-    <li>이 토글로 노출되는 것은 <strong>Data Agent뿐</strong>입니다. 온톨로지 MCP를 M365 Copilot에서 쓰려면 여전히 Copilot Studio가 필요합니다(위 "두 가지 노출 경로" 참고).</li>
+    <li>데모는 게시 설명을 <code>publish_info.json</code>과 <code>deploy_data_agent.py</code>로 관리한다고 기록합니다. 스크립트 재실행의 덮어쓰기 동작은 공개 소스로 확인하지 못했으므로 실행 전 diff·백업으로 확인하세요. 공식 문서는 Settings → Publishing에서 설명 변경을 지원합니다.</li>
+    <li>"You can't undo this action"은 보고된 UI 경고입니다. 이를 영구적인 삭제·접근 회수 불가로 확대 해석하지 마세요. 구성 변경은 초안에서 검증 후 재게시하고, 게시 취소·배포 철회·접근 회수는 각 제품의 현재 관리 기능을 확인합니다.</li>
+    <li>이 게시 옵션이 배포하는 것은 <strong>Data Agent</strong>이며 임의 Ontology MCP URL의 등록 기능은 아닙니다. M365 게시 설명의 지침도 최종 응답의 원문 보존이나 정책 강제를 보장하지 않습니다.</li>
   </ul>
 
   <h3>8.8 주의사항</h3>
   <ul>
     <li><strong>둘 다 Preview입니다.</strong> 프로덕션 아키텍처 제안 시 명시해야 합니다.</li>
     <li><strong>응답이 Fabric 규정 준수 경계·리전 밖으로 나갈 수 있습니다.</strong> MCP 클라이언트가 어디서 실행되고 데이터를 어떻게 저장하는지는 Fabric이 통제하지 못합니다. 거버넌스 검토 항목입니다.</li>
-    <li>Ontology MCP의 <code>resources/list</code>는 비활성화 상태이고, Data Agent MCP도 마찬가지로 <code>-32601 Feature is not enabled</code>를 반환합니다. 스키마를 리소스로 내보내는 기능은 아직 없습니다.</li>
+    <li>두 MCP 경로의 <code>resources/list</code>에서 <code>-32601 Feature is not enabled</code>가 보고되었습니다. 해당 데모 세션의 관찰이지 모든 버전의 기능 부재를 증명하지 않습니다. 초기화 응답의 capabilities와 도구 스키마를 확인하세요.</li>
+    <li><strong>공개 범위 검토</strong>: 실제 workspace/item ID, 스토리지 계정·컨테이너 경로, SharePoint 사이트·폴더 이름은 인프라 식별 정보입니다. 기존 데모 ID는 유지했으며 게시 여부는 소유자가 결정해야 합니다. 이 HTML 텍스트 검토에서 실제 토큰·암호·SAS는 발견하지 않았지만 이미지 검토는 별도입니다.</li>
   </ul>
   <p class="meta">상세 요청 예시와 실측치는 리포지토리 <code>docs/data-agent-operations.md</code>에 정리되어 있습니다.</p>
 
   <h2>9. 알려진 한계 & 문제 해결</h2>
   <ul>
-    <li><strong>3개 이상 엔터티를 한 문장에 스팬하면 빈 결과</strong> → Part 3·4처럼 분해해서 질문.</li>
-    <li><strong>큰 식별자 목록은 잘림</strong> → 카운트는 신뢰, 완전한 목록은 비신뢰.</li>
-    <li><strong>Instances 탭은 바인딩을 직접 읽어</strong> 그래프가 오래돼도 행을 보여줌 → 그래프 건강성은 에이전트 질문으로 확인.</li>
-    <li><strong>The Graph Model is not ready</strong> → 온톨로지를 포털에서 열고 저장.</li>
-    <li><strong>포털에 안 보이는 에이전트 복구</strong>: 아이템을 수리하지 말고 재생성 — <code>DELETE items/{oldId}</code> → <code>POST items</code>(type:DataAgent) → <code>deploy_data_agent.py</code>로 재배포 → 포털 URL <code>…/aiskills/{agentId}</code> 확인.</li>
+    <li><strong>복잡한 그래프 질의의 빈 결과(데모 관찰)</strong> → Part 3·4처럼 분해하고 바인딩·권한·필터를 확인합니다. 자연어 한 문장이 곧 하나의 그래프 쿼리는 아닙니다.</li>
+    <li><strong>큰 식별자 목록의 잘림 위험</strong> → 완전한 집합 없이 차집합이나 미구매 판정을 하지 않습니다. 집계값도 자동으로 신뢰하지 말고 생성 쿼리·필터·원본 집계로 교차 확인합니다.</li>
+    <li><strong>Instances 탭에 행이 보여도 전체 그래프의 최신성을 보장하지 않습니다.</strong> 직접 원본을 읽는다는 구현 설명은 확인하지 못했습니다. 그래프 새로 고침 상태와 알려진 원본 집계·관계를 함께 확인하세요.</li>
+    <li><strong>The Graph Model is not ready</strong> → 데모에서는 포털 열기·저장이 복구 방법으로 보고되었습니다. 공식적으로 원본 데이터 변경 후에는 연결된 Graph 항목의 <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-view-entity-type-details#refresh-the-graph-model">Schedule → Refresh now 또는 갱신 일정</a>을 확인합니다. 전체 새로 고침에는 용량 비용이 있으며, 바인딩·권한·column mapping 문제는 <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/resources-troubleshooting">공식 문제 해결</a>을 따릅니다.</li>
+    <li><strong>포털에 안 보이는 에이전트</strong> → 먼저 워크스페이스·권한·항목 유형·목록 필터·서비스 상태를 확인합니다. 삭제 후 재생성은 기본 복구 절차가 아니며 ID·링크·공유·게시 연동을 깨뜨릴 수 있습니다. 불가피할 때만 정의와 설정을 백업하고 소유자 승인 후 별도 항목으로 재배포·검증합니다. 이 가이드의 기존 데모 ID는 유지합니다.</li>
   </ul>
 
   <h2>10. 재현 방법</h2>
-  <p>리포지토리: <a href="https://github.com/yk2ndorganization/Ontologytesting">yk2ndorganization/Ontologytesting</a></p>
+  <p>리포지토리: <a href="https://github.com/yk2ndorganization/Ontologytesting">yk2ndorganization/Ontologytesting</a>. 2026-09-21 확인 시 GitHub는 <strong>internal/private</strong>로 보고했으므로 익명 공개 재현을 보장할 수 없습니다. 아래 명령은 제공된 데모 기록이며 소스·CLI 옵션을 공개 코드로 검증하지 못했습니다. 접근 권한을 확보한 뒤 README와 각 스크립트의 <code>--help</code>를 확인하고 전용 데모 환경에서 실행하세요.</p>
+  <p>먼저 용량·테넌트 설정·워크스페이스·Lakehouse·Eventhouse/KQL Database·Ontology·Data Agent 및 권한을 준비합니다. ADLS 업로드·연결·단축과 SharePoint 파일 업로드·Dataflow 구성도 별도 단계이며 아래 명령만으로 생성되지 않습니다. Customer 바인딩은 §4.2의 관리형 테이블 지원 제한에 맞춰 조정하고, 바인딩/그래프 갱신과 검증 후 에이전트를 게시합니다. 자산 이름은 <code>RetailCommerceOntology</code>와 <code>RetailInsightAgent</code>를 사용합니다.</p>
   <pre><code># 1) 결정적 데모 데이터 생성 (Delta/JSONL/Excel)
 python3 -m pip install -r requirements.txt
 python3 scripts/generate_demo_data.py
 
 # 2) 네이티브 데이터 배포 (Azure CLI 인증 후)
-python3 scripts/deploy_onelake.py     --workspace-id <ws> --lakehouse-id <lh> --source data/lakehouse
-python3 scripts/deploy_eventhouse.py  --cluster <kusto-uri> --database CustomerSignalsEH --source data/eventhouse/customer_events.jsonl
-python3 scripts/deploy_ontology.py    --workspace-id <ws> --ontology-id <ont> --lakehouse-id <lh> --eventhouse-id <eh> --cluster <kusto-uri> --database CustomerSignalsEH
-python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --agent-name RetailInsightAgent --ontology-id <ont> --ontology-name RetailCommerceOntology</code></pre>
-  <p>온톨로지를 REST로 배포한 뒤에는 <strong>포털에서 한 번 열어 저장</strong>해야 쿼리 그래프가 생성됩니다. SharePoint 적재는 UI(Dataflow Gen2)로 진행합니다(§4.3).</p>
+python3 scripts/deploy_onelake.py     --workspace-id &lt;ws&gt; --lakehouse-id &lt;lh&gt; --source data/lakehouse
+python3 scripts/deploy_eventhouse.py  --cluster &lt;kusto-uri&gt; --database CustomerSignalsEH --source data/eventhouse/customer_events.jsonl
+python3 scripts/deploy_ontology.py    --workspace-id &lt;ws&gt; --ontology-id &lt;ont&gt; --lakehouse-id &lt;lh&gt; --eventhouse-id &lt;eh&gt; --cluster &lt;kusto-uri&gt; --database CustomerSignalsEH
+python3 scripts/deploy_data_agent.py  --workspace-id &lt;ws&gt; --agent-id &lt;agent&gt; --agent-name RetailInsightAgent --ontology-id &lt;ont&gt; --ontology-name RetailCommerceOntology</code></pre>
+  <p>위 명령은 리포지토리 루트의 Bash/Python 예시이며 <code>&lt;…&gt;</code>를 실제 값으로 바꾼 뒤 실행합니다. 반복 실행의 덮어쓰기·중복 적재 여부는 소스 확인 전 보장할 수 없습니다. REST 배포 후 포털 열기·저장은 데모 기록의 단계이며, 그래프 생성·갱신 완료를 별도로 확인합니다(§9). SharePoint 적재는 Dataflow Gen2로 진행합니다(§4.3).</p>
 
   <hr />
   <h2>참고</h2>
@@ -651,7 +668,7 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
     <li>관련 가이드: <a href="../03-fabric-ontology/">03. 온톨로지 심화</a> · <a href="../04-fabric-data-agent/">04. Data Agent</a></li>
   </ul>
 
-  <p class="meta">최종 수정 2026-09-21 · 상태: Published · 데모 검증일 2026-09-11</p>
+  <p class="meta">문서 검토 2026-09-21 · 기록상 데모 상태: Published · 제공된 데모 검증일: 2026-09-11 · 이번 검토에서 라이브 재검증하지 않음</p>
 
   </div>
 
@@ -660,19 +677,19 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
   <p class="meta">An omnichannel retail demo that unifies four different physical data layers (Lakehouse managed Delta · ADLS shortcut · SharePoint Excel · Eventhouse) into a <strong>single ontology</strong>, on top of which a <strong>Data Agent</strong> answers business questions in natural language. This document explains the demo's architecture, data, scenario, and operations, and shows how to reproduce and present it.</p>
 
   <blockquote>
-    <p><strong>In one line</strong> — the agent derives, with evidence, the insight that "a well-funded promotion (PR9999, Seoul Audio Summer Surge) created strong purchase intent but failed to convert due to inventory scarcity" by traversing the relationships the ontology draws across multiple sources.</p>
+    <p><strong>In one line</strong> — the generated promotion data (PR9999, Seoul Audio Summer Surge) shows many cart events, few purchase events, and low stock together. The Data Agent connects evidence through ontology relationships to explain an <strong>inventory-constraint hypothesis</strong>, not to prove a causal effect of inventory scarcity.</p>
   </blockquote>
 
   <h2>1. What the Demo Shows</h2>
   <ul>
     <li><strong>Business question</strong>: Why did the Seoul audio summer promotion draw huge customer interest yet produce weak sales?</li>
     <li><strong>Core message</strong>: an ontology turns tables/columns into <em>business meaning (entities and relationships)</em>, and the Data Agent answers by <strong>traversing the relationship graph</strong> rather than matching names.</li>
-    <li><strong>The decisive signal</strong>: 1,729 add-to-cart vs. 36 actual purchases → a <strong>2.08%</strong> conversion. Average on-hand inventory for that store/product over the same window was <strong>1 unit</strong>.</li>
-    <li><strong>The action</strong>: reallocate campaign budget until inventory recovers, and legally re-contact only high-value customers who have personalization consent.</li>
+    <li><strong>The key signal</strong>: 1,729 AddToCart vs. 36 Purchase events attributed to PR9999 → an <strong>event-count ratio of 2.08%</strong> (36÷1,729), not a unique-customer or session conversion rate. Reported average stock for that store/product during the campaign was <strong>1 unit</strong>.</li>
+    <li><strong>Proposed action</strong>: consider reallocating campaign budget until stock recovers and shortlist high-value customers with personalization consent for re-contact. That flag alone does not establish lawful contact; separately check channel consent, withdrawals, and policy.</li>
   </ul>
 
   <h2>2. Architecture — Four Physical Layers → One Ontology</h2>
-  <p>The essence of this demo is that <strong>four different physical storage styles</strong> converge into a single ontology.</p>
+  <p>The demo compares <strong>four physical storage styles</strong>, not live federated queries across all four systems. This model uses Lakehouse tables and the reported ADLS shortcut; SharePoint is an ingested copy, and Eventhouse is a separate batch copy. See §4.2 for the current official restriction on Customer shortcut binding.</p>
   <div class="arch">
     <div class="arch-sources">
       <div class="arch-card s1"><b>Generated operations data</b><span class="tbl">products · stores · orders · order_lines · inventory_snapshots · customer_events</span><span class="pat">Managed Delta tables</span></div>
@@ -707,6 +724,7 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
   </blockquote>
 
   <h2>3. Fabric Assets (Current Workspace)</h2>
+  <p class="meta">Assets, row counts, and query results reflect supplied demo records. The 2026-09-21 review checked official documentation and internal consistency only; it made no live Fabric calls or data revalidation. <code>ykfabricf64</code> is a name; F16 is the recorded SKU.</p>
   <p>Live workspace: <a href="https://app.powerbi.com/groups/8653f3c5-60af-4976-9aad-13f7c26b9d93/list?experience=power-bi">Retail Ontology Agent Demo</a> (access requires permission)</p>
   <table>
     <thead><tr><th>Asset</th><th>Name</th><th>ID</th></tr></thead>
@@ -722,7 +740,7 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
     </tbody>
   </table>
   <h3>3.1 Lineage</h3>
-  <p>The full lineage as seen in the Fabric lineage view. Several sources converge into <code>RetailOperationsLH</code>, with the ontology and Data Agent layered on top.</p>
+  <p>Below are the demo lineage screen and asset mappings. The ontology and Data Agent sit over Lakehouse representations of multiple sources, but an Eventhouse node does not imply an Eventhouse → Lakehouse synchronization pipeline. Events were independently loaded from the same generated dataset as described in §2.</p>
   <figure class="fig">
     <img src="img/lineage.png" alt="Fabric lineage view — SharePoint · ADLS · Eventhouse → RetailOperationsLH → RetailCommerceOntology → RetailInsightAgent" />
     <figcaption>Fabric lineage view: SharePoint · ADLS(2) · Eventhouse sources → RetailOperationsLH → RetailCommerceOntology → RetailInsightAgent</figcaption>
@@ -762,9 +780,10 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
     <li>ADLS path: <code>abfss://raw@ykexternaldatalake.dfs.core.windows.net/retail-ontology-demo/customer_profiles</code></li>
     <li>OneLake shortcut: <code>RetailOperationsLH/Tables/customer_profiles</code></li>
     <li>Connection: <code>Retail Demo ADLS - Workspace Identity</code> (granted <code>Storage Blob Data Reader</code> at storage-account scope)</li>
-    <li>Same "no-copy access" pattern as Databricks catalog federation — data is not replicated into Fabric and stays in external ADLS.</li>
+    <li>An <a href="https://learn.microsoft.com/en-us/fabric/onelake/create-adls-shortcut">ADLS shortcut</a> references external files without requiring a separate ingestion copy. It is not Databricks catalog federation and does not automatically inherit Unity Catalog policies. ADLS access uses the shortcut connection credential, so review Fabric and storage permissions together.</li>
   </ul>
-  <p><code>customer_profiles</code> originates from an <strong>externally governed managed Delta table in Databricks (Unity Catalog)</strong>, and reaches Fabric through ADLS Gen2 as a OneLake shortcut. Below is an example of a Delta table managed in an external Databricks Unity Catalog (Type: Managed, Data source: Delta).</p>
+  <p>The demo records describe <code>customer_profiles</code> as a shortcut to external ADLS Delta. The Unity Catalog screen below is an <strong>illustration</strong> of a managed Delta table; it does not establish that it contains the same data as this ADLS path or that the demo directly reads a UC managed table.</p>
+  <blockquote><p><strong>Important support discrepancy</strong> — current <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-bind-data#limitations-and-troubleshooting">ontology binding documentation</a> supports only managed Lakehouse tables, not tables at external locations. The demo's <code>Customer → customer_profiles</code> shortcut binding is therefore a reported configuration, not a general support guarantee. For reproduction, consider loading a managed Delta table and rebinding (requiring copying and refresh). Sources with OneLake security or Delta column mapping enabled also have limitations; do not disable security merely to make the demo work—use a separately approved demo dataset.</p></blockquote>
   <figure class="fig">
     <img src="img/databricks-external-delta.png" alt="External managed Delta table in Databricks Unity Catalog" />
     <figcaption>External Databricks Unity Catalog — a managed Delta table (this kind of externally governed Delta reaches OneLake as a shortcut via ADLS)</figcaption>
@@ -780,7 +799,7 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
       <tr><td>Destination table</td><td><code>RetailOperationsLH/Tables/promotions</code></td></tr>
     </tbody>
   </table>
-  <p>Dataflow Gen2 loaded 17 unique promotions and activated the <code>Promotion</code> entity binding. ⚠️ The SharePoint <strong>Folder</strong> connector must use the <strong>site URL only</strong> — do not pass the library view URL ending in <code>/Forms/AllItems.aspx</code>.</p>
+  <p>The demo records report 17 unique promotions loaded by Dataflow Gen2, with <code>Promotion</code> separately bound to the destination table. Loading data does not itself create an ontology binding. ⚠️ Use the <strong>site URL</strong> for the <a href="https://learn.microsoft.com/en-us/power-query/connectors/sharepoint-folder">SharePoint Folder connector</a>, not the library view URL ending in <code>/Forms/AllItems.aspx</code>.</p>
   <figure class="fig">
     <img src="img/sharepoint-library.png" alt="RetailPromotionPlan.xlsx in the SharePoint ykTEST folder" />
     <figcaption>SharePoint <code>Leadership-AWOA04 POC</code> site → <code>Shared Documents/ykTEST</code> → <code>RetailPromotionPlan.xlsx</code></figcaption>
@@ -794,6 +813,7 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
   <p>The <code>CustomerEvents</code> KQL table in <code>CustomerSignalsEH</code> retains 30,000 rows. It is for real-time / time-series analysis, while entity identity and properties come from the Lakehouse copy (see §2 design note).</p>
 
   <h2>5. Ontology Model — 7 Entities · 12 Relationships</h2>
+  <p>This is the logical model from the demo records. Verify the deployed definition and property mappings when reproducing it; see §4.2 for the official restriction on Customer shortcut binding. Relationship keys summarize join context, not the complete binding definition.</p>
   <h3>5.1 Entities</h3>
   <table>
     <thead><tr><th>Entity</th><th>Identity</th><th>Source binding</th><th>Key properties</th></tr></thead>
@@ -912,27 +932,28 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
   <ul>
     <li>Answer by <strong>traversing ontology relationships</strong>, not by matching names.</li>
     <li>Map behavior=CustomerEvent, stock=InventorySnapshot, sales=Order, campaign=Promotion.</li>
-    <li><strong>Never write one query spanning three or more entities</strong>, and never express "has no X" as NOT EXISTS / anti-join → those return zero rows in this ontology.</li>
+    <li>Instruct the agent to avoid <strong>3+ entity queries and NOT EXISTS / anti-join patterns</strong> that reportedly returned empty results in this demo. This is not a Fabric-wide entity-count limit or a claim that every anti-join fails.</li>
     <li>Instead <strong>decompose</strong>: one simple per-entity query for ID lists, then intersect/subtract yourself.</li>
-    <li>Always <strong>begin with the smallest, most selective entity</strong> and carry its ID list into the larger one (avoids truncation).</li>
+    <li><strong>Begin with the smallest, most selective entity</strong> and carry its ID list into the larger one (reduces truncation risk). Verify both lists are complete before computing a set difference.</li>
     <li>Never divide by a count before confirming it is greater than zero.</li>
   </ul>
-  <p>Terminology is pinned in the instructions too — purchase intent = AddToCart, conversion = Purchase, high-value customer = Segment 'High Value', contactable = ConsentForPersonalization true, stockout risk = OnHandQuantity ≤ ReorderPoint, etc.</p>
+  <p>Demo terminology: purchase intent = AddToCart, purchase event = Purchase, high-value customer = Segment 'High Value', re-contact candidate = ConsentForPersonalization true, inventory risk = OnHandQuantity ≤ ReorderPoint. Instructions guide model behavior; they do not enforce access control or consent policy.</p>
 
-  <h3>6.2 How to query (Assistants-style API)</h3>
-  <p>Requires <code>?api-version=2024-05-01-preview</code> + a bearer token for <code>https://api.fabric.microsoft.com</code>.</p>
+  <h3>6.2 Historical query path and current recommendation</h3>
+  <p><a href="https://learn.microsoft.com/en-us/fabric/data-science/consume-data-agent-python">Current Microsoft Learn guidance</a> recommends <strong>migration to MCP</strong> following the OpenAI Assistants API sunset on 2026-08-26 (see §8). Below is the supplied demo's Assistants-style call record (<code>?api-version=2024-05-01-preview</code>, Fabric resource token), not a currently supported execution recipe. Availability of this Fabric route was not revalidated.</p>
   <pre><code>BASE = https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/dataAgents/{agentId}/aiassistant/openai
 
 POST {BASE}/assistants                     -> assistant_id
 POST {BASE}/threads                        -> thread_id
-POST {BASE}/threads/{id}/messages          {"role":"user","content":"<question>"}
-POST {BASE}/threads/{id}/runs              {"assistant_id":"<assistant_id>"}
+POST {BASE}/threads/{id}/messages          {"role":"user","content":"&lt;question&gt;"}
+POST {BASE}/threads/{id}/runs              {"assistant_id":"&lt;assistant_id&gt;"}
 GET  {BASE}/threads/{id}/runs/{run_id}     poll until terminal
 GET  {BASE}/threads/{id}/messages          -> answer
 DELETE {BASE}/threads/{id}</code></pre>
-  <p>❗ Endpoints that don't work here: <code>/chat/completions</code> (404), the MCP tool call (times out), and samples built on the OpenAI Assistants API retired on 2026-08-26.</p>
+  <p>The earlier <code>/chat/completions</code> 404 and MCP timeout were reported outcomes of particular calls. Distinguish them from the successful MCP observations in §8 and official MCP support; they do not mean MCP itself is nonfunctional.</p>
 
-  <h2>7. Demo Scenario (12 Verified Questions)</h2>
+  <h2>7. Demo Scenario (10 Example Questions)</h2>
+  <p>Numbers below are expected results from supplied demo records, not rerun in this review. Check PromotionID, time-window, store, and product filters for event aggregates. PR9999-attributed events and campaign-window inventory may cover different scopes.</p>
 
   <h3>Part 1 — the model is real</h3>
   <p><code>How many stores are there?</code> → 6 · <code>How many products are there?</code> → 50 · <code>How many orders are there?</code> → 6,000</p>
@@ -946,26 +967,30 @@ DELETE {BASE}/threads/{id}</code></pre>
 
   <h3>Part 3 — the insight (centerpiece)</h3>
   <ul>
-    <li><code>How many AddToCart and Purchase customer events are attributed to promotion PR9999?</code> → <strong>1,729 vs 36 (2.08% conversion)</strong></li>
+    <li><code>How many AddToCart and Purchase customer events are attributed to promotion PR9999?</code> → <strong>1,729 vs 36 (2.08% event-count ratio)</strong></li>
     <li><code>How many CustomerEvent records have ProductID P0001?</code> → 3,586</li>
   </ul>
-  <p><strong>Narrative</strong>: the campaign was well funded and customers clearly wanted the product, yet almost nobody could buy it. During the window (2026-08-03–08-16) average on-hand stock for P0001 at S001 was 1 unit, and all 14 snapshots in that window sat at or below the reorder point.</p>
+  <p><strong>Narrative</strong>: during the campaign window (2026-08-03–08-16), reported average stock for P0001 at S001 was 1 unit, with all 14 snapshots at or below the reorder point. Low stock and a low purchase-event ratio are consistent with an inventory-constraint hypothesis, but being below the reorder point is not the same as being out of stock, and snapshots alone do not prove why purchases failed.</p>
 
   <h3>Part 4 — the action</h3>
   <ul>
     <li><code>How many Customer records have Segment High Value and ConsentForPersonalization true?</code> → 33</li>
-    <li><code>Which high-value customers showed purchase intent for P0001 but did not purchase, and may be contacted under their personalization consent?</code> → about 32 of the 33 (C000006, C000021, C000037, …). The agent decomposes the question, narrowing high-value consented customers first, then checking their events.</li>
+    <li><code>Which high-value customers showed purchase intent for P0001 but did not purchase, and may be contacted under their personalization consent?</code> → the reported demo result is about 32 of 33 (C000006, C000021, C000037, …). Narrow high-value consented customers, then compare AddToCart/Purchase customer sets over the same period. Do not use truncated lists or approximations as an actual contact list; verify source data and current consent first.</li>
   </ul>
 
     <h2>8. External Exposure via MCP</h2>
-  <p>External exposure is possible through <strong>two MCP endpoints</strong>. Both are provided by Fabric out of the box, so there's no need to build a separate server. The following was verified by actually calling them against this workspace.</p>
+  <p>Fabric provides <strong>Ontology MCP and Data Agent MCP</strong>. Below, <strong>officially documented support</strong> is distinguished from <strong>user-supplied demo call records</strong>. No endpoint was called in this review, and observed responses, errors, or timings are not guaranteed in every environment.</p>
 
   <h3>8.1 Endpoints</h3>
-  <pre><code># Ontology MCP — expose the ontology directly
+  <pre><code># Ontology MCP — current Microsoft Learn route
+https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/{workspaceId}/items/{ontologyId}/ontologyEndpoint
+
+# Ontology MCP — separate route with reported demo success (general support unverified)
 POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/ontologies/{ontologyId}
 
 # Data Agent MCP — expose through the agent
 POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents/{agentId}/agent</code></pre>
+  <p>Sources: <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-use-ontology-mcp-server">Ontology MCP</a> · <a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-mcp-server">Data Agent MCP</a>. Do not assume the two ontology routes are equivalent officially supported aliases. For a published Data Agent, check Settings → Model Context Protocol for its URL and tool details.</p>
   <p>Actual values for this demo:</p>
   <table>
     <thead><tr><th>Item</th><th>ID</th></tr></thead>
@@ -976,32 +1001,34 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
     </tbody>
   </table>
   <blockquote>
-    <p><strong>The ontology path has nothing appended after the ID.</strong> Adding <code>ontology</code>, <code>/mcp</code>, or <code>/agent</code> yields <code>404 EntityNotFound</code>. Conversely, the agent path <strong>requires</strong> the trailing <code>/agent</code>.</p>
+    <p>The demo's <code>/ontologies/{ontologyId}</code> route has no suffix; adding suffixes reportedly returned 404. This does not invalidate the official route ending in <code>/ontologyEndpoint</code>. The documented Data Agent route includes <code>/agent</code>.</p>
   </blockquote>
 
   <h3>8.2 Authentication</h3>
-  <p>An Entra ID token is required; anonymous access is not allowed. The caller inherits the workspace permissions as-is.</p>
+  <p>Entra ID authentication is required; this is not anonymous public access. The caller needs effective read access to the item and required underlying data. Sharing an agent does not grant source access (<a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-sharing">permissions documentation</a>). Below is a <strong>Bash/Azure CLI example</strong> after sign-in. MCP uses the Fabric token scope <code>https://api.fabric.microsoft.com/.default</code>; never store tokens in code, logs, or Git.</p>
   <pre><code>TOKEN=$(az account get-access-token \
   --resource https://api.fabric.microsoft.com \
   --query accessToken -o tsv)</code></pre>
-  <p>For production, use a service principal, and the tenant setting <strong>"Service principals can use Fabric APIs"</strong> must be on.</p>
+  <p><a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-mcp-server#authentication">Data Agent MCP documentation</a> explicitly supports user and service principal tokens; this is not inferred from the tenant's <strong>Service principals can use Fabric APIs</strong> switch alone. Check workspace/source permissions and limitations in the <a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-service-principal">SPN guidance</a> (KQL-connected agents and managed identities are not supported there). That article and the MCP article name different token resources, so use the endpoint-specific MCP scope above. <strong>The reviewed documentation does not explicitly establish SPN support for direct Ontology MCP; verify it separately.</strong> Workspace Identity for an ADLS shortcut is a different authentication layer from an agent caller.</p>
 
   <h3>8.3 How to call</h3>
-  <p>MCP is JSON-RPC 2.0, and the <code>Accept</code> header must include <code>text/event-stream</code>.</p>
-  <pre><code>curl -X POST "$URL" \
+  <p>MCP uses JSON-RPC 2.0 / Streamable HTTP. <strong>Complete initialize negotiation and notifications/initialized first</strong>, then propagate the negotiated protocol version and any server-issued session ID in subsequent requests. The official MCP SDK example handles this flow. The Bash fragment below illustrates <code>tools/list</code> in an already initialized session, not a complete standalone client. Choose <code>URL</code> from §8.1 and add required session headers.</p>
+  <pre><code># After MCP initialization; include negotiated protocol/session headers as applicable
+curl -X POST "$URL" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'</code></pre>
 
-  <h4>Ontology MCP exposes 2 tools</h4>
+  <h4>Two Ontology MCP tools (arguments from demo records)</h4>
+  <p>The <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-create-agent-copilot-studio">official Copilot Studio integration guide</a> confirms these two tool names. Verify arguments and return shapes against the connected server's <code>tools/list</code> schema.</p>
   <pre><code>{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{
   "name":"list_ontology_entity_types",
   "arguments":{"includeProperties":true}}}</code></pre>
   <pre><code>{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{
   "name":"search_ontology",
   "arguments":{"naturalLanguageQuery":"...","naturalLanguageResponse":true}}}</code></pre>
-  <p><code>search_ontology</code> returns an aggregated table in <code>structuredContent.raw</code>.</p>
+  <p>In the demo records, <code>search_ontology</code> returned an aggregate table in <code>structuredContent.raw</code>. This abbreviated response illustration includes <code>...</code> and is not complete JSON. It does not guarantee the return format of every call.</p>
   <pre><code>{"Fields": ["promotion_id", "event_type", "event_count"],
  "Value": [["PR9999", "AddToCart", 1729], ["PR9999", "Purchase", 36], ...]}</code></pre>
 
@@ -1009,29 +1036,33 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
   <pre><code>{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{
   "name":"DataAgent_RetailInsightAgent",
   "arguments":{"userQuestion":"How many stores are there?"}}}</code></pre>
-  <p>The tool name <strong>follows the agent's display name.</strong> Renaming the agent changes the tool name, which can break client configuration.</p>
+  <p><code>DataAgent_RetailInsightAgent</code> and <code>userQuestion</code> are examples from demo records. Official guidance recommends <strong>discovering name and inputSchema through tools/list</strong> rather than hard-coding them. Recheck after renaming; do not assume the tool name must track the display name.</p>
 
   <h3>8.4 Registering an MCP client</h3>
-  <p>Register it as an HTTP server in an MCP client such as VS Code or Claude Desktop.</p>
+  <p>This is <strong>VS Code .vscode/mcp.json syntax</strong> using the official Ontology URL. Other clients need their own configuration and support for Streamable HTTP and Fabric bearer-token headers. The input is masked, but expired tokens still need renewal. Data Agent MCP does not support dynamic client registration, so do not assume automatic OAuth registration works.</p>
   <pre><code>{
   "servers": {
     "fabric-ontology": {
       "type": "http",
-      "url": "https://api.fabric.microsoft.com/v1/mcp/workspaces/8653f3c5-60af-4976-9aad-13f7c26b9d93/ontologies/f7eecc18-db38-46f4-8815-90f5bb3deb21",
+      "url": "https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/8653f3c5-60af-4976-9aad-13f7c26b9d93/items/f7eecc18-db38-46f4-8815-90f5bb3deb21/ontologyEndpoint",
       "headers": { "Authorization": "Bearer ${input:fabricToken}" }
     }
-  }
+  },
+  "inputs": [
+    { "id": "fabricToken", "type": "promptString", "description": "Fabric access token", "password": true }
+  ]
 }</code></pre>
   <blockquote>
-    <p><strong>Increase the timeout.</strong> An ontology query took 17 seconds and an agent query 31 seconds, and the first call after idle takes longer. Clients with a short default timeout will fail.</p>
+    <p><strong>Review client timeouts.</strong> The supplied observations of 17 seconds (Ontology) and 31 seconds (Data Agent) are individual demo timings, not an SLA or controlled benchmark. First calls, questions, and load can differ. Official Data Agent MCP documentation also describes the tasks extension for long-running requests; check client support.</p>
   </blockquote>
 
   <h3>8.5 Prerequisites</h3>
+  <p>Official prerequisites include paid F2+ or Fabric-enabled P1+ capacity, required tenant features, and permissions. Check the Ontology item setting and Data Agent AI processing/storage geography settings against organizational policy. The recorded F16/Korea Central deployment does not guarantee availability of every feature.</p>
   <table>
     <thead><tr><th>Path</th><th>What's required</th></tr></thead>
     <tbody>
-      <tr><td>Ontology MCP</td><td>Save the ontology once in the portal (builds the query graph)</td></tr>
-      <tr><td>Data Agent MCP</td><td>The agent must be <strong>published</strong>. Without a published stage you get <code>Stage configuration not found</code></td></tr>
+      <tr><td>Ontology MCP</td><td>An ontology item, supported bindings, and a healthy query graph. Portal saving was a reported demo recovery step; check graph refresh in §9 for upstream changes</td></tr>
+      <tr><td>Data Agent MCP</td><td>A <strong>published agent</strong> is officially required. <code>Stage configuration not found</code> was the reported demo error when unpublished</td></tr>
     </tbody>
   </table>
 
@@ -1040,83 +1071,86 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
     <thead><tr><th></th><th>Ontology MCP</th><th>Data Agent MCP</th></tr></thead>
     <tbody>
       <tr><td>Tools</td><td>Schema exploration + query (2)</td><td>Query (1)</td></tr>
-      <tr><td>Returns</td><td><strong>Structured table</strong> + optional prose</td><td>Prose only</td></tr>
-      <tr><td>Speed</td><td>17s</td><td>31s</td></tr>
-      <tr><td>Data scope</td><td>That ontology</td><td>All sources connected to the agent</td></tr>
-      <tr><td><strong>Analysis instructions</strong></td><td><strong>Not applied</strong></td><td>Applied</td></tr>
+      <tr><td>Observed return</td><td><strong>Structured table</strong> + prose</td><td>Text answer in this demo</td></tr>
+      <tr><td>Individual observation (not SLA)</td><td>17s</td><td>31s</td></tr>
+      <tr><td>Data scope</td><td>That ontology within granted access</td><td>Configured sources accessible to the caller</td></tr>
+      <tr><td><strong>Data Agent analysis instructions</strong></td><td><strong>Not passed through</strong></td><td>Guide model analysis (not enforced controls)</td></tr>
     </tbody>
   </table>
-  <p>The last row is the real deciding factor. The rules baked into <code>deploy_data_agent.py</code> — "judge purchase intent by <code>AddToCart</code>", "don't use <code>Order</code> to decide conversion; use <code>Purchase</code> from <code>CustomerEvent</code>", "only consented customers are contactable" — these domain guardrails <strong>apply to the agent only.</strong></p>
+  <p>The last row is one selection criterion. Demo records describe the analysis instructions in <code>deploy_data_agent.py</code> as "purchase intent means <code>AddToCart</code>", "count <code>Purchase</code> from <code>CustomerEvent</code>, not <code>Order</code>, for the event ratio", and "shortlist only consented customers for re-contact". These Data Agent instructions are <strong>not automatically passed to direct Ontology MCP</strong>, and do not guarantee correctness or consent compliance.</p>
   <ul>
     <li>An external agent wants to reason on its own and get structured data → <strong>Ontology MCP</strong></li>
-    <li>You want to enforce analysis rules on the server side, or combine multiple Fabric sources → <strong>Data Agent MCP</strong></li>
+    <li>You want to centrally manage analysis instructions or combine supported Fabric sources → <strong>Data Agent MCP</strong></li>
   </ul>
+  <p><strong>Instructions are not a security boundary.</strong> Separately implement and validate least privilege, source access controls and supported row/column security, consent checks, auditing, and output policy. Direct Ontology MCP does not pass through Data Agent instructions. Given the binding restrictions in §4.2, do not assume every source security feature is supported unchanged through this ontology path.</p>
 
   <h3>8.7 Publishing to M365 Copilot</h3>
-  <p>A Data Agent can be <strong>published directly to Microsoft 365 Copilot without Copilot Studio</strong>. Fabric's Publish dialog has an <strong>"Also publish to Microsoft 365 Copilot"</strong> toggle, so this single toggle makes the ontology-backed agent appear in M365 Copilot.</p>
+  <p><a href="https://learn.microsoft.com/en-us/fabric/data-science/data-agent-microsoft-365-copilot">Official documentation</a> supports <strong>direct Data Agent publishing to M365 Copilot without Copilot Studio</strong> in preview, including ontology sources. Its UI label is <strong>Publish to Agent Store</strong>; <strong>Also publish to Microsoft 365 Copilot</strong> is the user-reported demo label. Prerequisites include the same tenant and signed-in account, eligible M365 licensing/subscription per user, Fabric capacity/source permissions, and admin-enabled Copilot extensibility. A toggle does not replace these requirements.</p>
 
   <h4>Where it shows up after publishing</h4>
   <table>
     <thead><tr><th>Location</th><th>What appears</th></tr></thead>
     <tbody>
-      <tr><td><strong>M365 Copilot</strong> (<code>m365.cloud.microsoft/chat</code>)</td><td><code>RetailInsightAgent</code> appears in the right-hand <strong>Agents</strong> panel. Select it and chat immediately</td></tr>
-      <tr><td><strong>Teams</strong></td><td>Listed the same way in the agent list inside the Copilot app</td></tr>
-      <tr><td><strong>Fabric portal</strong></td><td>The published version of the agent item. Subsequent REST/MCP calls use this version</td></tr>
+      <tr><td><strong>M365 Copilot</strong> (<code>m365.cloud.microsoft/chat</code>)</td><td>Select an available agent from Agent Store or @mention it. The demo reportedly showed it in an Agents panel</td></tr>
+      <tr><td><strong>Teams</strong></td><td>Official guidance describes Teams consumption; confirm placement and availability under tenant policy and the current UI</td></tr>
+      <tr><td><strong>Fabric portal</strong></td><td>Published version and editable draft are separate. Data Agent MCP uses the published version; draft changes require republishing</td></tr>
     </tbody>
   </table>
-  <p>As the toggle explains, <strong>you can use it immediately</strong>, while making it visible to colleagues requires a separate share. If the toggle is <strong>Off</strong> it won't appear in M365 Copilot, so turn it on and Publish.</p>
+  <p>Listing can take time after publishing. Refresh navigation and check admin settings if it is missing. Colleagues need access to the agent <strong>and read access to connected sources</strong>. This publishing option controls M365 distribution; do not treat switching it Off as revoking existing publication or access.</p>
 
   <h4>Two exposure paths</h4>
   <table>
     <thead><tr><th></th><th>Path A · Data Agent</th><th>Path B · Ontology MCP</th></tr></thead>
     <tbody>
-      <tr><td>Method</td><td><strong>Publish directly</strong> from Fabric (one toggle)</td><td>Via Copilot Studio</td></tr>
+      <tr><td>Method</td><td><strong>Publish directly</strong> from Fabric after meeting prerequisites</td><td>Via Copilot Studio (a documented option)</td></tr>
       <tr><td>Intermediate component</td><td>None</td><td>A Copilot Studio agent</td></tr>
-      <tr><td>Domain rules</td><td><code>aiInstructions</code> applied as-is</td><td>Rewritten in Copilot Studio</td></tr>
-      <tr><td>M365 Copilot registration</td><td>Automatic via the toggle</td><td>Register the MCP in Copilot Studio, then publish</td></tr>
+      <tr><td>Domain instructions</td><td>Data Agent instructions guide analysis; M365 can reshape the final answer</td><td>Separately configured and tested in Copilot Studio</td></tr>
+      <tr><td>M365 Copilot registration</td><td>Agent Store publishing option plus sharing/access checks</td><td>Connect Fabric IQ MCP, then configure, publish, and distribute through the Teams/M365 channel</td></tr>
     </tbody>
   </table>
-  <p><strong>M365 Copilot cannot register an MCP endpoint directly.</strong> So using the <strong>ontology MCP</strong> from M365 Copilot still requires <strong>Copilot Studio</strong> (Path B). A <strong>Data Agent</strong>, by contrast, appears via the Fabric publish toggle alone — no Copilot Studio needed (Path A).</p>
+  <p>Pasting an arbitrary MCP URL into ordinary M365 chat is not the same as integrating and deploying an agent. <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-create-agent-copilot-studio">Copilot Studio's Fabric IQ MCP connection</a> plus <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/publication-add-bot-to-microsoft-teams">Teams/M365 channel publishing</a> is a documented Path B. It is <strong>not presented as the only way to use ontology in M365</strong>: direct publishing of an ontology-backed Data Agent (Path A) is also available, and other developer integrations require separate support review.</p>
   <blockquote>
-    <p><strong>Demo perspective</strong> — Path A is far more compelling. A single toggle making a Fabric ontology-backed agent appear in M365 Copilot needs almost no explanation. Save the ontology MCP (Path B) for the different message that "an external agent explores the schema on its own and receives structured data."</p>
+    <p><strong>Demo perspective</strong> — Path A demonstrates distributing a configured Data Agent to M365; Path B demonstrates an external agent using ontology tools. Test either path as the intended user and explain that the M365 orchestrator can summarize or reinterpret the answer.</p>
   </blockquote>
 
   <h4>Publishing caveats</h4>
   <ul>
-    <li>The description text in the publish dialog comes from the description in <code>publish_info.json</code>. The current value was written by <code>deploy_data_agent.py</code>, so rerunning the script overwrites any edits made here.</li>
-    <li>"You can't undo this action" — the published version cannot be reverted; to change it you must publish again.</li>
-    <li>Only the <strong>Data Agent</strong> is exposed by this toggle. Using the ontology MCP from M365 Copilot still requires Copilot Studio (see "Two exposure paths" above).</li>
+    <li>The demo records describe managing the publishing description with <code>publish_info.json</code> and <code>deploy_data_agent.py</code>. Script overwrite behavior could not be checked against public source; review diffs and backups before rerunning. Official documentation supports description updates through Settings → Publishing.</li>
+    <li>"You can't undo this action" is a reported UI warning, not proof that deletion or access revocation is permanently impossible. Test configuration changes in draft and republish; check current product controls for unpublishing, distribution withdrawal, and access revocation.</li>
+    <li>This publishing option distributes the <strong>Data Agent</strong>; it does not register an arbitrary Ontology MCP URL. Instructions in the M365 publishing description likewise do not guarantee verbatim responses or policy enforcement.</li>
   </ul>
 
   <h3>8.8 Caveats</h3>
   <ul>
     <li><strong>Both are Preview.</strong> Call this out when proposing a production architecture.</li>
     <li><strong>Responses may leave the Fabric compliance boundary / region.</strong> Fabric cannot control where the MCP client runs or how it stores data. This is a governance review item.</li>
-    <li>Ontology MCP's <code>resources/list</code> is disabled, and Data Agent MCP likewise returns <code>-32601 Feature is not enabled</code>. There is no capability yet to export the schema as a resource.</li>
+    <li><code>resources/list</code> reportedly returned <code>-32601 Feature is not enabled</code> on both MCP paths. This is a demo-session observation, not proof of absence across all versions. Check initialization capabilities and discovered tool schemas.</li>
+    <li><strong>Publication review</strong>: actual workspace/item IDs, storage account/container paths, and SharePoint site/folder names identify infrastructure. Existing demo IDs are preserved for the owner's publication decision. No actual token, password, or SAS was found in this HTML text review; images require separate review.</li>
   </ul>
   <p class="meta">Detailed request examples and measured figures are in the repository's <code>docs/data-agent-operations.md</code>.</p>
 
   <h2>9. Known Limits &amp; Troubleshooting</h2>
   <ul>
-    <li><strong>Spanning 3+ entities in one sentence returns empty</strong> → decompose like Part 3/4.</li>
-    <li><strong>Large identifier lists get truncated</strong> → counts are reliable, exhaustive lists are not.</li>
-    <li><strong>The Instances tab reads bindings directly</strong> and shows rows even when the graph is stale → confirm graph health with an agent question.</li>
-    <li><strong>The Graph Model is not ready</strong> → open and save the ontology in the portal.</li>
-    <li><strong>Recovering an agent invisible in the portal</strong>: recreate rather than repair — <code>DELETE items/{oldId}</code> → <code>POST items</code> (type:DataAgent) → redeploy with <code>deploy_data_agent.py</code> → verify the portal URL <code>…/aiskills/{agentId}</code>.</li>
+    <li><strong>Empty results from complex graph queries (demo observation)</strong> → decompose as in Part 3/4 and check bindings, permissions, and filters. One natural-language sentence need not produce just one graph query.</li>
+    <li><strong>Large identifier lists risk truncation</strong> → do not infer set differences or non-purchases from incomplete sets. Counts are not automatically trustworthy either: cross-check generated queries, filters, and source aggregates.</li>
+    <li><strong>Rows in Instances do not prove the whole graph is current.</strong> The claim that it directly reads source bindings was not verified. Check graph refresh status against known source aggregates and relationships.</li>
+    <li><strong>The Graph Model is not ready</strong> → opening/saving in the portal was a reported demo recovery step. Officially, after upstream changes, check the associated Graph item's <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-view-entity-type-details#refresh-the-graph-model">Schedule → Refresh now or refresh schedule</a>. Full refresh consumes capacity; follow <a href="https://learn.microsoft.com/en-us/fabric/iq/ontology/resources-troubleshooting">official troubleshooting</a> for binding, permission, or column-mapping issues.</li>
+    <li><strong>An agent missing from the portal</strong> → first check workspace, permissions, item type, list filters, and service health. Deleting and recreating is not the default recovery procedure: it can break IDs, links, sharing, and publishing integrations. Only if necessary, back up definitions/settings and obtain owner approval before deploying and validating a separate item. This guide preserves existing demo IDs.</li>
   </ul>
 
   <h2>10. How to Reproduce</h2>
-  <p>Repository: <a href="https://github.com/yk2ndorganization/Ontologytesting">yk2ndorganization/Ontologytesting</a></p>
+  <p>Repository: <a href="https://github.com/yk2ndorganization/Ontologytesting">yk2ndorganization/Ontologytesting</a>. GitHub reported it as <strong>internal/private</strong> on 2026-09-21, so anonymous public reproduction cannot be promised. Commands below come from supplied demo records; source and CLI options could not be verified against public code. Obtain access, check the README and each script's <code>--help</code>, and use a dedicated demo environment.</p>
+  <p>First provision capacity, tenant settings, workspace, Lakehouse, Eventhouse/KQL Database, Ontology, Data Agent, and permissions. ADLS upload/connection/shortcut and SharePoint upload/Dataflow configuration are separate steps, not created by the commands alone. Adjust Customer binding for the managed-table support restriction in §4.2, refresh and validate bindings/graph, then publish the agent. Use the asset names <code>RetailCommerceOntology</code> and <code>RetailInsightAgent</code>.</p>
   <pre><code># 1) Generate deterministic demo data (Delta/JSONL/Excel)
 python3 -m pip install -r requirements.txt
 python3 scripts/generate_demo_data.py
 
 # 2) Deploy native data (after Azure CLI auth)
-python3 scripts/deploy_onelake.py     --workspace-id <ws> --lakehouse-id <lh> --source data/lakehouse
-python3 scripts/deploy_eventhouse.py  --cluster <kusto-uri> --database CustomerSignalsEH --source data/eventhouse/customer_events.jsonl
-python3 scripts/deploy_ontology.py    --workspace-id <ws> --ontology-id <ont> --lakehouse-id <lh> --eventhouse-id <eh> --cluster <kusto-uri> --database CustomerSignalsEH
-python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --agent-name RetailInsightAgent --ontology-id <ont> --ontology-name RetailCommerceOntology</code></pre>
-  <p>After deploying the ontology via REST, <strong>open and save it once in the portal</strong> to build the query graph. SharePoint ingestion is done through the UI (Dataflow Gen2) — see §4.3.</p>
+python3 scripts/deploy_onelake.py     --workspace-id &lt;ws&gt; --lakehouse-id &lt;lh&gt; --source data/lakehouse
+python3 scripts/deploy_eventhouse.py  --cluster &lt;kusto-uri&gt; --database CustomerSignalsEH --source data/eventhouse/customer_events.jsonl
+python3 scripts/deploy_ontology.py    --workspace-id &lt;ws&gt; --ontology-id &lt;ont&gt; --lakehouse-id &lt;lh&gt; --eventhouse-id &lt;eh&gt; --cluster &lt;kusto-uri&gt; --database CustomerSignalsEH
+python3 scripts/deploy_data_agent.py  --workspace-id &lt;ws&gt; --agent-id &lt;agent&gt; --agent-name RetailInsightAgent --ontology-id &lt;ont&gt; --ontology-name RetailCommerceOntology</code></pre>
+  <p>These are Bash/Python examples run from the source repository root; replace <code>&lt;…&gt;</code> with actual values first. Overwrite or duplicate-ingestion behavior on reruns cannot be guaranteed without inspecting the scripts. Opening/saving after REST deployment is a demo-recorded step; separately confirm graph creation/refresh completion (§9). Use Dataflow Gen2 for SharePoint ingestion (§4.3).</p>
 
   <hr />
   <h2>References</h2>
@@ -1126,7 +1160,7 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
     <li>Related guides: <a href="../03-fabric-ontology/">03. Ontology deep-dive</a> · <a href="../04-fabric-data-agent/">04. Data Agent</a></li>
   </ul>
 
-  <p class="meta">Last updated 2026-09-21 · Status: Published · Demo verified 2026-09-11</p>
+  <p class="meta">Document reviewed 2026-09-21 · Recorded demo status: Published · Supplied demo verification date: 2026-09-11 · No live revalidation in this review</p>
 
   </div>
 </main>
