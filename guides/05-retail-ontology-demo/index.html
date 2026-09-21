@@ -195,6 +195,8 @@ blockquote p { margin: .35rem 0; }
   .fig{margin:1.1rem 0}
   .fig img{width:100%;border:1px solid var(--cp-border);border-radius:10px;display:block}
   .fig figcaption{font-size:12.5px;color:var(--cp-text-soft);margin-top:7px;text-align:center}
+  .ograph-wrap{overflow-x:auto;border:1px solid var(--cp-border);border-radius:10px;background:var(--cp-bg-elevated);padding:10px}
+  .ograph{width:100%;min-width:660px;height:auto;display:block}
   </style>
   <div class="arch">
     <div class="arch-sources">
@@ -352,6 +354,85 @@ blockquote p { margin: .35rem 0; }
       <tr><td>occurredAt</td><td>CustomerEvent → Store</td><td>customer_events.StoreID</td></tr>
     </tbody>
   </table>
+
+  <h3><span class="lang-ko">5.3 온톨로지 그래프</span><span class="lang-en">5.3 Ontology graph</span></h3>
+  <p><span class="lang-ko">온톨로지 정의에서 추출한 전체 그래프입니다 — 7개 엔터티(노드)와 12개 관계(방향 간선). 화살표는 관계의 방향을, 라벨은 관계 이름을 나타냅니다.</span><span class="lang-en">The full graph extracted from the ontology definition — 7 entities (nodes) and 12 relationships (directed edges). Arrows show relationship direction; labels are the relationship names.</span></p>
+  <figure class="fig">
+    <div class="ograph-wrap">
+<svg class="ograph" viewBox="0 0 820 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Retail Commerce Ontology graph">
+  <defs>
+    <marker id="oarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a8a8a"/>
+    </marker>
+  </defs>
+  <path d="M121.5,228.0 Q214.1,185.0 273.5,102.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M109.5,272.0 Q150.8,381.8 235.5,463.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M343.5,102.0 Q505.8,213.2 691.5,278.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M378.0,85.8 Q500.6,120.9 627.0,104.2" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M315.0,102.0 Q353.5,204.6 435.0,278.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M273.8,463.0 Q367.7,411.6 426.2,322.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M276.7,463.0 Q494.0,317.6 678.3,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M307.7,463.0 Q501.8,416.8 677.3,322.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M479.5,278.0 Q593.0,225.8 675.5,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M528.0,300.0 Q592.5,326.0 657.0,300.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M711.3,322.0 Q612.3,378.4 548.7,473.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M535.3,473.0 Q638.6,313.5 694.7,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <rect x="181.6" y="166.0" width="48.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="205.8" y="178.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">placed</text>
+  <rect x="127.8" y="365.7" width="67.6" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="161.6" y="378.2" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">generated</text>
+  <rect x="506.5" y="209.7" width="80.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="546.7" y="222.2" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">fulfilledAt</text>
+  <rect x="470.9" y="99.0" width="61.2" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="501.5" y="111.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">contains</text>
+  <rect x="308.1" y="188.3" width="112.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="364.3" y="200.8" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">appliedPromotion</text>
+  <rect x="307.7" y="400.0" width="86.8" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="351.1" y="412.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">attributedTo</text>
+  <rect x="576.3" y="174.2" width="99.6" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="626.1" y="186.7" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">interactedWith</text>
+  <rect x="533.3" y="365.5" width="74.0" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="570.3" y="378.0" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">occurredAt</text>
+  <rect x="570.1" y="194.5" width="61.2" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="600.7" y="207.0" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">promotes</text>
+  <rect x="568.3" y="304.0" width="48.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="592.5" y="316.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">runsAt</text>
+  <rect x="577.8" y="379.0" width="86.8" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="621.2" y="391.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">hasInventory</text>
+  <rect x="531.3" y="399.3" width="86.8" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="574.7" y="411.8" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">inventoryFor</text>
+  <g>
+    <rect x="17.0" y="228.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="95.0" y="255.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Customer</text>
+  </g>
+  <g>
+    <rect x="222.0" y="58.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="300.0" y="85.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Order</text>
+  </g>
+  <g>
+    <rect x="172.0" y="463.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="250.0" y="490.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">CustomerEvent</text>
+  </g>
+  <g>
+    <rect x="372.0" y="278.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="450.0" y="305.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Promotion</text>
+  </g>
+  <g>
+    <rect x="627.0" y="88.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="705.0" y="115.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Product</text>
+  </g>
+  <g>
+    <rect x="657.0" y="278.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="735.0" y="305.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Store</text>
+  </g>
+  <g>
+    <rect x="447.0" y="473.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="525.0" y="500.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">InventorySnapshot</text>
+  </g>
+</svg>
+    </div>
+    <figcaption><span class="lang-ko">RetailCommerceOntology 전체 그래프 · 노드 = 엔터티, 간선 라벨 = 관계 이름</span><span class="lang-en">RetailCommerceOntology full graph · nodes = entities, edge labels = relationship names</span></figcaption>
+  </figure>
 
   <h2>6. Data Agent — RetailInsightAgent</h2>
   <h3>6.1 그라운딩 지침(핵심)</h3>
@@ -612,6 +693,85 @@ python3 scripts/deploy_data_agent.py  --workspace-id <ws> --agent-id <agent> --a
       <tr><td>occurredAt</td><td>CustomerEvent → Store</td><td>customer_events.StoreID</td></tr>
     </tbody>
   </table>
+
+  <h3><span class="lang-ko">5.3 온톨로지 그래프</span><span class="lang-en">5.3 Ontology graph</span></h3>
+  <p><span class="lang-ko">온톨로지 정의에서 추출한 전체 그래프입니다 — 7개 엔터티(노드)와 12개 관계(방향 간선). 화살표는 관계의 방향을, 라벨은 관계 이름을 나타냅니다.</span><span class="lang-en">The full graph extracted from the ontology definition — 7 entities (nodes) and 12 relationships (directed edges). Arrows show relationship direction; labels are the relationship names.</span></p>
+  <figure class="fig">
+    <div class="ograph-wrap">
+<svg class="ograph" viewBox="0 0 820 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Retail Commerce Ontology graph">
+  <defs>
+    <marker id="oarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a8a8a"/>
+    </marker>
+  </defs>
+  <path d="M121.5,228.0 Q214.1,185.0 273.5,102.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M109.5,272.0 Q150.8,381.8 235.5,463.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M343.5,102.0 Q505.8,213.2 691.5,278.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M378.0,85.8 Q500.6,120.9 627.0,104.2" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M315.0,102.0 Q353.5,204.6 435.0,278.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M273.8,463.0 Q367.7,411.6 426.2,322.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M276.7,463.0 Q494.0,317.6 678.3,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M307.7,463.0 Q501.8,416.8 677.3,322.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M479.5,278.0 Q593.0,225.8 675.5,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M528.0,300.0 Q592.5,326.0 657.0,300.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M711.3,322.0 Q612.3,378.4 548.7,473.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <path d="M535.3,473.0 Q638.6,313.5 694.7,132.0" fill="none" stroke="#8a8a8a" stroke-width="1.5" marker-end="url(#oarrow)"/>
+  <rect x="181.6" y="166.0" width="48.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="205.8" y="178.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">placed</text>
+  <rect x="127.8" y="365.7" width="67.6" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="161.6" y="378.2" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">generated</text>
+  <rect x="506.5" y="209.7" width="80.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="546.7" y="222.2" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">fulfilledAt</text>
+  <rect x="470.9" y="99.0" width="61.2" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="501.5" y="111.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">contains</text>
+  <rect x="308.1" y="188.3" width="112.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="364.3" y="200.8" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">appliedPromotion</text>
+  <rect x="307.7" y="400.0" width="86.8" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="351.1" y="412.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">attributedTo</text>
+  <rect x="576.3" y="174.2" width="99.6" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="626.1" y="186.7" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">interactedWith</text>
+  <rect x="533.3" y="365.5" width="74.0" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="570.3" y="378.0" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">occurredAt</text>
+  <rect x="570.1" y="194.5" width="61.2" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="600.7" y="207.0" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">promotes</text>
+  <rect x="568.3" y="304.0" width="48.4" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="592.5" y="316.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">runsAt</text>
+  <rect x="577.8" y="379.0" width="86.8" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="621.2" y="391.5" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">hasInventory</text>
+  <rect x="531.3" y="399.3" width="86.8" height="16" rx="4" fill="var(--cp-surface)" stroke="var(--cp-border)" stroke-width="0.75" opacity="0.96"/>
+  <text x="574.7" y="411.8" text-anchor="middle" font-family="Consolas,monospace" font-size="10.5" fill="var(--cp-text-muted)">inventoryFor</text>
+  <g>
+    <rect x="17.0" y="228.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="95.0" y="255.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Customer</text>
+  </g>
+  <g>
+    <rect x="222.0" y="58.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="300.0" y="85.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Order</text>
+  </g>
+  <g>
+    <rect x="172.0" y="463.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="250.0" y="490.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">CustomerEvent</text>
+  </g>
+  <g>
+    <rect x="372.0" y="278.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="450.0" y="305.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Promotion</text>
+  </g>
+  <g>
+    <rect x="627.0" y="88.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="705.0" y="115.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Product</text>
+  </g>
+  <g>
+    <rect x="657.0" y="278.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="735.0" y="305.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">Store</text>
+  </g>
+  <g>
+    <rect x="447.0" y="473.0" width="156" height="44" rx="11" fill="var(--cp-accent)"/>
+    <text x="525.0" y="500.0" text-anchor="middle" font-family="'Segoe UI',sans-serif" font-size="14" font-weight="650" fill="var(--cp-accent-fg)">InventorySnapshot</text>
+  </g>
+</svg>
+    </div>
+    <figcaption><span class="lang-ko">RetailCommerceOntology 전체 그래프 · 노드 = 엔터티, 간선 라벨 = 관계 이름</span><span class="lang-en">RetailCommerceOntology full graph · nodes = entities, edge labels = relationship names</span></figcaption>
+  </figure>
 
   <h2>6. Data Agent — RetailInsightAgent</h2>
   <h3>6.1 Grounding instructions (key)</h3>
