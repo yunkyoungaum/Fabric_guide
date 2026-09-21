@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <!-- TODO: 문서 제목으로 변경 -->
-<title>Fabric 온톨로지 심화 가이드</title>
+<title>Fabric 온톨로지 심화 · Ontology Deep-Dive</title>
 <script>
   (() => {
     const param = new URLSearchParams(window.location.search).get("scoutTheme");
@@ -144,14 +144,15 @@ blockquote p { margin: .35rem 0; }
 @media print { .toggle { display: none; } main { border: none; box-shadow: none; padding: 0; } }
 </style>
 </head>
-<body>
+<body data-lang="ko">
 <main>
   <div class="topbar">
     <!-- TODO: 배지 문구 변경 -->
     <span class="badge">Microsoft Fabric · Guide</span>
-    <button class="toggle" id="themeToggle" type="button">테마 전환</button>
+    <button class="toggle" id="themeToggle" type="button"><span class="lang-ko">테마 전환</span><span class="lang-en">Theme</span></button>
   </div>
 
+  <div class="lang-ko">
   <h1>Fabric 온톨로지 심화 가이드</h1>
   <p class="meta">비즈니스 개념을 데이터 위에 얹는 온톨로지 — 개념부터 모델링, 데이터 매핑, 시맨틱 레이어, 거버넌스까지 심화해서 다룹니다.</p>
 
@@ -204,6 +205,63 @@ blockquote p { margin: .35rem 0; }
   <hr />
   <p class="meta">최종 수정 2026-09-21 · 상태: Draft</p>
 
+
+  </div>
+
+  <div class="lang-en">
+  <h1>Fabric Ontology Deep-Dive Guide</h1>
+  <p class="meta">Ontology puts business concepts on top of your data — from concept to modeling, data mapping, the semantic layer, and governance.</p>
+
+  <blockquote>
+    <p><strong>Draft</strong> — the outline below shows what this guide will cover.</p>
+  </blockquote>
+
+  <h2>1. Why Ontology</h2>
+  <ul>
+    <li>The need for a "semantics" layer beyond tables and columns</li>
+    <li>Ontology vs. semantic model vs. data catalog</li>
+    <li>Its role as the knowledge base that drives Data Agent and Copilot quality</li>
+  </ul>
+
+  <h2>2. Core Concepts</h2>
+  <ul>
+    <li>Entities, properties, relationships</li>
+    <li>A concept-graph / knowledge-graph perspective</li>
+    <li>The building blocks of an ontology item</li>
+  </ul>
+
+  <h2>3. Building an Ontology</h2>
+  <ul>
+    <li>Confirm prerequisites (tenant settings, capacity, permissions)</li>
+    <li>Steps to create an ontology item (to be added)</li>
+    <li>Entity/relationship definition workflow</li>
+  </ul>
+
+  <h2>4. Mapping Data Sources</h2>
+  <ul>
+    <li>Map Lakehouse/Warehouse tables to entities</li>
+    <li>Define keys, joins, and relationships</li>
+    <li>Calculated / derived properties</li>
+  </ul>
+
+  <h2>5. Using It as a Semantic Layer</h2>
+  <ul>
+    <li>Ontology-driven querying and exploration</li>
+    <li>Integration with Data Agent (accuracy-boosting points)</li>
+    <li>Clarifying the relationship with the Semantic Model</li>
+  </ul>
+
+  <h2>6. Governance · Reuse · Best Practices</h2>
+  <ul>
+    <li>Naming conventions and version control</li>
+    <li>Reuse strategy at the domain level</li>
+    <li>Common mistakes and anti-patterns</li>
+  </ul>
+
+  <hr />
+  <p class="meta">Last updated 2026-09-21 · Status: Draft</p>
+
+  </div>
 </main>
 
 <script>
@@ -213,6 +271,7 @@ blockquote p { margin: .35rem 0; }
   });
 </script>
 <!-- 삭제하지 마세요: 가이드 목록으로 돌아가는 공통 링크 -->
+<script src="../../assets/i18n.js"></script>
 <script src="../../assets/guide-nav.js"></script>
 </body>
 </html>

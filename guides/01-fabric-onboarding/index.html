@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <!-- TODO: 문서 제목으로 변경 -->
-<title>Microsoft Fabric 온보딩 가이드</title>
+<title>Microsoft Fabric 온보딩 가이드 · Onboarding Guide</title>
 <script>
   (() => {
     const param = new URLSearchParams(window.location.search).get("scoutTheme");
@@ -144,14 +144,15 @@ blockquote p { margin: .35rem 0; }
 @media print { .toggle { display: none; } main { border: none; box-shadow: none; padding: 0; } }
 </style>
 </head>
-<body>
+<body data-lang="ko">
 <main>
   <div class="topbar">
     <!-- TODO: 배지 문구 변경 -->
     <span class="badge">Microsoft Fabric · Guide</span>
-    <button class="toggle" id="themeToggle" type="button">테마 전환</button>
+    <button class="toggle" id="themeToggle" type="button"><span class="lang-ko">테마 전환</span><span class="lang-en">Theme</span></button>
   </div>
 
+  <div class="lang-ko">
   <h1>Microsoft Fabric 온보딩 가이드</h1>
   <p class="meta">Capacity 생성부터 Workspace 구성, 테넌트 기능 활성화(Copilot · Data Agent · 온톨로지), 역할·권한 설계까지 — Fabric를 처음 도입하는 팀을 위한 실무 온보딩 안내서. (기준: 2026-09, 공식 문서 반영)</p>
 
@@ -414,6 +415,273 @@ blockquote p { margin: .35rem 0; }
 
   <p class="meta">최종 수정 2026-09-21 · 상태: Published · 기준 문서 2026-08~09</p>
 
+
+  </div>
+
+  <div class="lang-en">
+  <h1>Microsoft Fabric Onboarding Guide</h1>
+  <p class="meta">From creating a capacity to setting up workspaces, enabling AI features (Copilot · Data Agent · ontology) in tenant settings, and designing roles and permissions — a practical onboarding handbook for teams adopting Fabric for the first time. (As of 2026-09, based on official docs.)</p>
+
+  <blockquote>
+    <p><strong>By the end of this guide</strong> you'll be able to decide ① which capacity (SKU) and licenses to buy, ② how to split up workspaces, ③ which tenant settings you need to turn on Copilot, Data Agent, and ontology, and ④ how to design permissions.</p>
+  </blockquote>
+
+  <h2>0. The Big Picture</h2>
+  <p>A Fabric rollout roughly follows the order below. Each step is detailed in the sections that follow.</p>
+  <pre><code>① Prerequisites    Entra tenant · admin roles · license plan
+        ↓
+② Get capacity     Create an F SKU in Azure (or validate with the 60-day trial)
+        ↓
+③ Build workspaces Create workspace → assign capacity → assign roles → organize domains
+        ↓
+④ Tenant settings  Enable Copilot · Data Agent · Digital Twin Builder (ontology)
+        ↓
+⑤ Permissions      OneLake security · sensitivity labels · audit logs</code></pre>
+
+  <h2>1. Prerequisites</h2>
+
+  <h3>1.1 Microsoft Entra tenant</h3>
+  <ul>
+    <li>Fabric runs on organizational accounts (Microsoft Entra ID). The <strong>Azure subscription</strong> where you create the capacity must be in the <strong>same Entra tenant</strong> as your Fabric tenant.</li>
+    <li>B2B (guest) users <strong>cannot be designated as a Capacity admin.</strong></li>
+  </ul>
+
+  <h3>1.2 The two axes of licensing</h3>
+  <p>To collaborate in Fabric you need <strong>both</strong> — ① a capacity license (organization level) + ② a per-user license (individual level).</p>
+  <table>
+    <thead><tr><th>Per-user license</th><th>What it lets you do</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Free</strong></td><td>Automatically granted on first sign-in if Fabric is enabled for the tenant. Lets you create and share <strong>non-Power BI Fabric items</strong> (lakehouses, warehouses, notebooks, etc.) on an F (or trial) capacity. But on capacities smaller than F64 it does not grant Power BI content viewing.</td></tr>
+      <tr><td><strong>Pro</strong></td><td>Required to create/share Power BI items outside My workspace. Every organization needs at least one Pro or PPU user to use Power BI.</td></tr>
+      <tr><td><strong>Premium Per User (PPU)</strong></td><td>Provides most Power BI Premium features per user (large models, XMLA, 48 refreshes/day, etc.). <strong>PPU does not provision a Fabric capacity</strong>, so you still need an F/trial capacity to create non-Power BI items.</td></tr>
+    </tbody>
+  </table>
+  <blockquote>
+    <p><strong>Key rule</strong> — On capacities smaller than F64, anyone viewing Power BI content needs their own Pro/PPU. On <strong>F64 or larger</strong>, a Free license + Viewer role is enough to view Power BI content. That's why F64 is the tipping point for organizations with many viewers.</p>
+  </blockquote>
+
+  <h3>1.3 Line up admin roles first</h3>
+  <table>
+    <thead><tr><th>Role</th><th>Scope</th><th>Assigned in</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Fabric admin</strong> (or Power Platform admin)</td><td>Whole tenant — admin portal, tenant settings, auditing</td><td>Microsoft 365 admin center / Entra role</td></tr>
+      <tr><td><strong>Capacity admin</strong></td><td>A specific capacity — assign workspaces, manage capacity permissions/workloads</td><td>Set when the capacity is created</td></tr>
+      <tr><td><strong>Workspace admin</strong></td><td>A single workspace</td><td>Workspace roles (§3)</td></tr>
+      <tr><td>Billing / License admin</td><td>Buy subscriptions · assign licenses</td><td>Microsoft 365 admin center</td></tr>
+    </tbody>
+  </table>
+  <p>Using dedicated Fabric admin roles lets you delegate Fabric administration <strong>without granting full M365 admin rights</strong> (least-privilege principle).</p>
+
+  <h2>2. Creating a Fabric Capacity</h2>
+
+  <h3>2.1 Capacity and Capacity Units (CU)</h3>
+  <p>A capacity is a <strong>distinct pool of compute resources</strong> used by Fabric workloads. Its size is expressed in <strong>Capacity Units (CU)</strong>, and all workloads (Data Engineering, Warehouse, Real-Time, Power BI, etc.) share this CU pool.</p>
+
+  <h3>2.2 Choosing an SKU</h3>
+  <table>
+    <thead><tr><th>SKU</th><th>CU</th><th>Power BI equiv.</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>F2</td><td>2</td><td>–</td><td>Smallest SKU. Dev/PoC. Copilot/Data Agent supported (§4)</td></tr>
+      <tr><td>F4</td><td>4</td><td>–</td><td>One of the default trial sizes</td></tr>
+      <tr><td>F8</td><td>8</td><td>EM/A1</td><td></td></tr>
+      <tr><td>F16</td><td>16</td><td>EM2/A2</td><td></td></tr>
+      <tr><td>F32</td><td>32</td><td>EM3/A3</td><td></td></tr>
+      <tr><td><strong>F64</strong></td><td>64</td><td><strong>P1/A4</strong></td><td>Tipping point for Free-license Power BI viewing (§1.2)</td></tr>
+      <tr><td>F128 – F512</td><td>128 – 512</td><td>P2/P3/P4</td><td>Production scale</td></tr>
+      <tr><td>F1024 – F8192</td><td>1024 – 8192</td><td>P5 –</td><td>Large scale (F2048/4096/8192 have no P equivalent)</td></tr>
+    </tbody>
+  </table>
+  <blockquote>
+    <p>The Power BI mapping is a <strong>compute-comparison reference only</strong> — it does not imply feature or license equivalence. Microsoft is also <strong>consolidating the older Power BI Premium P SKUs into F SKUs</strong>, so plan new purchases around F SKUs.</p>
+  </blockquote>
+
+  <h3>2.3 Creating a capacity in the Azure portal</h3>
+  <ol>
+    <li>Sign in to the Azure portal → search for and select the <strong>Microsoft Fabric</strong> service</li>
+    <li>Select <strong>Create Fabric Capacity</strong></li>
+    <li>On the <strong>Basics</strong> tab, set Subscription · Resource group · Capacity name · <strong>Region</strong> · <strong>Size (SKU)</strong> · <strong>Capacity administrator</strong> (the admin must belong to the same tenant)</li>
+    <li>Tags → <strong>Review + create</strong></li>
+  </ol>
+  <p><strong>Prerequisites:</strong> a Fabric/Power BI license, an Azure subscription in the same tenant, the <code>Microsoft.Fabric</code> resource provider registered, sufficient CU quota, and these Azure RBAC permissions — <code>Microsoft.Fabric/capacities/</code> <code>read</code> · <code>write</code> · <code>suspend/action</code> · <code>resume/action</code>.</p>
+
+  <h3>2.4 Pay-as-you-go vs. reservation</h3>
+  <ul>
+    <li><strong>Pay-as-you-go</strong> — no commitment, billed <strong>per second (one-minute minimum)</strong>. Pricing is regional.</li>
+    <li><strong>Reservation</strong> — committing a set number of CUs in a region for <strong>one or three years</strong> gets you a cheaper reserved rate. It covers <strong>capacity usage only</strong> — storage and networking are separate. Auto-renew is off by default.</li>
+  </ul>
+  <blockquote>
+    <p>The exact reservation discount (%) is not stated numerically in the official Learn docs; it follows the <a href="https://azure.microsoft.com/pricing/details/microsoft-fabric/">Fabric pricing page</a> and varies by region. Check the pricing page directly when planning.</p>
+  </blockquote>
+
+  <h3>2.5 Pause / resume and cost</h3>
+  <ul>
+    <li>F SKUs can be <strong>paused</strong> when idle to save cost (P SKUs cannot).</li>
+    <li>On pause, any remaining <strong>cumulative overage and smoothed operations are summed and billed immediately</strong>. Pausing also <strong>immediately clears throttling</strong>.</li>
+    <li>⚠️ Pausing makes that capacity's Fabric content unavailable, so confirm it isn't in use first.</li>
+  </ul>
+
+  <h3>2.6 Smoothing · bursting · throttling (concepts)</h3>
+  <p>Fabric evaluates usage in 30-second timepoints.</p>
+  <ul>
+    <li><strong>Bursting</strong> — temporarily uses more compute than the provisioned capacity to finish large operations quickly.</li>
+    <li><strong>Smoothing</strong> — spreads usage over future timepoints. Interactive over 5–64 minutes, background over 24 hours.</li>
+    <li><strong>Throttling</strong> — if you borrow too much future capacity, requests are delayed then rejected in stages.</li>
+  </ul>
+  <table>
+    <thead><tr><th>Future capacity used</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td>≤ 10 min</td><td>Protection window — no throttling</td></tr>
+      <tr><td>10 – 60 min</td><td>Interactive requests delayed 20s at submission</td></tr>
+      <tr><td>60 min – 24 h</td><td>Interactive requests rejected (background still runs)</td></tr>
+      <tr><td>&gt; 24 h</td><td>All requests rejected</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.7 Validate with a trial capacity first</h3>
+  <ul>
+    <li><strong>60 days</strong> free. Currently provisioned as <strong>F4 (4 CU) or F64 (64 CU)</strong> (changed from the old "trial = F64").</li>
+    <li>Includes all workloads, workspace collaboration, the Capacity Metrics app, and <strong>1 TB of OneLake</strong> storage.</li>
+    <li>❗ <strong>Excluded from trial</strong>: <strong>Copilot</strong>, <strong>Data agent / AI functions / AI services</strong>, Trusted Workspace Access, Private Link. → You need a <strong>paid F capacity</strong> to validate AI features.</li>
+    <li>On expiry, workspaces are reassigned to Pro and non-Power BI items become inactive (content is retained in OneLake for 7 days and recoverable once reassigned to a paid capacity).</li>
+  </ul>
+
+  <h2>3. Creating Workspaces and Assigning Capacity</h2>
+
+  <h3>3.1 Create a workspace</h3>
+  <ol>
+    <li>Nav pane → <strong>Workspaces</strong> → <strong>New workspace</strong></li>
+    <li>Enter a unique <strong>name</strong> (required) and description (optional); assign a <strong>domain</strong> if needed</li>
+    <li>Under <strong>Advanced</strong>, set the contact list, <strong>workspace type</strong> (formerly "license mode"), default storage format, and more</li>
+  </ol>
+  <p>A workspace is <strong>assigned to a capacity</strong> at creation. With the workspace admin / capacity admin / capacity contributor role you can later reassign it to another capacity (specific capacities can only be chosen for Fabric-type workspaces).</p>
+
+  <h3>3.2 Workspace roles</h3>
+  <table>
+    <thead><tr><th>What you can do</th><th>Admin</th><th>Member</th><th>Contributor</th><th>Viewer</th></tr></thead>
+    <tbody>
+      <tr><td>Update/delete the workspace</td><td>✅</td><td></td><td></td><td></td></tr>
+      <tr><td>Add/remove people (incl. admins)</td><td>✅</td><td></td><td></td><td></td></tr>
+      <tr><td>Add lower-permission members · allow reshare</td><td>✅</td><td>✅</td><td></td><td></td></tr>
+      <tr><td>Create workspace identity · connect Git</td><td>✅</td><td></td><td></td><td></td></tr>
+      <tr><td>Create/modify/delete items · run jobs</td><td>✅</td><td>✅</td><td>✅</td><td></td></tr>
+      <tr><td>Read data via OneLake API/Spark (ReadAll)</td><td>✅</td><td>✅</td><td>✅</td><td></td></tr>
+      <tr><td>View metadata · execution output</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+      <tr><td>Read data via SQL analytics endpoint (ReadData)</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><strong>Admin</strong>: full control (delete workspace, manage admins, connect Git).</li>
+    <li><strong>Member</strong>: can add members, reshare, and read/write data, but cannot delete the workspace or add admins.</li>
+    <li><strong>Contributor</strong>: the "builder" role — create/modify/run items, but cannot manage people or reshare.</li>
+    <li><strong>Viewer</strong>: read-only. Reads data only through the SQL endpoint (ReadData); direct OneLake reads require a separate OneLake security role.</li>
+  </ul>
+  <p>Roles can be granted not only to individuals but also to <strong>security groups, M365 groups, and service principals</strong>. If a user is in multiple groups, the <strong>highest</strong> permission applies.</p>
+
+  <h3>3.3 Workspace organization strategy</h3>
+  <ul>
+    <li>Separate by team/project/environment (dev/test/prod), and grant roles to <strong>security groups</strong> to reduce management overhead.</li>
+    <li>Use <strong>Domains</strong> to group workspaces by business area (marketing, sales, etc.) for easier filtering and governance in the OneLake catalog. Note that <strong>domain assignment does not change access</strong> — visibility/access are determined by workspace roles and item permissions.</li>
+  </ul>
+
+  <h2>4. Tenant Settings — Enabling Features</h2>
+  <p>Features like Copilot, Data Agent, and ontology must be explicitly turned on in the <strong>tenant settings of the admin portal</strong>.</p>
+
+  <h3>4.1 Reaching the admin portal · tenant settings</h3>
+  <ol>
+    <li>Sign in to the Fabric portal (app.fabric.microsoft.com) as a <strong>Fabric admin</strong></li>
+    <li>Top <strong>Settings (⚙️)</strong> → <strong>Admin portal</strong> under <strong>Governance and insights</strong></li>
+    <li>Select <strong>Tenant settings</strong></li>
+  </ol>
+  <p>Setting changes can take up to <strong>15 minutes</strong> (some AI settings up to 1 hour) to take effect.</p>
+
+  <h3>4.2 Staged rollout via security groups</h3>
+  <p>Most tenant settings can be scoped as — enabled for the whole org / enabled for the whole org except certain groups / <strong>enabled for specific security groups only</strong> / enabled for specific groups except some. <strong>Turn it on for a pilot group first, then expand gradually</strong> for a safe rollout.</p>
+
+  <h3>4.3 Copilot and AI features</h3>
+  <ul>
+    <li>Setting group: <strong>"Copilot and AI"</strong>. The key setting <strong>"Users can use Copilot and other features powered by Azure OpenAI"</strong> is <strong>on by default</strong>.</li>
+    <li>Requirement: a paid <strong>F2 or higher</strong> capacity (or Power BI Premium P1+). <em>The old F64-only requirement no longer applies.</em></li>
+    <li>For Pro/PPU workspaces, you can designate a <strong>Fabric Copilot capacity</strong> separately and attach the workspace to it.</li>
+    <li>If the capacity region is outside the EU Data Boundary and the US, you may also need to enable the settings that allow data processing/storage outside that boundary (off by default).</li>
+  </ul>
+
+  <h3>4.4 Fabric Data Agent</h3>
+  <ul>
+    <li><strong>Name/status</strong>: renamed from "AI skills" to <strong>"Fabric data agent"</strong>, now <strong>Generally Available (GA)</strong>.</li>
+    <li><strong>Requirement</strong>: paid <strong>F2 or higher</strong> (or P1+) + <strong>the Copilot setting must be on</strong> (Data Agent is a Copilot-powered feature).</li>
+    <li><strong>Required tenant settings</strong>: ① "Users can use Copilot and other features powered by Azure OpenAI" ② "Capacities can be designated as Fabric Copilot capacities" ③ (if the region is outside the boundary) the data processing/storage settings ④ the Copilot "Standalone Copilot experience" (to use Data Agent inside Copilot).</li>
+    <li>⚠️ There is currently <strong>no standalone toggle literally named "create and share data agents"</strong> in the docs. Creation/sharing is governed by the Copilot/Azure OpenAI settings above plus standard workspace roles.</li>
+    <li><strong>Connectable data sources</strong> (up to 5 in any combination): Lakehouse · Warehouse · Power BI Semantic Model · KQL Database/Eventhouse · Mirrored Database · <strong>Ontology (Digital Twin Builder)</strong> · Microsoft Graph.</li>
+  </ul>
+
+  <h3>4.5 Ontology — Digital Twin Builder</h3>
+  <ul>
+    <li>In Fabric, "ontology" is delivered as the <strong>Digital Twin Builder</strong> item in Real-Time Intelligence (modeling business concepts as entities and relationships). Currently in <strong>Preview</strong>.</li>
+    <li><strong>Enable</strong>: a Fabric admin turns on <strong>"Digital Twin Builder (preview)"</strong> in tenant settings.</li>
+    <li><strong>Requirements/constraints</strong>: a workspace on a Fabric-enabled capacity. <strong>It is not compatible if "Autoscale Billing for Spark" is enabled on the tenant.</strong> Data must first land in a Lakehouse before being modeled into the ontology.</li>
+    <li>Ontologies built here can be consumed as a <strong>data source for Data Agent</strong> (→ <a href="../04-fabric-data-agent/">04. Data Agent</a>, <a href="../03-fabric-ontology/">03. Ontology deep-dive</a>).</li>
+  </ul>
+
+  <table>
+    <thead><tr><th>Feature</th><th>Status</th><th>Min capacity</th><th>Key tenant setting</th></tr></thead>
+    <tbody>
+      <tr><td>Copilot</td><td>GA</td><td>F2 (or P1)</td><td>Copilot and Azure OpenAI (on by default)</td></tr>
+      <tr><td>Fabric Data Agent</td><td>GA</td><td>F2 (or P1)</td><td>Copilot setting + designate Copilot capacity</td></tr>
+      <tr><td>Digital Twin Builder (ontology)</td><td>Preview</td><td>Fabric-enabled capacity</td><td>Digital Twin Builder (preview)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5. Designing Permissions and Governance</h2>
+
+  <h3>5.1 The two security planes</h3>
+  <ul>
+    <li><strong>Control plane</strong> — "what you can do" to an item (create, configure, share, manage). Set via workspace roles + item permissions.</li>
+    <li><strong>Data plane</strong> — "what data you can see". For OneLake this is <strong>OneLake security</strong>, scoped down to folders, tables, schemas, rows, and columns.</li>
+  </ul>
+  <p>Admin/Member/Contributor already have data read/write, so <strong>OneLake security roles are mainly used to grant data access to Viewers or users with Read permission</strong>. OneLake security roles can be created by Admin/Member and support row- and column-level security.</p>
+
+  <h3>5.2 Item-level sharing</h3>
+  <p>You can share an individual item even with non-members of the workspace — permission levels are <strong>Read / ReadData / ReadAll / Write</strong>, and SQL analytics endpoint access also depends on the endpoint mode (Delegated, etc.).</p>
+
+  <h3>5.3 Sensitivity labels · auditing</h3>
+  <ul>
+    <li><strong>Sensitivity labels</strong>: apply Microsoft Purview Information Protection labels/policies across Fabric and Power BI. Requires an appropriate Purview license, and labels must be defined and published first. Supports manual/default/(Power BI-only) mandatory labeling and downstream inheritance.</li>
+    <li><strong>Auditing/monitoring</strong>: use Microsoft Purview audit logs and the OneLake catalog governance experiences to understand label coverage and sensitive data.</li>
+    <li>Conditional access is configured in Microsoft Entra/Azure; user and license management in the M365 admin center.</li>
+  </ul>
+
+  <h2>6. Onboarding Checklist</h2>
+  <table>
+    <thead><tr><th>#</th><th>Item</th><th>Done when</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Entra tenant · Azure subscription</td><td>Subscription in the same tenant, <code>Microsoft.Fabric</code> provider registered</td></tr>
+      <tr><td>2</td><td>Assign admin roles</td><td>Fabric admin · Billing admin assigned (least privilege)</td></tr>
+      <tr><td>3</td><td>License plan</td><td>Decide the F64 tipping point by viewer count, size Pro/PPU needs</td></tr>
+      <tr><td>4</td><td>Secure capacity</td><td>Validate with trial → create a paid F SKU (region, SKU, capacity admin)</td></tr>
+      <tr><td>5</td><td>Build workspaces</td><td>Workspaces by team/env + security-group roles + domains</td></tr>
+      <tr><td>6</td><td>Enable AI features</td><td>Confirm Copilot, meet Data Agent requirements, (if needed) turn on Digital Twin Builder (preview) — pilot with a security group first</td></tr>
+      <tr><td>7</td><td>Permissions · governance</td><td>OneLake security roles, published sensitivity labels, audit logs verified</td></tr>
+    </tbody>
+  </table>
+
+  <hr />
+  <h2>References</h2>
+  <ul>
+    <li><a href="https://learn.microsoft.com/fabric/enterprise/licenses">Microsoft Fabric licenses (SKU · CU · licensing)</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/enterprise/buy-capacity">Buy a Microsoft Fabric capacity</a> · <a href="https://learn.microsoft.com/azure/cost-management-billing/reservations/fabric-capacity">Fabric capacity reservations</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/enterprise/pause-resume">Pause and resume capacity</a> · <a href="https://learn.microsoft.com/fabric/enterprise/throttling">Throttling</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/fundamentals/fabric-trial">Fabric trial</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/fundamentals/roles-workspaces">Roles in workspaces</a> · <a href="https://learn.microsoft.com/fabric/fundamentals/create-workspaces">Create a workspace</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/admin/roles">Fabric admin roles</a> · <a href="https://learn.microsoft.com/fabric/admin/about-tenant-settings">About tenant settings</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/fundamentals/copilot-enable-fabric">Enable Copilot</a> · <a href="https://learn.microsoft.com/fabric/admin/service-admin-portal-copilot">Copilot/AI admin settings</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/data-science/concept-data-agent">Fabric data agent concept</a> · <a href="https://learn.microsoft.com/fabric/data-science/data-agent-tenant-settings">Data agent tenant settings</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/real-time-intelligence/digital-twin-builder/overview">Digital Twin Builder overview</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/onelake/security/get-started-security">OneLake data security</a> · <a href="https://learn.microsoft.com/fabric/governance/domains">Domains</a> · <a href="https://learn.microsoft.com/fabric/governance/information-protection">Information protection</a></li>
+  </ul>
+
+  <p class="meta">Last updated 2026-09-21 · Status: Published · Based on docs from 2026-08~09</p>
+
+  </div>
 </main>
 
 <script>
@@ -423,6 +691,7 @@ blockquote p { margin: .35rem 0; }
   });
 </script>
 <!-- 삭제하지 마세요: 가이드 목록으로 돌아가는 공통 링크 -->
+<script src="../../assets/i18n.js"></script>
 <script src="../../assets/guide-nav.js"></script>
 </body>
 </html>

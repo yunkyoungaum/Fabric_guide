@@ -140,9 +140,21 @@ python -m http.server 8000
 
 ---
 
+## 이중 언어(한국어 / English)
+
+모든 페이지는 우측 상단 토글로 **한국어 ↔ English**를 전환합니다. 구현은 공용 자산 `assets/i18n.js` 하나로 처리됩니다.
+
+- 페이지에 `<script src="assets/i18n.js"></script>`(허브) 또는 `../../assets/i18n.js`(가이드)를 넣으면 **언어 토글 바가 자동 삽입**됩니다.
+- `<body>`에 기본값 `data-lang="ko"`를 둡니다.
+- 콘텐츠는 언어별로 감쌉니다 — 한국어는 `<div class="lang-ko">…</div>`, 영어는 `<div class="lang-en">…</div>`. CSS가 현재 언어가 아닌 블록을 자동으로 숨깁니다.
+- 선택한 언어는 `localStorage`와 URL `?lang=` 파라미터로 유지되어 **페이지를 이동해도 이어집니다**.
+- 허브 카드의 이중 언어는 `guides.js`의 `title_en` · `summary_en` · `tags_en` 필드로 처리합니다(한국어 필드는 기존대로). 새 가이드를 추가할 때 이 EN 필드도 함께 채우세요.
+- 새 가이드는 `guides/_template/index.html`을 복사하면 `lang-ko`/`lang-en` 뼈대와 토글이 이미 포함되어 있습니다.
+
 ## 작성 규칙
 
 1. **테마 일관성** — 모든 가이드는 `--cp-*` CSS 변수를 사용합니다. 색상 하드코딩 금지.
+1-1. **이중 언어** — 본문은 `lang-ko`/`lang-en` 블록으로 함께 작성하고, 카드용 EN 필드(`*_en`)도 `guides.js`에 채웁니다.
 2. **폰트** — `"Segoe UI", Aptos, Calibri, ...` / 코드는 `Consolas, "Courier New", ...`
 3. **자기완결형(self-contained)** — 가이드 1개는 HTML 파일 1개로 완결되게 유지합니다. 공통 자산은 `assets/`에만 둡니다.
 4. **검증 가능한 내용** — 기능명·설정 경로·제품 용어는 공식 문서로 확인한 값을 사용하고, 참고 링크를 문서 말미에 남깁니다.

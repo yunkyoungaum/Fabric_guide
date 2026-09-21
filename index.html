@@ -146,14 +146,22 @@ footer.page code {
 }
 </style>
 </head>
-<body>
+<body data-lang="ko">
 <div class="wrap">
   <header class="page">
     <div>
-      <h1>Microsoft Fabric 실무 가이드 모음</h1>
-      <p>Fabric 온보딩부터 Lakehouse·Eventhouse·Semantic Model·Ontology·Data Agent까지, 현장 도입·운영 주제를 가이드 단위로 정리합니다.</p>
+      <h1>
+        <span class="lang-ko">Microsoft Fabric 실무 가이드 모음</span>
+        <span class="lang-en">Microsoft Fabric Practical Guides</span>
+      </h1>
+      <p>
+        <span class="lang-ko">Fabric 온보딩부터 Lakehouse·Eventhouse·Semantic Model·Ontology·Data Agent까지, 현장 도입·운영 주제를 가이드 단위로 정리합니다.</span>
+        <span class="lang-en">From Fabric onboarding to Lakehouse, Eventhouse, Semantic Model, Ontology, and Data Agent — real-world adoption and operations topics organized guide by guide.</span>
+      </p>
     </div>
-    <button class="toggle" id="themeToggle" type="button">테마 전환</button>
+    <button class="toggle" id="themeToggle" type="button">
+      <span class="lang-ko">테마 전환</span><span class="lang-en">Theme</span>
+    </button>
   </header>
 
   <div class="toolbar">
@@ -161,13 +169,21 @@ footer.page code {
   </div>
 
   <div class="cards" id="cards"></div>
-  <p class="empty" id="empty" hidden>검색 결과가 없습니다.</p>
+  <p class="empty" id="empty" hidden>
+    <span class="lang-ko">검색 결과가 없습니다.</span>
+    <span class="lang-en">No results found.</span>
+  </p>
 
   <footer class="page">
-    <p>
+    <p class="lang-ko">
       가이드를 추가하려면 <code>guides/&lt;번호&gt;-&lt;슬러그&gt;/index.html</code>을 만들고
       <code>guides.js</code>의 <code>GUIDES</code> 배열에 항목을 추가하세요.
       자세한 절차는 <a href="README.md">README</a>를 참고하세요.
+    </p>
+    <p class="lang-en">
+      To add a guide, create <code>guides/&lt;no&gt;-&lt;slug&gt;/index.html</code> and add an entry to the
+      <code>GUIDES</code> array in <code>guides.js</code>.
+      See the <a href="README.md">README</a> for the full process.
     </p>
   </footer>
 </div>
@@ -183,31 +199,45 @@ footer.page code {
   var search = document.getElementById("search");
   var toggle = document.getElementById("themeToggle");
 
+  var STR = {
+    ko: { placeholder: "제목 · 요약 · 태그 검색 (예: 온보딩, Lakehouse, Ontology, Data Agent)", src: "원본(.md)", updated: "업데이트 " },
+    en: { placeholder: "Search title · summary · tags (e.g. onboarding, Lakehouse, Ontology, Data Agent)", src: "source (.md)", updated: "Updated " }
+  };
+
+  function lang() {
+    return document.body.dataset.lang === "en" ? "en" : "ko";
+  }
+
   function esc(s) {
     return String(s == null ? "" : s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
 
+  function field(g, base) {
+    if (lang() === "en") return g[base + "_en"] != null ? g[base + "_en"] : g[base];
+    return g[base];
+  }
+
   function cardHtml(g) {
+    var L = STR[lang()];
     var href = "guides/" + esc(g.slug) + "/";
-    var tags = (g.tags || []).map(function (t) {
+    var tags = (field(g, "tags") || []).map(function (t) {
       return '<span class="tag">' + esc(t) + "</span>";
     }).join("");
     var draft = g.status === "draft" ? '<span class="draft">draft</span>' : "";
     var src = g.source
-      ? '<a class="srclink" href="guides/' + esc(g.slug) + "/" + esc(g.source) + '">원본(.md)</a>'
+      ? '<a class="srclink" href="guides/' + esc(g.slug) + "/" + esc(g.source) + '">' + esc(L.src) + "</a>"
       : "";
-    // 앵커 중첩은 잘못된 HTML이므로 카드는 div로 두고 제목만 링크로 둔다.
     return '' +
       '<div class="card" data-href="' + href + '">' +
         '<div class="card-head">' +
           '<span class="num">' + esc(g.no) + "</span>" +
-          '<h2><a href="' + href + '">' + esc(g.title) + "</a></h2>" + draft +
+          '<h2><a href="' + href + '">' + esc(field(g, "title")) + "</a></h2>" + draft +
         "</div>" +
-        '<p class="summary">' + esc(g.summary) + "</p>" +
+        '<p class="summary">' + esc(field(g, "summary")) + "</p>" +
         '<div class="metarow">' + tags + src +
-          '<span class="updated">업데이트 ' + esc(g.updated) + "</span>" +
+          '<span class="updated">' + esc(L.updated) + esc(g.updated) + "</span>" +
         "</div>" +
       "</div>";
   }
@@ -216,14 +246,18 @@ footer.page code {
     var needle = (q || "").trim().toLowerCase();
     var shown = list.filter(function (g) {
       if (!needle) return true;
-      var hay = [g.no, g.title, g.summary].concat(g.tags || []).join(" ").toLowerCase();
+      var hay = [g.no, field(g, "title"), field(g, "summary")].concat(field(g, "tags") || []).join(" ").toLowerCase();
       return hay.indexOf(needle) !== -1;
     });
     cards.innerHTML = shown.map(cardHtml).join("");
     empty.hidden = shown.length > 0;
   }
 
-  // 카드 어디를 눌러도 이동. 단, 내부 링크(원본 .md, 제목)는 자기 동작을 유지.
+  function syncLangUi() {
+    if (search) search.placeholder = STR[lang()].placeholder;
+    render(search ? search.value : "");
+  }
+
   cards.addEventListener("click", function (e) {
     if (e.target.closest("a")) return;
     var card = e.target.closest(".card");
@@ -237,8 +271,11 @@ footer.page code {
     document.documentElement.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
   });
 
-  render("");
+  window.addEventListener("langchange", syncLangUi);
+
+  syncLangUi();
 })();
 </script>
+<script src="assets/i18n.js"></script>
 </body>
 </html>
