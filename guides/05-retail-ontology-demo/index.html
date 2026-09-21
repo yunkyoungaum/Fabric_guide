@@ -588,7 +588,44 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
   <p class="meta">상세 요청 예시와 실측치는 리포지토리 <code>docs/data-agent-operations.md</code>에 정리되어 있습니다.</p>
 
 
-  <h2>9. 알려진 한계 & 문제 해결</h2>
+  <h2>9. M365 Copilot에 게시</h2>
+  <p>Data Agent는 <strong>Copilot Studio 없이 Microsoft 365 Copilot에 직접 게시</strong>할 수 있습니다. Fabric의 게시(Publish) 대화 상자에 <strong>"Also publish to Microsoft 365 Copilot"</strong> 토글이 있어, 이 토글 하나로 온톨로지 기반 에이전트가 M365 Copilot에 바로 등장합니다.</p>
+
+  <h3>9.1 게시 후 보이는 곳</h3>
+  <table>
+    <thead><tr><th>위치</th><th>무엇이 보이는지</th></tr></thead>
+    <tbody>
+      <tr><td><strong>M365 Copilot</strong> (<code>m365.cloud.microsoft/chat</code>)</td><td>우측 <strong>Agents</strong> 패널에 <code>RetailInsightAgent</code>가 나타납니다. 선택하면 바로 대화 가능</td></tr>
+      <tr><td><strong>Teams</strong></td><td>Copilot 앱 내 에이전트 목록에 동일하게 표시</td></tr>
+      <tr><td><strong>Fabric 포털</strong></td><td>에이전트 항목의 published 버전. 이후 REST·MCP 호출이 이 버전을 사용</td></tr>
+    </tbody>
+  </table>
+  <p>토글 설명대로 <strong>본인은 즉시 사용 가능</strong>하고, 동료에게 보이게 하려면 별도 공유가 필요합니다. 토글이 <strong>Off</strong>이면 M365 Copilot에 나타나지 않으므로, 켜고 Publish해야 합니다.</p>
+
+  <h3>9.2 두 가지 노출 경로</h3>
+  <table>
+    <thead><tr><th></th><th>경로 A · Data Agent</th><th>경로 B · Ontology MCP</th></tr></thead>
+    <tbody>
+      <tr><td>방법</td><td>Fabric에서 <strong>직접 게시</strong> (토글 하나)</td><td>Copilot Studio 경유</td></tr>
+      <tr><td>중간 구성 요소</td><td>없음</td><td>Copilot Studio 에이전트</td></tr>
+      <tr><td>도메인 규칙</td><td><code>aiInstructions</code> 그대로 적용</td><td>Copilot Studio에 다시 작성</td></tr>
+      <tr><td>M365 Copilot 등록</td><td>토글로 자동</td><td>Copilot Studio에서 MCP 등록 후 게시</td></tr>
+    </tbody>
+  </table>
+  <p><strong>M365 Copilot은 MCP 엔드포인트를 직접 등록할 수 없습니다.</strong> 따라서 <strong>온톨로지 MCP</strong>를 M365 Copilot에서 쓰려면 여전히 <strong>Copilot Studio</strong>가 필요합니다(경로 B). 반면 <strong>Data Agent</strong>는 Fabric 게시 토글만으로 등장하므로 Copilot Studio가 필요 없습니다(경로 A).</p>
+  <blockquote>
+    <p><strong>데모 관점</strong> — 경로 A가 훨씬 강력합니다. 토글 하나로 Fabric 온톨로지 기반 에이전트가 M365 Copilot에 등장하는 장면은 설명이 거의 필요 없습니다. 온톨로지 MCP(경로 B)는 "외부 에이전트가 스키마를 스스로 탐색하고 구조화된 데이터를 받는다"는 다른 메시지를 보여줄 때 쓰는 것이 좋습니다.</p>
+  </blockquote>
+
+  <h3>9.3 주의할 점</h3>
+  <ul>
+    <li>게시 대화 상자의 설명 문구는 <code>publish_info.json</code>의 description에서 옵니다. 현재 값은 <code>deploy_data_agent.py</code>가 쓴 것이라, 스크립트를 다시 돌리면 여기서 수정한 내용이 덮어써집니다.</li>
+    <li>"You can't undo this action" — published 버전은 되돌릴 수 없고, 변경하려면 다시 게시해야 합니다.</li>
+    <li>이 토글로 노출되는 것은 <strong>Data Agent뿐</strong>입니다. 온톨로지 MCP를 M365 Copilot에서 쓰려면 여전히 Copilot Studio가 필요합니다(§9.2 경로 B).</li>
+  </ul>
+
+
+  <h2>10. 알려진 한계 & 문제 해결</h2>
   <ul>
     <li><strong>3개 이상 엔터티를 한 문장에 스팬하면 빈 결과</strong> → Part 3·4처럼 분해해서 질문.</li>
     <li><strong>큰 식별자 목록은 잘림</strong> → 카운트는 신뢰, 완전한 목록은 비신뢰.</li>
@@ -597,7 +634,7 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
     <li><strong>포털에 안 보이는 에이전트 복구</strong>: 아이템을 수리하지 말고 재생성 — <code>DELETE items/{oldId}</code> → <code>POST items</code>(type:DataAgent) → <code>deploy_data_agent.py</code>로 재배포 → 포털 URL <code>…/aiskills/{agentId}</code> 확인.</li>
   </ul>
 
-  <h2>10. 재현 방법</h2>
+  <h2>11. 재현 방법</h2>
   <p>리포지토리: <a href="https://github.com/yk2ndorganization/Ontologytesting">yk2ndorganization/Ontologytesting</a></p>
   <pre><code># 1) 결정적 데모 데이터 생성 (Delta/JSONL/Excel)
 python3 -m pip install -r requirements.txt
@@ -1030,7 +1067,44 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
   <p class="meta">Detailed request examples and measured figures are in the repository's <code>docs/data-agent-operations.md</code>.</p>
 
 
-  <h2>9. Known Limits & Troubleshooting</h2>
+  <h2>9. Publishing to M365 Copilot</h2>
+  <p>A Data Agent can be <strong>published directly to Microsoft 365 Copilot without Copilot Studio</strong>. Fabric's Publish dialog has an <strong>"Also publish to Microsoft 365 Copilot"</strong> toggle, so this single toggle makes the ontology-backed agent appear in M365 Copilot.</p>
+
+  <h3>9.1 Where it shows up after publishing</h3>
+  <table>
+    <thead><tr><th>Location</th><th>What appears</th></tr></thead>
+    <tbody>
+      <tr><td><strong>M365 Copilot</strong> (<code>m365.cloud.microsoft/chat</code>)</td><td><code>RetailInsightAgent</code> appears in the right-hand <strong>Agents</strong> panel. Select it and chat immediately</td></tr>
+      <tr><td><strong>Teams</strong></td><td>Listed the same way in the agent list inside the Copilot app</td></tr>
+      <tr><td><strong>Fabric portal</strong></td><td>The published version of the agent item. Subsequent REST/MCP calls use this version</td></tr>
+    </tbody>
+  </table>
+  <p>As the toggle explains, <strong>you can use it immediately</strong>, while making it visible to colleagues requires a separate share. If the toggle is <strong>Off</strong> it won't appear in M365 Copilot, so turn it on and Publish.</p>
+
+  <h3>9.2 Two exposure paths</h3>
+  <table>
+    <thead><tr><th></th><th>Path A · Data Agent</th><th>Path B · Ontology MCP</th></tr></thead>
+    <tbody>
+      <tr><td>Method</td><td><strong>Publish directly</strong> from Fabric (one toggle)</td><td>Via Copilot Studio</td></tr>
+      <tr><td>Intermediate component</td><td>None</td><td>A Copilot Studio agent</td></tr>
+      <tr><td>Domain rules</td><td><code>aiInstructions</code> applied as-is</td><td>Rewritten in Copilot Studio</td></tr>
+      <tr><td>M365 Copilot registration</td><td>Automatic via the toggle</td><td>Register the MCP in Copilot Studio, then publish</td></tr>
+    </tbody>
+  </table>
+  <p><strong>M365 Copilot cannot register an MCP endpoint directly.</strong> So using the <strong>ontology MCP</strong> from M365 Copilot still requires <strong>Copilot Studio</strong> (Path B). A <strong>Data Agent</strong>, by contrast, appears via the Fabric publish toggle alone — no Copilot Studio needed (Path A).</p>
+  <blockquote>
+    <p><strong>Demo perspective</strong> — Path A is far more compelling. A single toggle making a Fabric ontology-backed agent appear in M365 Copilot needs almost no explanation. Save the ontology MCP (Path B) for the different message that "an external agent explores the schema on its own and receives structured data."</p>
+  </blockquote>
+
+  <h3>9.3 Caveats</h3>
+  <ul>
+    <li>The description text in the publish dialog comes from the description in <code>publish_info.json</code>. The current value was written by <code>deploy_data_agent.py</code>, so rerunning the script overwrites any edits made here.</li>
+    <li>"You can't undo this action" — the published version cannot be reverted; to change it you must publish again.</li>
+    <li>Only the <strong>Data Agent</strong> is exposed by this toggle. Using the ontology MCP from M365 Copilot still requires Copilot Studio (Path B in §9.2).</li>
+  </ul>
+
+
+  <h2>10. Known Limits & Troubleshooting</h2>
   <ul>
     <li><strong>Spanning 3+ entities in one sentence returns empty</strong> → decompose like Part 3/4.</li>
     <li><strong>Large identifier lists get truncated</strong> → counts are reliable, exhaustive lists are not.</li>
@@ -1039,7 +1113,7 @@ POST https://api.fabric.microsoft.com/v1/mcp/workspaces/{workspaceId}/dataagents
     <li><strong>Recovering an agent invisible in the portal</strong>: recreate rather than repair — <code>DELETE items/{oldId}</code> → <code>POST items</code> (type:DataAgent) → redeploy with <code>deploy_data_agent.py</code> → verify the portal URL <code>…/aiskills/{agentId}</code>.</li>
   </ul>
 
-  <h2>10. How to Reproduce</h2>
+  <h2>11. How to Reproduce</h2>
   <p>Repository: <a href="https://github.com/yk2ndorganization/Ontologytesting">yk2ndorganization/Ontologytesting</a></p>
   <pre><code># 1) Generate deterministic demo data (Delta/JSONL/Excel)
 python3 -m pip install -r requirements.txt
