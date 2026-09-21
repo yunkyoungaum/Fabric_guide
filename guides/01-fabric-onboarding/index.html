@@ -168,7 +168,7 @@ blockquote p { margin: .35rem 0; }
         ↓
 ③ Workspace 구성   워크스페이스 생성 → 용량 할당 → 역할 배정 → 도메인 정리
         ↓
-④ 테넌트 설정      Copilot · Data Agent · Digital Twin Builder(온톨로지) 활성화
+④ 테넌트 설정      Copilot · Data Agent · Ontology(Fabric IQ) 활성화
         ↓
 ⑤ 권한 · 거버넌스  OneLake 보안 · 민감도 레이블 · 감사 로그</code></pre>
 
@@ -345,15 +345,16 @@ blockquote p { margin: .35rem 0; }
     <li><strong>요건</strong>: 유료 <strong>F2 이상</strong>(또는 P1 이상) + <strong>Copilot 설정이 켜져 있어야 함</strong>(Data Agent는 Copilot 기반 기능).</li>
     <li><strong>필요한 테넌트 설정</strong>: ①"Users can use Copilot and other features powered by Azure OpenAI" ②"Capacities can be designated as Fabric Copilot capacities" ③(국경 밖 리전이면) 데이터 처리·저장 관련 설정 ④Copilot의 "Standalone Copilot experience"(Copilot 안에서 Data Agent를 쓰려면).</li>
     <li>⚠️ 현재 공식 문서에는 <strong>"데이터 에이전트 생성·공유"라는 이름의 단독 토글은 없습니다.</strong> 생성·공유는 위 Copilot/Azure OpenAI 설정 + 표준 워크스페이스 역할로 제어됩니다.</li>
-    <li><strong>연결 가능한 데이터 소스</strong>(최대 5개 조합): Lakehouse · Warehouse · Power BI Semantic Model · KQL Database/Eventhouse · Mirrored Database · <strong>Ontology(Digital Twin Builder)</strong> · Microsoft Graph.</li>
+    <li><strong>연결 가능한 데이터 소스</strong>(최대 5개 조합): Lakehouse · Warehouse · Power BI Semantic Model · KQL Database/Eventhouse · Mirrored Database · <strong>Ontology</strong> · Microsoft Graph.</li>
   </ul>
 
-  <h3>4.5 온톨로지 — Digital Twin Builder</h3>
+  <h3>4.5 온톨로지 — Ontology (Fabric IQ)</h3>
   <ul>
-    <li>Fabric에서 "온톨로지"는 <strong>Real-Time Intelligence의 Digital Twin Builder</strong> 아이템으로 제공됩니다(현업 개념을 엔터티·관계로 모델링). 현재 <strong>미리 보기(Preview)</strong>.</li>
-    <li><strong>활성화</strong>: 테넌트 설정에서 <strong>"Digital Twin Builder (preview)"</strong>를 Fabric 관리자가 켭니다.</li>
-    <li><strong>요건/제약</strong>: Fabric 사용 용량의 워크스페이스 필요. <strong>테넌트에 "Autoscale Billing for Spark"가 켜져 있으면 호환되지 않습니다.</strong> 데이터는 먼저 Lakehouse로 들어온 뒤 온톨로지로 모델링됩니다.</li>
+    <li>Fabric에서 온톨로지는 <strong>Fabric IQ(preview) 워크로드의 독립된 "Ontology(preview)" 아이템</strong>으로 제공됩니다 — 현업 개념을 엔터티(Entity Type)·속성·관계(Relationship)로 정의하는 시맨틱 레이어입니다. 현재 <strong>미리 보기(Preview)</strong>.</li>
+    <li><strong>활성화</strong>: 테넌트 설정에서 <strong>"Users can create Ontology (preview) items"</strong>를 Fabric 관리자가 켭니다.</li>
+    <li><strong>요건</strong>: Fabric 사용 용량의 워크스페이스가 필요하며, 엔터티는 OneLake 기반 소스(Lakehouse/Warehouse 등)에 데이터 바인딩됩니다.</li>
     <li>여기서 만든 온톨로지는 <strong>Data Agent의 데이터 소스</strong>로 소비할 수 있습니다(→ <a href="../04-fabric-data-agent/">04. Data Agent</a>, <a href="../03-fabric-ontology/">03. 온톨로지 심화</a>).</li>
+    <li>⚠️ <strong>Digital Twin Builder</strong>(Real-Time Intelligence의 별개 preview 아이템)와 혼동하지 마세요. Digital Twin Builder도 내부적으로 자체 온톨로지를 모델링하지만, 위 <strong>Ontology 아이템과는 다른 별개 제품</strong>입니다.</li>
   </ul>
 
   <table>
@@ -361,7 +362,7 @@ blockquote p { margin: .35rem 0; }
     <tbody>
       <tr><td>Copilot</td><td>GA</td><td>F2 (또는 P1)</td><td>Copilot and Azure OpenAI (기본 켜짐)</td></tr>
       <tr><td>Fabric Data Agent</td><td>GA</td><td>F2 (또는 P1)</td><td>Copilot 설정 + Copilot 용량 지정</td></tr>
-      <tr><td>Digital Twin Builder(온톨로지)</td><td>Preview</td><td>Fabric 사용 용량</td><td>Digital Twin Builder (preview)</td></tr>
+      <tr><td>Ontology (Fabric IQ)</td><td>Preview</td><td>Fabric 사용 용량</td><td>Users can create Ontology (preview) items</td></tr>
     </tbody>
   </table>
 
@@ -393,7 +394,7 @@ blockquote p { margin: .35rem 0; }
       <tr><td>3</td><td>라이선스 계획</td><td>뷰어 규모에 따라 F64 분기점 판단, Pro/PPU 필요 인원 산정</td></tr>
       <tr><td>4</td><td>용량 확보</td><td>체험으로 검증 → 유료 F SKU 생성(리전·SKU·용량 관리자 지정)</td></tr>
       <tr><td>5</td><td>워크스페이스 구성</td><td>팀/환경별 워크스페이스 + 보안 그룹 역할 + 도메인 정리</td></tr>
-      <tr><td>6</td><td>AI 기능 활성화</td><td>Copilot 확인, Data Agent 요건 충족, (필요 시) Digital Twin Builder(preview) 켜기 — 보안 그룹 파일럿 우선</td></tr>
+      <tr><td>6</td><td>AI 기능 활성화</td><td>Copilot 확인, Data Agent 요건 충족, (필요 시) Ontology(preview) 아이템 켜기 — 보안 그룹 파일럿 우선</td></tr>
       <tr><td>7</td><td>권한·거버넌스</td><td>OneLake 보안 역할, 민감도 레이블 게시, 감사 로그 확인</td></tr>
     </tbody>
   </table>
@@ -409,7 +410,7 @@ blockquote p { margin: .35rem 0; }
     <li><a href="https://learn.microsoft.com/fabric/admin/roles">Fabric admin roles</a> · <a href="https://learn.microsoft.com/fabric/admin/about-tenant-settings">About tenant settings</a></li>
     <li><a href="https://learn.microsoft.com/fabric/fundamentals/copilot-enable-fabric">Enable Copilot</a> · <a href="https://learn.microsoft.com/fabric/admin/service-admin-portal-copilot">Copilot/AI admin settings</a></li>
     <li><a href="https://learn.microsoft.com/fabric/data-science/concept-data-agent">Fabric data agent 개념</a> · <a href="https://learn.microsoft.com/fabric/data-science/data-agent-tenant-settings">Data agent tenant settings</a></li>
-    <li><a href="https://learn.microsoft.com/fabric/real-time-intelligence/digital-twin-builder/overview">Digital Twin Builder 개요</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/iq/ontology/overview">Ontology (Fabric IQ) 개요</a> · <a href="https://learn.microsoft.com/fabric/real-time-intelligence/digital-twin-builder/overview">Digital Twin Builder 개요</a></li>
     <li><a href="https://learn.microsoft.com/fabric/onelake/security/get-started-security">OneLake 데이터 보안</a> · <a href="https://learn.microsoft.com/fabric/governance/domains">Domains</a> · <a href="https://learn.microsoft.com/fabric/governance/information-protection">Information protection</a></li>
   </ul>
 
@@ -434,7 +435,7 @@ blockquote p { margin: .35rem 0; }
         ↓
 ③ Build workspaces Create workspace → assign capacity → assign roles → organize domains
         ↓
-④ Tenant settings  Enable Copilot · Data Agent · Digital Twin Builder (ontology)
+④ Tenant settings  Enable Copilot · Data Agent · Ontology (Fabric IQ)
         ↓
 ⑤ Permissions      OneLake security · sensitivity labels · audit logs</code></pre>
 
@@ -611,15 +612,16 @@ blockquote p { margin: .35rem 0; }
     <li><strong>Requirement</strong>: paid <strong>F2 or higher</strong> (or P1+) + <strong>the Copilot setting must be on</strong> (Data Agent is a Copilot-powered feature).</li>
     <li><strong>Required tenant settings</strong>: ① "Users can use Copilot and other features powered by Azure OpenAI" ② "Capacities can be designated as Fabric Copilot capacities" ③ (if the region is outside the boundary) the data processing/storage settings ④ the Copilot "Standalone Copilot experience" (to use Data Agent inside Copilot).</li>
     <li>⚠️ There is currently <strong>no standalone toggle literally named "create and share data agents"</strong> in the docs. Creation/sharing is governed by the Copilot/Azure OpenAI settings above plus standard workspace roles.</li>
-    <li><strong>Connectable data sources</strong> (up to 5 in any combination): Lakehouse · Warehouse · Power BI Semantic Model · KQL Database/Eventhouse · Mirrored Database · <strong>Ontology (Digital Twin Builder)</strong> · Microsoft Graph.</li>
+    <li><strong>Connectable data sources</strong> (up to 5 in any combination): Lakehouse · Warehouse · Power BI Semantic Model · KQL Database/Eventhouse · Mirrored Database · <strong>Ontology</strong> · Microsoft Graph.</li>
   </ul>
 
-  <h3>4.5 Ontology — Digital Twin Builder</h3>
+  <h3>4.5 Ontology — Ontology (Fabric IQ)</h3>
   <ul>
-    <li>In Fabric, "ontology" is delivered as the <strong>Digital Twin Builder</strong> item in Real-Time Intelligence (modeling business concepts as entities and relationships). Currently in <strong>Preview</strong>.</li>
-    <li><strong>Enable</strong>: a Fabric admin turns on <strong>"Digital Twin Builder (preview)"</strong> in tenant settings.</li>
-    <li><strong>Requirements/constraints</strong>: a workspace on a Fabric-enabled capacity. <strong>It is not compatible if "Autoscale Billing for Spark" is enabled on the tenant.</strong> Data must first land in a Lakehouse before being modeled into the ontology.</li>
+    <li>In Fabric, ontology is delivered as a <strong>standalone "Ontology (preview)" item in the Fabric IQ (preview) workload</strong> — a semantic layer that defines business concepts as entity types, properties, and relationships. Currently in <strong>Preview</strong>.</li>
+    <li><strong>Enable</strong>: a Fabric admin turns on <strong>"Users can create Ontology (preview) items"</strong> in tenant settings.</li>
+    <li><strong>Requirements</strong>: a workspace on a Fabric-enabled capacity; entities are data-bound to OneLake-backed sources (Lakehouse/Warehouse, etc.).</li>
     <li>Ontologies built here can be consumed as a <strong>data source for Data Agent</strong> (→ <a href="../04-fabric-data-agent/">04. Data Agent</a>, <a href="../03-fabric-ontology/">03. Ontology deep-dive</a>).</li>
+    <li>⚠️ Don't confuse it with <strong>Digital Twin Builder</strong> (a separate preview item in Real-Time Intelligence). Digital Twin Builder also models its own internal ontology, but it is a <strong>different product from the Ontology item</strong> above.</li>
   </ul>
 
   <table>
@@ -627,7 +629,7 @@ blockquote p { margin: .35rem 0; }
     <tbody>
       <tr><td>Copilot</td><td>GA</td><td>F2 (or P1)</td><td>Copilot and Azure OpenAI (on by default)</td></tr>
       <tr><td>Fabric Data Agent</td><td>GA</td><td>F2 (or P1)</td><td>Copilot setting + designate Copilot capacity</td></tr>
-      <tr><td>Digital Twin Builder (ontology)</td><td>Preview</td><td>Fabric-enabled capacity</td><td>Digital Twin Builder (preview)</td></tr>
+      <tr><td>Ontology (Fabric IQ)</td><td>Preview</td><td>Fabric-enabled capacity</td><td>Users can create Ontology (preview) items</td></tr>
     </tbody>
   </table>
 
@@ -659,7 +661,7 @@ blockquote p { margin: .35rem 0; }
       <tr><td>3</td><td>License plan</td><td>Decide the F64 tipping point by viewer count, size Pro/PPU needs</td></tr>
       <tr><td>4</td><td>Secure capacity</td><td>Validate with trial → create a paid F SKU (region, SKU, capacity admin)</td></tr>
       <tr><td>5</td><td>Build workspaces</td><td>Workspaces by team/env + security-group roles + domains</td></tr>
-      <tr><td>6</td><td>Enable AI features</td><td>Confirm Copilot, meet Data Agent requirements, (if needed) turn on Digital Twin Builder (preview) — pilot with a security group first</td></tr>
+      <tr><td>6</td><td>Enable AI features</td><td>Confirm Copilot, meet Data Agent requirements, (if needed) turn on the Ontology (preview) item — pilot with a security group first</td></tr>
       <tr><td>7</td><td>Permissions · governance</td><td>OneLake security roles, published sensitivity labels, audit logs verified</td></tr>
     </tbody>
   </table>
@@ -675,7 +677,7 @@ blockquote p { margin: .35rem 0; }
     <li><a href="https://learn.microsoft.com/fabric/admin/roles">Fabric admin roles</a> · <a href="https://learn.microsoft.com/fabric/admin/about-tenant-settings">About tenant settings</a></li>
     <li><a href="https://learn.microsoft.com/fabric/fundamentals/copilot-enable-fabric">Enable Copilot</a> · <a href="https://learn.microsoft.com/fabric/admin/service-admin-portal-copilot">Copilot/AI admin settings</a></li>
     <li><a href="https://learn.microsoft.com/fabric/data-science/concept-data-agent">Fabric data agent concept</a> · <a href="https://learn.microsoft.com/fabric/data-science/data-agent-tenant-settings">Data agent tenant settings</a></li>
-    <li><a href="https://learn.microsoft.com/fabric/real-time-intelligence/digital-twin-builder/overview">Digital Twin Builder overview</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/iq/ontology/overview">Ontology (Fabric IQ) overview</a> · <a href="https://learn.microsoft.com/fabric/real-time-intelligence/digital-twin-builder/overview">Digital Twin Builder overview</a></li>
     <li><a href="https://learn.microsoft.com/fabric/onelake/security/get-started-security">OneLake data security</a> · <a href="https://learn.microsoft.com/fabric/governance/domains">Domains</a> · <a href="https://learn.microsoft.com/fabric/governance/information-protection">Information protection</a></li>
   </ul>
 
