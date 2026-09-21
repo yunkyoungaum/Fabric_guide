@@ -153,59 +153,266 @@ blockquote p { margin: .35rem 0; }
   </div>
 
   <h1>Microsoft Fabric 온보딩 가이드</h1>
-  <p class="meta">Capacity 생성부터 Workspace 구성, 테넌트 기능 활성화, 역할·권한 설계까지 — Fabric를 처음 도입하는 팀을 위한 온보딩 체크리스트.</p>
+  <p class="meta">Capacity 생성부터 Workspace 구성, 테넌트 기능 활성화(Copilot · Data Agent · 온톨로지), 역할·권한 설계까지 — Fabric를 처음 도입하는 팀을 위한 실무 온보딩 안내서. (기준: 2026-09, 공식 문서 반영)</p>
 
   <blockquote>
-    <p><strong>작성 중(Draft)</strong> — 아래는 이 가이드에서 다룰 목차 틀입니다. 각 섹션의 상세 내용은 순차적으로 채워집니다.</p>
+    <p><strong>이 가이드를 다 읽으면</strong> ① 어떤 용량(SKU)과 라이선스를 살지, ② 워크스페이스를 어떻게 나눌지, ③ Copilot·Data Agent·온톨로지를 켜려면 어떤 테넌트 설정이 필요한지, ④ 권한을 어떻게 설계할지 판단할 수 있습니다.</p>
   </blockquote>
 
+  <h2>0. 온보딩 큰 그림</h2>
+  <p>Fabric 도입은 대략 다음 순서로 진행됩니다. 각 단계의 상세는 아래 섹션에서 다룹니다.</p>
+  <pre><code>① 사전 준비        Entra 테넌트 · 관리자 역할 · 라이선스 계획
+        ↓
+② Capacity 확보    Azure에서 F SKU 생성 (또는 60일 체험으로 검증)
+        ↓
+③ Workspace 구성   워크스페이스 생성 → 용량 할당 → 역할 배정 → 도메인 정리
+        ↓
+④ 테넌트 설정      Copilot · Data Agent · Digital Twin Builder(온톨로지) 활성화
+        ↓
+⑤ 권한 · 거버넌스  OneLake 보안 · 민감도 레이블 · 감사 로그</code></pre>
+
   <h2>1. 사전 준비 (Prerequisites)</h2>
+
+  <h3>1.1 Microsoft Entra 테넌트</h3>
   <ul>
-    <li>Microsoft Entra(테넌트)와 조직 계정 요건</li>
-    <li>필요한 라이선스 개관 — Fabric(F SKU) vs Power BI Premium(P SKU) vs 무료 체험(Trial)</li>
-    <li>관리자 역할: Fabric 관리자 / 용량 관리자 / 테넌트 관리자의 구분</li>
+    <li>Fabric는 조직 계정(Microsoft Entra ID) 기반으로 동작합니다. 용량을 만들 <strong>Azure 구독</strong>은 Fabric 테넌트와 <strong>같은 Entra 테넌트</strong>에 있어야 합니다.</li>
+    <li>B2B(게스트) 사용자는 <strong>용량 관리자(Capacity admin)로 지정할 수 없습니다.</strong></li>
   </ul>
 
+  <h3>1.2 라이선스의 두 축</h3>
+  <p>Fabric에서 협업하려면 <strong>두 가지</strong>가 모두 필요합니다 — ① 용량 라이선스(조직 단위) + ② 사용자별 라이선스(개인 단위).</p>
+  <table>
+    <thead><tr><th>사용자 라이선스</th><th>무엇을 할 수 있나</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Free</strong></td><td>테넌트에 Fabric가 켜져 있으면 첫 로그인 시 자동 부여. F(또는 체험) 용량 위에서 <strong>Power BI 외 Fabric 아이템</strong>(레이크하우스·웨어하우스·노트북 등)을 생성·공유 가능. 단 F64 미만에서는 Power BI 콘텐츠 열람 권한이 없음.</td></tr>
+      <tr><td><strong>Pro</strong></td><td>내 작업 영역 밖에서 Power BI 아이템을 생성·공유하려면 필요. 조직에 최소 1명은 Pro 또는 PPU가 있어야 Power BI 사용 가능.</td></tr>
+      <tr><td><strong>Premium Per User (PPU)</strong></td><td>대부분의 Power BI Premium 기능을 사용자 단위로 제공(대용량 모델, XMLA, 하루 48회 새로 고침 등). <strong>PPU는 Fabric 용량을 제공하지 않으므로</strong>, Power BI 외 아이템을 만들려면 여전히 F/체험 용량이 필요.</td></tr>
+    </tbody>
+  </table>
+  <blockquote>
+    <p><strong>핵심 규칙</strong> — F64 미만 용량에서는 Power BI 콘텐츠를 보는 사람도 각자 Pro/PPU가 필요합니다. <strong>F64 이상</strong>이면 Free 라이선스 + Viewer 역할만으로 Power BI 콘텐츠를 열람할 수 있습니다. 뷰어가 많은 조직에서 F64가 분기점이 되는 이유입니다.</p>
+  </blockquote>
+
+  <h3>1.3 관리자 역할 미리 정리</h3>
+  <table>
+    <thead><tr><th>역할</th><th>범위</th><th>할당 위치</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Fabric 관리자</strong> (또는 Power Platform 관리자)</td><td>테넌트 전체 — 관리 포털·테넌트 설정·감사</td><td>Microsoft 365 관리 센터 / Entra 역할</td></tr>
+      <tr><td><strong>용량 관리자</strong> (Capacity admin)</td><td>특정 용량 — 워크스페이스 할당, 용량 권한/워크로드 관리</td><td>용량 생성 시 지정</td></tr>
+      <tr><td><strong>워크스페이스 관리자</strong></td><td>단일 워크스페이스</td><td>워크스페이스 역할(§3)</td></tr>
+      <tr><td>Billing / License 관리자</td><td>구독 구매 · 라이선스 할당</td><td>Microsoft 365 관리 센터</td></tr>
+    </tbody>
+  </table>
+  <p>전용 Fabric 관리자 역할을 쓰면 <strong>전체 M365 관리자 권한을 주지 않고도</strong> Fabric 관리 권한만 위임할 수 있습니다(최소 권한 원칙).</p>
+
   <h2>2. Fabric Capacity 생성</h2>
+
+  <h3>2.1 Capacity와 Capacity Unit(CU)</h3>
+  <p>용량(Capacity)은 Fabric 워크로드가 사용하는 <strong>독립적인 컴퓨팅 리소스 풀</strong>입니다. 용량의 크기는 <strong>CU(Capacity Unit)</strong>로 표현되며, 모든 워크로드(데이터 엔지니어링·웨어하우스·실시간·Power BI 등)가 이 CU를 공유합니다.</p>
+
+  <h3>2.2 SKU 선택</h3>
+  <table>
+    <thead><tr><th>SKU</th><th>CU</th><th>Power BI 대응</th><th>참고</th></tr></thead>
+    <tbody>
+      <tr><td>F2</td><td>2</td><td>–</td><td>최소 SKU. 개발·PoC. Copilot/Data Agent 사용 가능(§4)</td></tr>
+      <tr><td>F4</td><td>4</td><td>–</td><td>체험 기본 크기 중 하나</td></tr>
+      <tr><td>F8</td><td>8</td><td>EM/A1</td><td></td></tr>
+      <tr><td>F16</td><td>16</td><td>EM2/A2</td><td></td></tr>
+      <tr><td>F32</td><td>32</td><td>EM3/A3</td><td></td></tr>
+      <tr><td><strong>F64</strong></td><td>64</td><td><strong>P1/A4</strong></td><td>Free 라이선스 Power BI 열람 분기점(§1.2)</td></tr>
+      <tr><td>F128 ~ F512</td><td>128 ~ 512</td><td>P2/P3/P4</td><td>운영 규모</td></tr>
+      <tr><td>F1024 ~ F8192</td><td>1024 ~ 8192</td><td>P5 ~</td><td>대규모(F2048/4096/8192는 P 대응 없음)</td></tr>
+    </tbody>
+  </table>
+  <blockquote>
+    <p>이 표의 Power BI 대응은 <strong>컴퓨팅 비교용 참고</strong>일 뿐, 기능·라이선스 동등성을 뜻하지 않습니다. 또한 Microsoft는 기존 Power BI Premium <strong>P SKU를 F SKU로 통합·정리</strong>하는 중이므로, 신규 구매는 F SKU를 기준으로 계획하세요.</p>
+  </blockquote>
+
+  <h3>2.3 Azure Portal에서 용량 만들기</h3>
+  <ol>
+    <li>Azure Portal 로그인 → <strong>Microsoft Fabric</strong> 서비스 검색·선택</li>
+    <li><strong>Create Fabric Capacity</strong> 선택</li>
+    <li><strong>Basics</strong> 탭에서 구독 · 리소스 그룹 · 용량 이름 · <strong>리전(Region)</strong> · <strong>크기(SKU)</strong> · <strong>용량 관리자</strong> 지정 (관리자는 같은 테넌트 소속이어야 함)</li>
+    <li>Tags → <strong>Review + create</strong></li>
+  </ol>
+  <p><strong>사전 요건:</strong> Fabric/Power BI 라이선스, 같은 테넌트의 Azure 구독, <code>Microsoft.Fabric</code> 리소스 공급자 등록, 충분한 CU 쿼터, 그리고 다음 Azure RBAC 권한 — <code>Microsoft.Fabric/capacities/</code> 의 <code>read</code> · <code>write</code> · <code>suspend/action</code> · <code>resume/action</code>.</p>
+
+  <h3>2.4 종량제 vs 예약</h3>
   <ul>
-    <li>Capacity(용량)란 무엇인가 — CU(Capacity Unit)와 과금 모델</li>
-    <li>SKU 선택 기준: F2 ~ F2048, 워크로드별 권장 시작점</li>
-    <li>Azure Portal에서 Fabric Capacity 프로비저닝(리소스 그룹·리전 선택)</li>
-    <li>일시 중지(Pause)/재개(Resume)와 비용 절감, Autoscale·Smoothing 개념</li>
-    <li>체험(Trial) 용량으로 먼저 검증하기</li>
+    <li><strong>종량제(Pay-as-you-go)</strong> — 약정 없이 <strong>초 단위 과금(최소 1분)</strong>. 리전별 가격.</li>
+    <li><strong>예약(Reservation)</strong> — 특정 리전에 일정 CU를 <strong>1년 또는 3년</strong> 약정하면 종량제보다 저렴한 예약 요금 적용. <strong>용량 사용분만</strong> 커버하며 스토리지·네트워킹은 별도. 자동 갱신은 기본 꺼짐.</li>
+  </ul>
+  <blockquote>
+    <p>구체적인 예약 할인율(%)은 공식 학습 문서에 수치로 명시되어 있지 않고 <a href="https://azure.microsoft.com/pricing/details/microsoft-fabric/">Fabric 가격 페이지</a>를 따르며 리전에 따라 다릅니다. 도입 계획 시 가격 페이지에서 직접 확인하세요.</p>
+  </blockquote>
+
+  <h3>2.5 일시 중지 / 재개와 비용</h3>
+  <ul>
+    <li>F SKU는 사용하지 않을 때 <strong>일시 중지(Pause)</strong>해 비용을 아낄 수 있습니다(P SKU는 불가).</li>
+    <li>일시 중지 시, 남아 있는 <strong>누적 초과분·스무딩된 작업이 합산되어 즉시 청구</strong>됩니다. 또한 일시 중지는 <strong>즉시 스로틀링을 해제</strong>하는 수단이기도 합니다.</li>
+    <li>⚠️ 일시 중지하면 해당 용량의 Fabric 콘텐츠가 사용 불가가 되므로, 사용 중이 아닌지 확인 후 진행하세요.</li>
+  </ul>
+
+  <h3>2.6 스무딩 · 버스팅 · 스로틀링(개념)</h3>
+  <p>Fabric는 30초 단위 시점으로 사용량을 평가합니다.</p>
+  <ul>
+    <li><strong>버스팅(Bursting)</strong> — 큰 작업을 빠르게 끝내도록 일시적으로 provisioned 용량보다 많은 컴퓨팅을 사용.</li>
+    <li><strong>스무딩(Smoothing)</strong> — 사용량을 이후 시점으로 평탄화. 대화형은 5~64분, 백그라운드는 24시간에 걸쳐 분산.</li>
+    <li><strong>스로틀링</strong> — 미래 용량을 과도하게 당겨 쓰면 단계적으로 지연/거부됩니다.</li>
+  </ul>
+  <table>
+    <thead><tr><th>미래 용량 사용</th><th>영향</th></tr></thead>
+    <tbody>
+      <tr><td>≤ 10분</td><td>보호 구간 — 스로틀링 없음</td></tr>
+      <tr><td>10 ~ 60분</td><td>대화형 요청 제출 시 20초 지연</td></tr>
+      <tr><td>60분 ~ 24시간</td><td>대화형 요청 거부(백그라운드는 실행)</td></tr>
+      <tr><td>&gt; 24시간</td><td>모든 요청 거부</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.7 체험(Trial) 용량으로 먼저 검증</h3>
+  <ul>
+    <li><strong>60일</strong> 무료. 현재 <strong>F4(4 CU) 또는 F64(64 CU)</strong>로 프로비저닝됩니다(과거 "체험=F64"에서 변경).</li>
+    <li>모든 워크로드 사용, 워크스페이스 협업, 용량 메트릭 앱, <strong>OneLake 1 TB</strong> 저장 포함.</li>
+    <li>❗ <strong>체험에서 제외</strong>: <strong>Copilot</strong>, <strong>Data agent / AI functions / AI services</strong>, Trusted Workspace Access, Private Link. → AI 기능을 검증하려면 <strong>유료 F 용량</strong>이 필요합니다.</li>
+    <li>만료 시 워크스페이스는 Pro로 재할당되고 Power BI 외 아이템은 비활성화됩니다(콘텐츠는 OneLake에 7일 보관 후 유료 용량 재할당 시 복구).</li>
   </ul>
 
   <h2>3. Workspace 생성 및 용량 할당</h2>
+
+  <h3>3.1 워크스페이스 만들기</h3>
+  <ol>
+    <li>탐색 창 → <strong>Workspaces</strong> → <strong>New workspace</strong></li>
+    <li>고유 <strong>이름</strong>(필수) · 설명(선택) 입력, 필요 시 <strong>도메인</strong> 지정</li>
+    <li><strong>Advanced</strong>에서 연락처 목록, <strong>워크스페이스 유형</strong>(예전 명칭 "라이선스 모드"), 기본 저장 형식 등 설정</li>
+  </ol>
+  <p>워크스페이스는 생성 시 용량에 <strong>할당</strong>됩니다. 이후 워크스페이스 관리자/용량 관리자/용량 기여자 권한이 있으면 다른 용량으로 재할당할 수 있습니다(특정 용량 선택은 Fabric 유형 워크스페이스에서만 가능).</p>
+
+  <h3>3.2 워크스페이스 역할</h3>
+  <table>
+    <thead><tr><th>할 수 있는 일</th><th>Admin</th><th>Member</th><th>Contributor</th><th>Viewer</th></tr></thead>
+    <tbody>
+      <tr><td>워크스페이스 수정·삭제</td><td>✅</td><td></td><td></td><td></td></tr>
+      <tr><td>사용자 추가·제거(관리자 포함)</td><td>✅</td><td></td><td></td><td></td></tr>
+      <tr><td>하위 권한 멤버 추가 · 재공유 허용</td><td>✅</td><td>✅</td><td></td><td></td></tr>
+      <tr><td>워크스페이스 ID 생성 · Git 연결</td><td>✅</td><td></td><td></td><td></td></tr>
+      <tr><td>아이템 생성·수정·삭제, 작업 실행</td><td>✅</td><td>✅</td><td>✅</td><td></td></tr>
+      <tr><td>OneLake API/Spark로 데이터 읽기(ReadAll)</td><td>✅</td><td>✅</td><td>✅</td><td></td></tr>
+      <tr><td>메타데이터·실행 결과 열람</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+      <tr><td>SQL 분석 엔드포인트로 데이터 읽기(ReadData)</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    </tbody>
+  </table>
   <ul>
-    <li>Workspace 생성과 Capacity 바인딩</li>
-    <li>Workspace 역할: Admin · Member · Contributor · Viewer</li>
-    <li>도메인(Domains)과 워크스페이스 구성 전략(팀·프로젝트·환경 분리)</li>
-    <li>OneLake와 워크스페이스의 관계</li>
+    <li><strong>Admin</strong>: 전체 제어(워크스페이스 삭제, 관리자 관리, Git 연결).</li>
+    <li><strong>Member</strong>: 멤버 추가·재공유·데이터 읽기/쓰기 가능, 단 워크스페이스 삭제·관리자 추가 불가.</li>
+    <li><strong>Contributor</strong>: "빌더" 역할 — 아이템 생성/수정/실행 가능, 사람 관리·재공유 불가.</li>
+    <li><strong>Viewer</strong>: 읽기 전용. 데이터는 SQL 엔드포인트(ReadData)로만 접근하며, OneLake 직접 읽기는 별도 OneLake 보안 역할이 필요.</li>
+  </ul>
+  <p>역할은 개인뿐 아니라 <strong>보안 그룹·M365 그룹·서비스 주체</strong>에도 부여할 수 있고, 여러 그룹에 속하면 <strong>가장 높은 권한</strong>이 적용됩니다.</p>
+
+  <h3>3.3 워크스페이스 구성 전략</h3>
+  <ul>
+    <li>팀·프로젝트·환경(dev/test/prod)별로 분리하고, 역할은 <strong>보안 그룹</strong>에 부여해 관리 부담을 줄이세요.</li>
+    <li><strong>도메인(Domain)</strong>으로 여러 워크스페이스를 업무 영역(마케팅·영업 등)별로 묶으면 OneLake 카탈로그에서 필터링·거버넌스가 쉬워집니다. 단 <strong>도메인 지정은 접근 권한을 바꾸지 않습니다</strong>(가시성/접근은 워크스페이스 역할·아이템 권한이 결정).</li>
   </ul>
 
   <h2>4. 테넌트 설정 — 기능 활성화</h2>
-  <p>온톨로지, Data Agent, Copilot 등 신규 기능은 테넌트 관리 설정에서 명시적으로 켜야 합니다.</p>
+  <p>Copilot·Data Agent·온톨로지 같은 기능은 <strong>관리 포털의 테넌트 설정</strong>에서 명시적으로 켜야 합니다.</p>
+
+  <h3>4.1 관리 포털 · 테넌트 설정 접근</h3>
+  <ol>
+    <li>Fabric 포털(app.fabric.microsoft.com)에 <strong>Fabric 관리자</strong>로 로그인</li>
+    <li>상단 <strong>설정(⚙️)</strong> → <strong>Governance and insights</strong> 아래 <strong>Admin portal</strong></li>
+    <li><strong>Tenant settings</strong> 선택</li>
+  </ol>
+  <p>설정 변경은 적용까지 <strong>최대 15분</strong>(일부 AI 설정은 최대 1시간) 걸릴 수 있습니다.</p>
+
+  <h3>4.2 보안 그룹 기반 단계적 배포</h3>
+  <p>대부분의 테넌트 설정은 다음처럼 범위를 지정할 수 있습니다 — 조직 전체 사용 / 전체 사용(특정 그룹 제외) / <strong>특정 보안 그룹만 사용</strong> / 특정 그룹 사용(일부 제외). <strong>파일럿 그룹에 먼저 켜고 점진적으로 확대</strong>하는 방식으로 안전하게 롤아웃하세요.</p>
+
+  <h3>4.3 Copilot 및 AI 기능</h3>
   <ul>
-    <li>관리 포털 → 테넌트 설정 접근 경로</li>
-    <li>Copilot 및 AI 기능 활성화(용량 요건 포함)</li>
-    <li>Data Agent(데이터 에이전트) 생성 허용 설정</li>
-    <li>온톨로지 관련 미리 보기(Preview) 기능 활성화</li>
-    <li>보안 그룹 기반 단계적 배포(파일럿 → 전사)</li>
+    <li>설정 그룹: <strong>"Copilot and AI"</strong>. 핵심 설정 <strong>"Users can use Copilot and other features powered by Azure OpenAI"</strong>는 <strong>기본 사용(Enabled)</strong>.</li>
+    <li>요건: <strong>유료 F2 이상</strong> 용량(또는 Power BI Premium P1 이상). <em>과거의 F64 전용 요건은 더 이상 유효하지 않습니다.</em></li>
+    <li>Pro/PPU 워크스페이스에서는 <strong>Fabric Copilot 용량</strong>을 별도로 지정해 워크스페이스를 연결할 수 있습니다.</li>
+    <li>용량 리전이 EU 데이터 경계·미국 밖이면 데이터 처리/저장을 국경 밖에서 허용하는 설정(기본 꺼짐)을 추가로 켜야 할 수 있습니다.</li>
   </ul>
 
-  <h2>5. 권한 · 거버넌스 설계</h2>
+  <h3>4.4 Fabric Data Agent</h3>
   <ul>
-    <li>역할 기반 접근(RBAC)과 아이템 수준 권한</li>
-    <li>OneLake 데이터 접근 권한과 공유 모델</li>
-    <li>민감도 레이블(Sensitivity Label)과 데이터 보호</li>
-    <li>감사 로그와 모니터링</li>
+    <li><strong>이름/상태</strong>: 예전 "AI skills"에서 <strong>"Fabric data agent"</strong>로 개명, 현재 <strong>정식 출시(GA)</strong>.</li>
+    <li><strong>요건</strong>: 유료 <strong>F2 이상</strong>(또는 P1 이상) + <strong>Copilot 설정이 켜져 있어야 함</strong>(Data Agent는 Copilot 기반 기능).</li>
+    <li><strong>필요한 테넌트 설정</strong>: ①"Users can use Copilot and other features powered by Azure OpenAI" ②"Capacities can be designated as Fabric Copilot capacities" ③(국경 밖 리전이면) 데이터 처리·저장 관련 설정 ④Copilot의 "Standalone Copilot experience"(Copilot 안에서 Data Agent를 쓰려면).</li>
+    <li>⚠️ 현재 공식 문서에는 <strong>"데이터 에이전트 생성·공유"라는 이름의 단독 토글은 없습니다.</strong> 생성·공유는 위 Copilot/Azure OpenAI 설정 + 표준 워크스페이스 역할로 제어됩니다.</li>
+    <li><strong>연결 가능한 데이터 소스</strong>(최대 5개 조합): Lakehouse · Warehouse · Power BI Semantic Model · KQL Database/Eventhouse · Mirrored Database · <strong>Ontology(Digital Twin Builder)</strong> · Microsoft Graph.</li>
+  </ul>
+
+  <h3>4.5 온톨로지 — Digital Twin Builder</h3>
+  <ul>
+    <li>Fabric에서 "온톨로지"는 <strong>Real-Time Intelligence의 Digital Twin Builder</strong> 아이템으로 제공됩니다(현업 개념을 엔터티·관계로 모델링). 현재 <strong>미리 보기(Preview)</strong>.</li>
+    <li><strong>활성화</strong>: 테넌트 설정에서 <strong>"Digital Twin Builder (preview)"</strong>를 Fabric 관리자가 켭니다.</li>
+    <li><strong>요건/제약</strong>: Fabric 사용 용량의 워크스페이스 필요. <strong>테넌트에 "Autoscale Billing for Spark"가 켜져 있으면 호환되지 않습니다.</strong> 데이터는 먼저 Lakehouse로 들어온 뒤 온톨로지로 모델링됩니다.</li>
+    <li>여기서 만든 온톨로지는 <strong>Data Agent의 데이터 소스</strong>로 소비할 수 있습니다(→ <a href="../04-fabric-data-agent/">04. Data Agent</a>, <a href="../03-fabric-ontology/">03. 온톨로지 심화</a>).</li>
+  </ul>
+
+  <table>
+    <thead><tr><th>기능</th><th>상태</th><th>최소 용량</th><th>핵심 테넌트 설정</th></tr></thead>
+    <tbody>
+      <tr><td>Copilot</td><td>GA</td><td>F2 (또는 P1)</td><td>Copilot and Azure OpenAI (기본 켜짐)</td></tr>
+      <tr><td>Fabric Data Agent</td><td>GA</td><td>F2 (또는 P1)</td><td>Copilot 설정 + Copilot 용량 지정</td></tr>
+      <tr><td>Digital Twin Builder(온톨로지)</td><td>Preview</td><td>Fabric 사용 용량</td><td>Digital Twin Builder (preview)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5. 권한 · 거버넌스 설계</h2>
+
+  <h3>5.1 두 개의 보안 평면</h3>
+  <ul>
+    <li><strong>제어 평면(Control plane)</strong> — 아이템에 "무엇을 할 수 있나"(생성·구성·공유·관리). 워크스페이스 역할 + 아이템 권한으로 설정.</li>
+    <li><strong>데이터 평면(Data plane)</strong> — "어떤 데이터를 볼 수 있나". OneLake의 경우 <strong>OneLake 보안</strong>으로 폴더·테이블·스키마·행·열까지 범위를 좁힘.</li>
+  </ul>
+  <p>Admin/Member/Contributor는 이미 데이터 읽기/쓰기 권한을 가지며, <strong>OneLake 보안 역할은 주로 Viewer 또는 Read 권한 사용자에게 데이터 접근을 부여</strong>할 때 씁니다. OneLake 보안 역할은 Admin/Member가 만들 수 있고 행·열 수준 보안을 지원합니다.</p>
+
+  <h3>5.2 아이템 단위 공유</h3>
+  <p>워크스페이스 멤버가 아니어도 개별 아이템을 공유할 수 있습니다 — 권한 수준은 <strong>Read / ReadData / ReadAll / Write</strong>로 나뉘며, SQL 분석 엔드포인트 접근은 엔드포인트 모드(Delegated 등)에 따라 달라집니다.</p>
+
+  <h3>5.3 민감도 레이블 · 감사</h3>
+  <ul>
+    <li><strong>민감도 레이블</strong>: Microsoft Purview Information Protection의 레이블·정책을 Fabric/Power BI에 적용. 적절한 Purview 라이선스가 필요하고, 레이블을 먼저 정의·게시해야 합니다. 수동/기본/(Power BI 한정)필수 레이블, 다운스트림 상속 등을 지원.</li>
+    <li><strong>감사·모니터링</strong>: Microsoft Purview 감사 로그, OneLake 카탈로그의 거버넌스 경험으로 레이블 적용 현황·민감 데이터를 파악.</li>
+    <li>조건부 접근은 Microsoft Entra/Azure에서, 사용자·라이선스 관리는 M365 관리 센터에서 수행.</li>
   </ul>
 
   <h2>6. 온보딩 체크리스트</h2>
-  <p>도입 완료 여부를 확인하는 단계별 점검표(작성 예정).</p>
+  <table>
+    <thead><tr><th>#</th><th>항목</th><th>완료 기준</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Entra 테넌트 · Azure 구독</td><td>같은 테넌트에 구독 준비, <code>Microsoft.Fabric</code> 공급자 등록</td></tr>
+      <tr><td>2</td><td>관리자 역할 지정</td><td>Fabric 관리자 · Billing 관리자 배정(최소 권한)</td></tr>
+      <tr><td>3</td><td>라이선스 계획</td><td>뷰어 규모에 따라 F64 분기점 판단, Pro/PPU 필요 인원 산정</td></tr>
+      <tr><td>4</td><td>용량 확보</td><td>체험으로 검증 → 유료 F SKU 생성(리전·SKU·용량 관리자 지정)</td></tr>
+      <tr><td>5</td><td>워크스페이스 구성</td><td>팀/환경별 워크스페이스 + 보안 그룹 역할 + 도메인 정리</td></tr>
+      <tr><td>6</td><td>AI 기능 활성화</td><td>Copilot 확인, Data Agent 요건 충족, (필요 시) Digital Twin Builder(preview) 켜기 — 보안 그룹 파일럿 우선</td></tr>
+      <tr><td>7</td><td>권한·거버넌스</td><td>OneLake 보안 역할, 민감도 레이블 게시, 감사 로그 확인</td></tr>
+    </tbody>
+  </table>
 
   <hr />
-  <p class="meta">최종 수정 2026-09-21 · 상태: Draft</p>
+  <h2>참고 문서</h2>
+  <ul>
+    <li><a href="https://learn.microsoft.com/fabric/enterprise/licenses">Microsoft Fabric licenses (SKU·CU·라이선스)</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/enterprise/buy-capacity">Buy a Microsoft Fabric capacity</a> · <a href="https://learn.microsoft.com/azure/cost-management-billing/reservations/fabric-capacity">Fabric capacity reservations</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/enterprise/pause-resume">Pause and resume capacity</a> · <a href="https://learn.microsoft.com/fabric/enterprise/throttling">Throttling</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/fundamentals/fabric-trial">Fabric trial</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/fundamentals/roles-workspaces">Roles in workspaces</a> · <a href="https://learn.microsoft.com/fabric/fundamentals/create-workspaces">Create a workspace</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/admin/roles">Fabric admin roles</a> · <a href="https://learn.microsoft.com/fabric/admin/about-tenant-settings">About tenant settings</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/fundamentals/copilot-enable-fabric">Enable Copilot</a> · <a href="https://learn.microsoft.com/fabric/admin/service-admin-portal-copilot">Copilot/AI admin settings</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/data-science/concept-data-agent">Fabric data agent 개념</a> · <a href="https://learn.microsoft.com/fabric/data-science/data-agent-tenant-settings">Data agent tenant settings</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/real-time-intelligence/digital-twin-builder/overview">Digital Twin Builder 개요</a></li>
+    <li><a href="https://learn.microsoft.com/fabric/onelake/security/get-started-security">OneLake 데이터 보안</a> · <a href="https://learn.microsoft.com/fabric/governance/domains">Domains</a> · <a href="https://learn.microsoft.com/fabric/governance/information-protection">Information protection</a></li>
+  </ul>
+
+  <p class="meta">최종 수정 2026-09-21 · 상태: Published · 기준 문서 2026-08~09</p>
 
 </main>
 

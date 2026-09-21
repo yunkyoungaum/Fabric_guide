@@ -25,7 +25,7 @@ window.GUIDES = [
       "Fabric를 처음 도입할 때 필요한 용량(Capacity) 생성과 SKU 선택, 워크스페이스 구성, 온톨로지·Data Agent·Copilot 기능 활성화(테넌트 설정), 역할·권한 설계를 단계별로 정리합니다.",
     tags: ["온보딩", "Capacity", "Workspace", "테넌트 설정", "권한"],
     updated: "2026-09-21",
-    status: "draft",
+    status: "published",
     source: "source.md"
   },
   {
